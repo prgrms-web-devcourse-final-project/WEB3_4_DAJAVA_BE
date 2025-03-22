@@ -9,6 +9,7 @@ import com.dajava.backend.domain.home.dto.SampleRequest;
 import com.dajava.backend.domain.home.dto.SampleResponse;
 import com.dajava.backend.domain.home.service.SampleService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequestMapping("/v1")
+@Tag(name = "HomeController", description = "API 샘플 컨트롤러")
 @RequiredArgsConstructor
 public class HomeController {
 
@@ -33,7 +35,7 @@ public class HomeController {
 	 * @param request Sample 로직에 필요한 요청 정보
 	 * @return SampleResponse (DTO)
 	 */
-	@GetMapping("/")
+	@GetMapping
 	public SampleResponse home(
 		@RequestBody SampleRequest request
 	){
