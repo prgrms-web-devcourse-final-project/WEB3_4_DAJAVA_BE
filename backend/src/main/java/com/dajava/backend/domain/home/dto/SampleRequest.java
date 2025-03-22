@@ -1,4 +1,8 @@
 package com.dajava.backend.domain.home.dto;
 
-public record SampleRequest() {
-}
+import lombok.NonNull;
+
+public record SampleRequest(
+	@NonNull
+	String content
+) { }
