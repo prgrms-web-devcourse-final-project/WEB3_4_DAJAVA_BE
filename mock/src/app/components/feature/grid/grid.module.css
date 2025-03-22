@@ -1,0 +1,30 @@
+.wrap{
+     width: 100%;
+    max-width: calc(100% - var(--layout_mobile_padding));
+    display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      
+        margin: 0 auto;
+      
+        overflow-x: auto;
+        overflow-y: hidden;
+      
+        transition: transform 0.3s ease;
+      
+        @media screen and (min-width: 765px) {
+          min-width: 71.6rem;
+          max-width: calc(100% - var(--layout_tablet_padding));
+        }
+      
+        @media screen and (min-width: 1025px) {
+          min-width: 90.3rem;
+          max-width: calc(100% - var(--layout_pc_padding));
+        }
+  }
+  
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

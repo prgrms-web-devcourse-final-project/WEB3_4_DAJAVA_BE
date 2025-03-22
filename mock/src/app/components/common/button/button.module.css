@@ -1,0 +1,136 @@
+@keyframes Action {
+    0% {
+      width: 0px;
+      height: 0px;
+      opacity: 0.15;
+    }
+    100% {
+      width: 450px;
+      height: 450px;
+      opacity: 0;
+    }
+  }
+  
+  @keyframes Rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* 기본 버튼 */
+  .button {
+    position: relative;
+  
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+  
+    background-color: var(--color_sub_theme);
+  
+    font-size: 1.6rem;
+    color: var(--inverted_color_text);
+    white-space: nowrap;
+  
+    padding: 1.3rem 0.5rem;
+  
+    overflow: hidden;
+    transition: all 0.3s ease;
+  
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .button:disabled {
+    background: var(--color_disabled);
+  
+    color: var(--color_sub_disabled);
+  
+    cursor: not-allowed;
+  }
+  
+  .button:not(:disabled):hover {
+    background-color: var(--color_theme);
+  }
+  
+  .button:not(:disabled):focus {
+    color: var(--primary);
+    border: 1px solid var(--color_theme);
+    font-weight: bold;
+  }
+  
+  /* 아웃라인 버튼 */
+  .button.out-line {
+    border: 1px solid var(--color_theme);
+  
+    background-color: var(--inverted_color_text);
+  
+    color: var(--color_theme);
+  }
+  
+  .button.out-line:disabled {
+    border: 1px solid var(--color_disabled);
+    background: var(--color_disabled);
+  
+    color: var(--color_sub_disabled);
+  
+    cursor: not-allowed;
+  }
+  
+  .button.out-line:not(:disabled):hover {
+    background-color: var(--color_theme);
+    color: var(--inverted_color_text);
+  }
+  
+  /* 텍스트 버튼 */
+  .button.text {
+    border: none;
+  
+    background-color: transparent;
+  
+    color: var(--inverted_color_sub_text);
+  
+    padding: 0;
+  }
+  
+  .button.text:disabled {
+    background-color: transparent;
+  
+    color: var(--color_sub_disabled);
+  
+    cursor: not-allowed;
+  }
+  
+  .button.text:not(:disabled):hover {
+    border: none;
+    background-color: transparent;
+  
+    color: var(--color_theme);
+  
+    font-weight: 600;
+  }
+  
+  .button.text:not(:disabled):focus {
+    border: none;
+  }
+  
+  .button .active {
+    display: block;
+  
+    position: absolute;
+  
+    border-radius: 50%;
+  
+    background-color: var(--disabled);
+  
+    pointer-events: none;
+  
+    transform: translate(-50%, -50%);
+    animation: Action 0.6s linear;
+  }
+  
+  .button.icon {
+    animation: Rotate 2s linear infinite;
+  }
+  

@@ -1,0 +1,26 @@
+.wrap {
+    width: 100%;
+  
+    position: absolute;
+    top: -999rem;
+    left: -999rem;
+  
+    background-color: var(--color_sub_theme);
+    color: var(--inverted_color_text);
+    font-size: 1.8rem;
+  
+    padding: 1rem 0;
+  
+    transition: all 0.5s ease;
+  
+    @media screen and (min-width: 765px) {
+      padding: 2rem 0;
+    }
+  }
+  
+  .wrap:focus {
+    position: static;
+    top: auto;
+    left: auto;
+  }
+  

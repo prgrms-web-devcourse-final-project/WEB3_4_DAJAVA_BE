@@ -1,0 +1,111 @@
+.wrap {
+    width: 100%;
+  
+    display: none;
+  
+    @media screen and (min-width: 765px) {
+      display: block;
+      height: 15rem;
+    }
+  
+    @media screen and (min-width: 1025px) {
+      height: 10.4rem;
+    }
+  }
+  
+  .container {
+    width: 100%;
+    height: 100%;
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+  
+    position: relative;
+  
+    @media screen and (min-width: 1025px) {
+      max-width: calc(100% - 5rem);
+      flex-direction: row;
+  
+      gap: 5rem;
+  
+      margin: 0 0 0 auto;
+    }
+  
+    @media screen and (min-width: 1280px) {
+      max-width: calc(100% - 12rem);
+    }
+  
+    @media screen and (min-width: 1440px) {
+      max-width: calc(100% - 24rem);
+    }
+  }
+  
+  .logo {
+    height: 100%;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .web-header-account-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    gap: 2rem;
+    padding: 0 10rem;
+  }
+  
+  .text {
+    cursor: pointer;
+  }
+  
+  .custom-header-web-gnb {
+    max-width: 100%;
+  
+    width: 100%;
+    height: 100%;
+  
+    display: none;
+    font-size: var(--m);
+    color: var(--background);
+    background-color: var(--primary);
+  
+    @media (min-width: 1350px) {
+      max-width: 70%;
+    }
+  
+    @media screen and (min-width: 765px) {
+      display: flex;
+      position: relative;
+      justify-content: space-evenly;
+    }
+  }
+  
+  .auth {
+    width: 100%;
+  
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  
+    position: absolute;
+    top: 5rem;
+    right: 2rem;
+  
+    color: var(--color_footer);
+  
+    margin: 0 auto 0 0;
+  
+    gap: 2rem;
+  
+    @media screen and (min-width: 1025px) {
+      max-width: calc(100% - calc(100% - var(--layout_pc_padding)));
+  
+      top: 1rem;
+    }
+  }

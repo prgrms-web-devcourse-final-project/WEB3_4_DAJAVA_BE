@@ -1,0 +1,17 @@
+.wrap {
+    display: inline-flex;
+    position: relative;
+  
+    gap: 1rem;
+    cursor: pointer;
+  }
+  
+  .arrow {
+    display: none;
+  
+    @media (min-width: 1025px) {
+      display: inline-block;
+    }
+  }
+
+  

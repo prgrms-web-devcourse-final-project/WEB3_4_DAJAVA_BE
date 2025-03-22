@@ -1,0 +1,20 @@
+ 
+.list {
+    display: flex;
+    gap: 1rem;
+    cursor: pointer;
+  
+    @media screen and (min-width: 1025px) {
+      gap: 1.5rem;
+    }
+  }
+  
+  .link {
+    font-size: 1.4rem;
+  }
+  
+  .link:hover {
+    color: var(--color_theme);
+    font-weight: bold;
+  }
+  

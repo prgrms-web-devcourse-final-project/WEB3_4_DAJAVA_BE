@@ -1,0 +1,26 @@
+.wrap {
+    width: 100%;
+    @media screen and (min-width: 1025px) {
+      padding: 5rem 0;
+    }
+  }
+  
+  .container {
+    width: 100%;
+    height: 20rem;
+    display: block;    
+    position: relative;
+    margin: 0 auto;
+  
+    @media screen and (min-width: 765px) {
+      min-width: 71.6rem;
+      max-width: calc(100% - var(--layout_tablet_padding));
+    }
+  
+    @media screen and (min-width: 1025px) {
+      min-width: 100.3rem;
+      max-width: calc(100% - var(--layout_pc_padding));
+      height: 20rem;
+    }
+  }
+  

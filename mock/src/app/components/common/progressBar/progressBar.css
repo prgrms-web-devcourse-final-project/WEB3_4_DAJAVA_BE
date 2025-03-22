@@ -1,0 +1,33 @@
+#nprogress {
+    width: 100%;
+    height: 4px;
+  
+    position: fixed;
+  
+    top: 0;
+    left: 0;
+    z-index: 9999;
+  }
+  
+  #nprogress .bar {
+    width: 100%;
+    height: 4px;
+    position: fixed;
+  
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    background-color: rgb(80, 190, 241);
+    box-shadow: 0 0 2px rgb(80, 190, 241);
+  }
+  
+  #nprogree .peg {
+    width: 100%;
+    height: 0;
+  
+    display: block;
+    position: absolute;
+    transform: rotate(3deg) translate(0px, -4px);
+    box-shadow: 0 0 10px rgb(80, 190, 241), 0 0 5px rgb(80, 190, 241);
+  }
+  
