@@ -1,8 +1,10 @@
 package com.dajava.backend.domain.home.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.home.dto.SampleRequest;
@@ -36,9 +38,10 @@ public class HomeController {
 	 * @return SampleResponse (DTO)
 	 */
 	@GetMapping
+	@ResponseStatus(HttpStatus.OK)
 	public SampleResponse home(
 		@RequestBody SampleRequest request
-	){
+	) {
 		SampleResponse response = sampleService.sampleLogic(request);
 		log.info("Response Data : {}", request.toString());
 		return response;
