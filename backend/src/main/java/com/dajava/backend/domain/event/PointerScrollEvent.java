@@ -26,7 +26,7 @@ public class PointerScrollEvent extends BaseTimeEntity {
 	private long id;
 
 	@Column(nullable = false)
-	int clientY;
+	int scrollY;
 
 	@Column(nullable = false)
 	String pageUrl;
@@ -45,7 +45,7 @@ public class PointerScrollEvent extends BaseTimeEntity {
 	private SessionData sessionData;
 
 	public static PointerScrollEvent create(
-		int clientY,
+		int scrollY,
 		String pageUrl,
 		int browserWidth,
 		String sessionId,
@@ -53,7 +53,7 @@ public class PointerScrollEvent extends BaseTimeEntity {
 		SessionData sessionData
 	) {
 		PointerScrollEvent event = PointerScrollEvent.builder()
-			.clientY(clientY)
+			.scrollY(scrollY)
 			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)
