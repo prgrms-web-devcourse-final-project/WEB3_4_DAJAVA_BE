@@ -1,5 +1,7 @@
 package com.dajava.backend.domain.event.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.dajava.backend.domain.event.SessionData;
@@ -12,5 +14,8 @@ import com.dajava.backend.domain.event.SessionData;
  * @since 2025-03-24
  */
 public interface SessionDataRepository extends JpaRepository<SessionData, Long> {
+	Optional<SessionData> findByPageUrlAndSessionIdAndMemberSerialNumber(
+		String pageUrl, String sessionId, String memberSerialNumber
+	);
 }
 
