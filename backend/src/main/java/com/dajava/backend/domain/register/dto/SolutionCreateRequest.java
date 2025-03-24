@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.solution.dto;
+package com.dajava.backend.domain.register.dto;
 
 import java.time.LocalDateTime;
 

@@ -1,9 +1,9 @@
-package com.dajava.backend.domain.solution.entity;
+package com.dajava.backend.domain.register.entity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.dajava.backend.domain.solution.dto.SolutionCreateRequest;
+import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
 import com.dajava.backend.global.common.BaseTimeEntity;
 
 import jakarta.persistence.Column;

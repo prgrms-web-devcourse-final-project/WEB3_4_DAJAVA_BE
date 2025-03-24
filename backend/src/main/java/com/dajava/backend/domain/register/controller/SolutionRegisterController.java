@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.solution.controller;
+package com.dajava.backend.domain.register.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.solution.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.solution.dto.SolutionCreateResponse;
-import com.dajava.backend.domain.solution.service.SolutionService;
+import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
+import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
+import com.dajava.backend.domain.register.service.SolutionRegisterService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,8 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * SolutionController
- * "/v1/solution" 로 들어오는 API 컨트롤러
+ * SolutionRegisterController
+ * "/v1/solution" 로 들어오는 신청 관련 API 컨트롤러
  * 신청관련 요청을 처리
  *
  * @author ChoiHyunSan
@@ -25,12 +25,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequestMapping("/v1/solution")
-@Tag(name = "SolutionController", description = "API 신청 폼 컨트롤러")
+@Tag(name = "SolutionRegisterController", description = "API 신청 폼 컨트롤러")
 @RestController
 @RequiredArgsConstructor
-public class SolutionController {
+public class SolutionRegisterController {
 
-	private final SolutionService solutionService;
+	private final SolutionRegisterService solutionService;
 
 	/**
 	 * 솔루션 신청 폼 접수 API

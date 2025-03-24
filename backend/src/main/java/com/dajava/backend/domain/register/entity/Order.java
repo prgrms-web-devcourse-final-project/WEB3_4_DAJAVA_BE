@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.solution.entity;
+package com.dajava.backend.domain.register.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
