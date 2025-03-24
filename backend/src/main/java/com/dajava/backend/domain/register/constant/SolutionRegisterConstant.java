@@ -1,7 +1,7 @@
 package com.dajava.backend.domain.register.constant;
 
 /**
- *
+ * SolutionRegisterConstant
  *
  * @author ChoiHyunSan
  * @since 2025-03-24

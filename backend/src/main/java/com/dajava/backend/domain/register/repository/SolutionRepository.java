@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import com.dajava.backend.domain.register.entity.Solution;
 
 /**
- * SolutionRepository 
+ * SolutionRepository
  * Solution Entity 에 대한 Spring Data Jpa 인터페이스
  *
  */

@@ -60,7 +60,6 @@ public class SolutionRegisterValidator {
 		if (start == null || end == null) {
 			return false;
 		}
-
 		return !end.isBefore(start);
 	}
 }
