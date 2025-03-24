@@ -30,12 +30,12 @@ public class SolutionRegisterValidator {
 	public void validate(final SolutionCreateRequest request) {
 
 		// Request Data 유효성 검증
-		if (isValidEmail(request.email())) {
+		if (!isValidEmail(request.email()) || !isValidDate(request.startDate(), request.endDate())) {
 			throw new SolutionException(INVALID_SOLUTION_REQUEST);
 		}
 
 		// 2. Url 등록 가능 여부 체크
-		if (solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now(), 7)) {
+		if (solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
 			throw new SolutionException(ALREADY_REGISTER_URL);
 		}
 	}
