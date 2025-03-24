@@ -1,4 +1,3 @@
-// footer.tsx
 import React from "react";
 import styles from './footer.module.css';
 import { FooterIcon } from "./footer.types"; 
@@ -20,7 +19,6 @@ const Footer: React.FC = () => {
               rel="noopener noreferrer"
               aria-label={label}
             >
-              {/* 문자열로 전달 */}
               <Icon icon={icon} width={60} height={60} />
             </a>
           </li>

@@ -1,9 +1,11 @@
-interface CodeContextType {
-  code: Record<string, any>;
+interface LogContextType {
+  isLoaded: boolean;
 }
 
-interface CodeContextProviderProps {
+
+interface LogContextProviderProps {
   children: ReactNode;
 }
 
-export {CodeContextType, CodeContextProviderProps};
+
+export {LogContextType, LogContextProviderProps,Window};
