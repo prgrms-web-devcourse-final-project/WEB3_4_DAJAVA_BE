@@ -24,9 +24,12 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
 	 * @return 존재 여부
 	 */
 	@Query("""
-				select case when count(s) = 0 then true else false end from Solution s
-				where s.url = :url 
-				and (s.endDate is null or s.endDate < :pastDate)
+		      select count(s) = 0 or 
+		             (select s2.endDate from Solution s2 
+		              where s2.url = :url 
+		              order by s2.createDate desc limit 1) < :pastDate
+		      from Solution s
+		      where s.url = :url
 		""")
 	boolean checkUrlAvailability(
 		@Param("url") String url,

@@ -1,7 +1,9 @@
 package com.dajava.backend.domain.register.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2025-03-24
  */
 @Slf4j
-@RequestMapping("/v1/solution")
+@RequestMapping(value = "/v1/solution", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "SolutionRegisterController", description = "API 신청 폼 컨트롤러")
 @RestController
 @RequiredArgsConstructor
@@ -43,7 +45,7 @@ public class SolutionRegisterController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public SolutionCreateResponse create(
-		SolutionCreateRequest request
+		@RequestBody SolutionCreateRequest request
 	) {
 		log.info(request.toString());
 		return solutionService.createSolution(request);

@@ -35,7 +35,7 @@ public class SolutionRegisterValidator {
 		}
 
 		// 2. Url 등록 가능 여부 체크
-		if (solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
+		if (!solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
 			throw new SolutionException(ALREADY_REGISTER_URL);
 		}
 	}
