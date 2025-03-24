@@ -75,4 +75,19 @@ public class Solution extends BaseTimeEntity {
 	private static String createSerialNumber() {
 		return UUID.randomUUID().toString();
 	}
+
+	@Override
+	public String toString() {
+		return "Solution{"
+			+ "serialNumber='" + serialNumber + '\''
+			+ ", email='" + email + '\''
+			+ ", password='" + password + '\''
+			+ ", url='" + url + '\''
+			+ ", startDate=" + startDate
+			+ ", endDate=" + endDate
+			+ ", duration=" + duration
+			+ ", isServiceExpired=" + isServiceExpired
+			+ ", isSolutionComplete=" + isSolutionComplete
+			+ '}';
+	}
 }

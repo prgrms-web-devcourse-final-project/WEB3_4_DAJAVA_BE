@@ -28,4 +28,19 @@ public class Order {
 
 	@Column(nullable = false)
 	private String url;
+
+	public static Order create(String email, String url) {
+		return Order.builder()
+			.email(email)
+			.url(url)
+			.build();
+	}
+
+	@Override
+	public String toString() {
+		return "Order{"
+			+ "email='" + email + '\''
+			+ ", url='" + url + '\''
+			+ '}';
+	}
 }
