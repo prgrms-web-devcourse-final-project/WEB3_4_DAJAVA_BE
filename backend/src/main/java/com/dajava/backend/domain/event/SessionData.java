@@ -34,6 +34,15 @@ public class SessionData extends BaseTimeEntity {
 	@Column(nullable = false)
 	boolean isMissingValue;
 
+	@Column(nullable = false)
+	String pageUrl;
+
+	@Column(nullable = false)
+	String sessionId;
+
+	@Column(nullable = false)
+	String memberSerialNumber;
+
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<PointerClickEvent> pointerClickEvents = new ArrayList<>();
