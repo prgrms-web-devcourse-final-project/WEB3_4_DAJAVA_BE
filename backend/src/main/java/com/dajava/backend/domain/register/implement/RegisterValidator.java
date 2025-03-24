@@ -15,7 +15,7 @@ import com.dajava.backend.domain.register.repository.SolutionRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
- * SolutionRegisterValidator
+ * RegisterValidator
  * 솔루션 관련 데이터에 대한 validate 역할을 수행하는 클래스
  *
  * @author ChoiHyunSan
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Component
 @RequiredArgsConstructor
-public class SolutionRegisterValidator {
+public class RegisterValidator {
 
 	private final SolutionRepository solutionRepository;
 

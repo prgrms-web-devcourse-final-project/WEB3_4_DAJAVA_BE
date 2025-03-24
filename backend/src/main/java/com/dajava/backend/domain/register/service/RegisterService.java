@@ -1,7 +1,7 @@
 package com.dajava.backend.domain.register.service;
 
-import static com.dajava.backend.domain.register.constant.SolutionRegisterConstant.*;
-import static com.dajava.backend.domain.register.converter.SolutionConverter.*;
+import static com.dajava.backend.domain.register.constant.RegisterConstant.*;
+import static com.dajava.backend.domain.register.converter.RegisterConverter.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +10,7 @@ import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
 import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
 import com.dajava.backend.domain.register.entity.Order;
 import com.dajava.backend.domain.register.entity.Solution;
-import com.dajava.backend.domain.register.implement.SolutionRegisterValidator;
+import com.dajava.backend.domain.register.implement.RegisterValidator;
 import com.dajava.backend.domain.register.repository.OrderRepository;
 import com.dajava.backend.domain.register.repository.SolutionRepository;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * SolutionRegisterService
+ * RegisterService
  * 솔루션 관련 비즈니스 로직을 처리하는 클래스
  *
  * @author ChoiHyunSan
@@ -27,11 +27,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SolutionRegisterService {
+public class RegisterService {
 
 	private final SolutionRepository solutionRepository;
 	private final OrderRepository orderRepository;
-	private final SolutionRegisterValidator solutionValidator;
+	private final RegisterValidator solutionValidator;
 
 	@Transactional
 	public SolutionCreateResponse createSolution(final SolutionCreateRequest request) {

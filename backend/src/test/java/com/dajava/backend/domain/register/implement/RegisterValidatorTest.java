@@ -19,10 +19,10 @@ import com.dajava.backend.domain.register.exception.SolutionException;
 import com.dajava.backend.domain.register.repository.SolutionRepository;
 
 @ActiveProfiles("test")
-class SolutionRegisterValidatorTest {
+class RegisterValidatorTest {
 
 	@InjectMocks
-	private SolutionRegisterValidator validator;
+	private RegisterValidator validator;
 
 	@Mock
 	private SolutionRepository repository;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
 import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
-import com.dajava.backend.domain.register.service.SolutionRegisterService;
+import com.dajava.backend.domain.register.service.RegisterService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * SolutionRegisterController
+ * RegisterController
  * "/v1/solution" 로 들어오는 신청 관련 API 컨트롤러
  * 신청관련 요청을 처리
  *
@@ -26,13 +26,13 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2025-03-24
  */
 @Slf4j
-@RequestMapping(value = "/v1/solution", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "SolutionRegisterController", description = "API 신청 폼 컨트롤러")
+@RequestMapping(value = "/v1/register", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "RegisterController", description = "API 신청 폼 컨트롤러")
 @RestController
 @RequiredArgsConstructor
-public class SolutionRegisterController {
+public class RegisterController {
 
-	private final SolutionRegisterService solutionService;
+	private final RegisterService solutionService;
 
 	/**
 	 * 솔루션 신청 폼 접수 API

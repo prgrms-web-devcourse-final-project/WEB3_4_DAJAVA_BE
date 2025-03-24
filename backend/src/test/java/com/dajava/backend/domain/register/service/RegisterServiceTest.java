@@ -15,10 +15,10 @@ import com.dajava.backend.domain.register.repository.SolutionRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest
-class SolutionRegisterServiceTest {
+class RegisterServiceTest {
 
 	@Autowired
-	SolutionRegisterService service;
+	RegisterService service;
 
 	@Autowired
 	SolutionRepository repository;

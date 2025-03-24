@@ -15,13 +15,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.register.service.SolutionRegisterService;
+import com.dajava.backend.domain.register.service.RegisterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-class SolutionRegisterControllerTest {
+class RegisterControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -30,7 +30,7 @@ class SolutionRegisterControllerTest {
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	private SolutionRegisterService solutionRegisterService;
+	private RegisterService registerService;
 
 	@Test
 	@DisplayName("솔루션 신청 : 성공")
@@ -46,7 +46,7 @@ class SolutionRegisterControllerTest {
 		);
 
 		// when & then
-		mockMvc.perform(post("/v1/solution")
+		mockMvc.perform(post("/v1/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk())
@@ -67,7 +67,7 @@ class SolutionRegisterControllerTest {
 		);
 
 		// when & then
-		mockMvc.perform(post("/v1/solution")
+		mockMvc.perform(post("/v1/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
 				.content(objectMapper.writeValueAsString(request)))
@@ -88,13 +88,13 @@ class SolutionRegisterControllerTest {
 		);
 
 		// when & then
-		mockMvc.perform(post("/v1/solution")
+		mockMvc.perform(post("/v1/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());
 
-		mockMvc.perform(post("/v1/solution")
+		mockMvc.perform(post("/v1/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
 				.content(objectMapper.writeValueAsString(request)))
