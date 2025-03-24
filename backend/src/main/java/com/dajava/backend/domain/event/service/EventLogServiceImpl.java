@@ -126,6 +126,5 @@ public class EventLogServiceImpl implements EventLogService {
 		// TODO : 각 이벤트 저장이 아닌 버퍼링 후 배치 처리
 		// scrollEventRepository.save(scrollEvent);
 	}
-
 }
 

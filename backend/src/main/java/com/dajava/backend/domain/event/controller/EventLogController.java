@@ -13,6 +13,7 @@ import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.service.EventLogService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/v1/logs")
 @RequiredArgsConstructor
+@Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventLogController {
 
 	private final EventLogService eventLogService;
