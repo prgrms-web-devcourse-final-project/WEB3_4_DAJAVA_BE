@@ -8,29 +8,31 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.dajava.backend.domain.event.dto.SessionDataKey;
+
 public class EventQueueBuffer<T> {
 
 	private final Map<String, Queue<T>> bufferMap = new ConcurrentHashMap<>();
 	private final Map<String, Long> lastUpdatedMap = new ConcurrentHashMap<>();
 
-	private String getKey(String pageUrl, String memberSerialNumber) {
-		return pageUrl + "|" + memberSerialNumber;
+	private String getKey(SessionDataKey sessionDataKey) {
+		return sessionDataKey.pageUrl() + "|" + sessionDataKey.memberSerialNumber() + "|" + sessionDataKey.sessionId();
 	}
 
-	public void addEvent(String pageUrl, String memberSerialNumber, T event) {
-		String key = getKey(pageUrl, memberSerialNumber);
+	public void addEvent(SessionDataKey sessionDataKey, T event) {
+		String key = getKey(sessionDataKey);
 		bufferMap.computeIfAbsent(key, k -> new ConcurrentLinkedQueue<>()).add(event);
 		lastUpdatedMap.put(key, System.currentTimeMillis());
 	}
 
-	public List<T> getEvents(String pageUrl, String memberSerialNumber) {
-		String key = getKey(pageUrl, memberSerialNumber);
+	public List<T> getEvents(SessionDataKey sessionDataKey) {
+		String key = getKey(sessionDataKey);
 		Queue<T> queue = bufferMap.getOrDefault(key, new ConcurrentLinkedQueue<>());
 		return new ArrayList<>(queue);
 	}
 
-	public List<T> flushEvents(String pageUrl, String memberSerialNumber) {
-		String key = getKey(pageUrl, memberSerialNumber);
+	public List<T> flushEvents(SessionDataKey sessionDataKey) {
+		String key = getKey(sessionDataKey);
 		Queue<T> queue = bufferMap.remove(key);
 		if (queue == null) {
 			return Collections.emptyList();

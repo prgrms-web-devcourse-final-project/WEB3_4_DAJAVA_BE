@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
+import com.dajava.backend.domain.event.dto.SessionDataKey;
 
 import lombok.Getter;
 
@@ -19,42 +20,42 @@ public class EventBuffer {
 	private final EventQueueBuffer<PointerScrollEventRequest> scrollBuffer = new EventQueueBuffer<>();
 
 	// add
-	public void addClickEvent(PointerClickEventRequest event) {
-		clickBuffer.addEvent(event.pageUrl(), event.memberSerialNumber(), event);
+	public void addClickEvent(PointerClickEventRequest event, SessionDataKey sessionDataKey) {
+		clickBuffer.addEvent( sessionDataKey, event);
 	}
 
-	public void addMoveEvent(PointerMoveEventRequest event) {
-		moveBuffer.addEvent(event.pageUrl(), event.memberSerialNumber(), event);
+	public void addMoveEvent(PointerMoveEventRequest event, SessionDataKey sessionDataKey) {
+		moveBuffer.addEvent( sessionDataKey, event);
 	}
 
-	public void addScrollEvent(PointerScrollEventRequest event) {
-		scrollBuffer.addEvent(event.pageUrl(), event.memberSerialNumber(), event);
+	public void addScrollEvent(PointerScrollEventRequest event, SessionDataKey sessionDataKey) {
+		scrollBuffer.addEvent( sessionDataKey, event);
 	}
 
 	// get
-	public List<PointerClickEventRequest> getClickEvents(String pageUrl, String memberSerialNumber) {
-		return clickBuffer.getEvents(pageUrl, memberSerialNumber);
+	public List<PointerClickEventRequest> getClickEvents(SessionDataKey sessionDataKey) {
+		return clickBuffer.getEvents(sessionDataKey);
 	}
 
-	public List<PointerMoveEventRequest> getMoveEvents(String pageUrl, String memberSerialNumber) {
-		return moveBuffer.getEvents(pageUrl, memberSerialNumber);
+	public List<PointerMoveEventRequest> getMoveEvents(SessionDataKey sessionDataKey) {
+		return moveBuffer.getEvents(sessionDataKey);
 	}
 
-	public List<PointerScrollEventRequest> getScrollEvents(String pageUrl, String memberSerialNumber) {
-		return scrollBuffer.getEvents(pageUrl, memberSerialNumber);
+	public List<PointerScrollEventRequest> getScrollEvents(SessionDataKey sessionDataKey) {
+		return scrollBuffer.getEvents(sessionDataKey);
 	}
 
 	// flush
-	public List<PointerClickEventRequest> flushClickEvents(String pageUrl, String memberSerialNumber) {
-		return clickBuffer.flushEvents(pageUrl, memberSerialNumber);
+	public List<PointerClickEventRequest> flushClickEvents(SessionDataKey sessionDataKey) {
+		return clickBuffer.flushEvents(sessionDataKey);
 	}
 
-	public List<PointerMoveEventRequest> flushMoveEvents(String pageUrl, String memberSerialNumber) {
-		return moveBuffer.flushEvents(pageUrl, memberSerialNumber);
+	public List<PointerMoveEventRequest> flushMoveEvents(SessionDataKey sessionDataKey) {
+		return moveBuffer.flushEvents(sessionDataKey);
 	}
 
-	public List<PointerScrollEventRequest> flushScrollEvents(String pageUrl, String memberSerialNumber) {
-		return scrollBuffer.flushEvents(pageUrl, memberSerialNumber);
+	public List<PointerScrollEventRequest> flushScrollEvents(SessionDataKey sessionDataKey) {
+		return scrollBuffer.flushEvents(sessionDataKey);
 	}
 
 	// 전체 클리어
