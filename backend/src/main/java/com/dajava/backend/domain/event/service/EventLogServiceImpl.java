@@ -10,6 +10,7 @@ import com.dajava.backend.domain.event.SessionData;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
+import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
 import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
 import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;
@@ -45,11 +46,13 @@ public class EventLogServiceImpl implements EventLogService {
 	public void createClickEvent(PointerClickEventRequest request) {
 		log.info("클릭 이벤트 로깅: {}", request);
 
+		SessionDataKey sessionDataKey = new SessionDataKey(
+			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+		);
+
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		SessionData sessionData = sessionDataService.createOrFindSessionData(
-			request.pageUrl(),
-			request.sessionId(),
-			request.memberSerialNumber()
+			sessionDataKey
 		);
 
 		// PointerClickEvent 생성
@@ -72,11 +75,13 @@ public class EventLogServiceImpl implements EventLogService {
 	public void createMoveEvent(PointerMoveEventRequest request) {
 		log.info("이동 이벤트 로깅: {}", request);
 
+		SessionDataKey sessionDataKey = new SessionDataKey(
+			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+		);
+
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		SessionData sessionData = sessionDataService.createOrFindSessionData(
-			request.pageUrl(),
-			request.sessionId(),
-			request.memberSerialNumber()
+			sessionDataKey
 		);
 
 		// PointerMoveEvent 생성
@@ -99,11 +104,13 @@ public class EventLogServiceImpl implements EventLogService {
 	public void createScrollEvent(PointerScrollEventRequest request) {
 		log.info("스크롤 이벤트 로깅: {}", request);
 
+		SessionDataKey sessionDataKey = new SessionDataKey(
+			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+		);
+
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		SessionData sessionData = sessionDataService.createOrFindSessionData(
-			request.pageUrl(),
-			request.sessionId(),
-			request.memberSerialNumber()
+			sessionDataKey
 		);
 
 		// PointerScrollEvent 생성

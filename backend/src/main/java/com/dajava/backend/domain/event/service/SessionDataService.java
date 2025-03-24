@@ -26,16 +26,16 @@ public class SessionDataService {
 	private final Map<SessionDataKey, SessionData> sessionCache = new ConcurrentHashMap<>();
 
 	@Transactional
-	public SessionData createOrFindSessionData(String pageUrl, String sessionId, String memberSerialNumber) {
-		SessionDataKey key = new SessionDataKey(sessionId, pageUrl, memberSerialNumber);
-
+	public SessionData createOrFindSessionData(SessionDataKey key) {
 		return sessionCache.computeIfAbsent(key, k ->
-			sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(pageUrl, sessionId, memberSerialNumber)
+			sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
+					k.sessionId(), k.pageUrl(), k.memberSerialNumber()
+				)
 				.orElseGet(() -> {
 					SessionData newSession = SessionData.builder()
-						.pageUrl(pageUrl)
-						.sessionId(sessionId)
-						.memberSerialNumber(memberSerialNumber)
+						.sessionId(k.sessionId())
+						.pageUrl(k.pageUrl())
+						.memberSerialNumber(k.memberSerialNumber())
 						.isOutlier(false)
 						.isMissingValue(false)
 						.isVerified(false)
