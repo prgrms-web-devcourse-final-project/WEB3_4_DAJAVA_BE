@@ -13,3 +13,4 @@ import com.dajava.backend.domain.event.SessionData;
  */
 public interface SessionDataRepository extends JpaRepository<SessionData, Long> {
 }
+
