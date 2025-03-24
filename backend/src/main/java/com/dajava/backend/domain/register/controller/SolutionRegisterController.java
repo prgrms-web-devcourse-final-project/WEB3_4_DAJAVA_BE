@@ -2,7 +2,7 @@ package com.dajava.backend.domain.register.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -42,7 +42,7 @@ public class SolutionRegisterController {
 	@Operation(
 		summary = "솔루션 요청",
 		description = "솔루션 폼 정보를 기반으로 등록 후 일련 번호 등 등록 정보를 반환합니다.")
-	@GetMapping
+	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
 	public SolutionCreateResponse create(
 		@RequestBody SolutionCreateRequest request
