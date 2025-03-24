@@ -43,6 +43,10 @@ public class SessionData extends BaseTimeEntity {
 	@Column(nullable = false)
 	String memberSerialNumber;
 
+	// 이상치, 결측치 검증을 했는지 확인하는 boolean 값
+	@Column(nullable = false)
+	boolean isVerified;
+
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<PointerClickEvent> pointerClickEvents = new ArrayList<>();
