@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.home.event;
+package com.dajava.backend.domain.event;
 
 import com.dajava.backend.global.common.BaseTimeEntity;
 
@@ -19,14 +19,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointerMoveEvent extends BaseTimeEntity {
+public class PointerScrollEvent extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue
 	private long id;
-
-	@Column(nullable = false)
-	int clientX;
 
 	@Column(nullable = false)
 	int clientY;
@@ -47,8 +44,7 @@ public class PointerMoveEvent extends BaseTimeEntity {
 	@JoinColumn(name = "session_data_id")
 	private SessionData sessionData;
 
-	public static PointerMoveEvent create(
-		int clientX,
+	public static PointerScrollEvent create(
 		int clientY,
 		String pageUrl,
 		int browserWidth,
@@ -56,8 +52,7 @@ public class PointerMoveEvent extends BaseTimeEntity {
 		String memberSerialNumber,
 		SessionData sessionData
 	) {
-		PointerMoveEvent event = PointerMoveEvent.builder()
-			.clientX(clientX)
+		PointerScrollEvent event = PointerScrollEvent.builder()
 			.clientY(clientY)
 			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
@@ -65,7 +60,8 @@ public class PointerMoveEvent extends BaseTimeEntity {
 			.memberSerialNumber(memberSerialNumber)
 			.sessionData(sessionData)
 			.build();
-		sessionData.addMoveEvent(event); // 양방향 연관관계 설정
+		sessionData.addScrollEvent(event); // 양방향 연관관계 설정
 		return event;
 	}
+
 }
