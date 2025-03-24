@@ -48,7 +48,7 @@ public class EventLogServiceImpl implements EventLogService {
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		SessionData sessionData = sessionDataService.createOrFindSessionData(
 			request.pageUrl(),
-			String.valueOf(request.sessionId()),
+			request.sessionId(),
 			request.memberSerialNumber()
 		);
 
@@ -58,7 +58,7 @@ public class EventLogServiceImpl implements EventLogService {
 			request.clientY(),
 			request.pageUrl(),
 			request.browserWidth(),
-			String.valueOf(request.sessionId()),
+			request.sessionId(),
 			request.memberSerialNumber(),
 			sessionData
 		);
@@ -75,7 +75,7 @@ public class EventLogServiceImpl implements EventLogService {
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		SessionData sessionData = sessionDataService.createOrFindSessionData(
 			request.pageUrl(),
-			String.valueOf(request.sessionId()),
+			request.sessionId(),
 			request.memberSerialNumber()
 		);
 
@@ -85,7 +85,7 @@ public class EventLogServiceImpl implements EventLogService {
 			request.clientY(),
 			request.pageUrl(),
 			request.browserWidth(),
-			String.valueOf(request.sessionId()),
+			request.sessionId(),
 			request.memberSerialNumber(),
 			sessionData
 		);
@@ -102,7 +102,7 @@ public class EventLogServiceImpl implements EventLogService {
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		SessionData sessionData = sessionDataService.createOrFindSessionData(
 			request.pageUrl(),
-			String.valueOf(request.sessionId()),
+			request.sessionId(),
 			request.memberSerialNumber()
 		);
 
@@ -111,7 +111,7 @@ public class EventLogServiceImpl implements EventLogService {
 			request.scrollY(),
 			request.pageUrl(),
 			request.browserWidth(),
-			String.valueOf(request.sessionId()),
+			request.sessionId(),
 			request.memberSerialNumber(),
 			sessionData
 		);

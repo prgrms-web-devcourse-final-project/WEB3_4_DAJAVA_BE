@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
  * @author Metronon
  */
 public record PointerClickEventRequest(
-	@NotNull Long sessionId,
+	@NotNull String sessionId,
 	@NotNull String pageUrl,
 	@NotNull String memberSerialNumber,
 	@NotNull Long timestamp,
