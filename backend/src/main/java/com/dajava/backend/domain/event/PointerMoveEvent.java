@@ -1,10 +1,9 @@
-package com.dajava.backend.domain.home.event;
+package com.dajava.backend.domain.event;
 
 import com.dajava.backend.global.common.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -20,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointerClickEvent extends BaseTimeEntity {
+public class PointerMoveEvent extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue
@@ -48,7 +47,7 @@ public class PointerClickEvent extends BaseTimeEntity {
 	@JoinColumn(name = "session_data_id")
 	private SessionData sessionData;
 
-	public static PointerClickEvent create(
+	public static PointerMoveEvent create(
 		int clientX,
 		int clientY,
 		String pageUrl,
@@ -57,7 +56,7 @@ public class PointerClickEvent extends BaseTimeEntity {
 		String memberSerialNumber,
 		SessionData sessionData
 	) {
-		PointerClickEvent event = PointerClickEvent.builder()
+		PointerMoveEvent event = PointerMoveEvent.builder()
 			.clientX(clientX)
 			.clientY(clientY)
 			.pageUrl(pageUrl)
@@ -66,7 +65,7 @@ public class PointerClickEvent extends BaseTimeEntity {
 			.memberSerialNumber(memberSerialNumber)
 			.sessionData(sessionData)
 			.build();
-		sessionData.addClickEvent(event); // 양방향 연관관계 설정
+		sessionData.addMoveEvent(event); // 양방향 연관관계 설정
 		return event;
 	}
 }
