@@ -12,20 +12,20 @@ public class SolutionService {
 	@Value("${DAJAVA_AI_API_URL}")
 	private String apiUrl;
 
-	public String getAISolution() {
+	public String getAISolution(String dummy) {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
 			.defaultHeader("Content-Type", "application/json")
 			.build();
-		String requestBody = "{\n" +
+		String requestBody = String.format("{\n" +
 			"  \"contents\": [\n" +
 			"    {\n" +
 			"      \"parts\": [\n" +
-			"        {\"text\": \"너는 내가 물었던 질문들을 기억하면서 머신러닝이 가능하니?\"}\n" +
+			"        {\"text\": \"%s\"}\n" +
 			"      ]\n" +
 			"    }\n" +
 			"  ]\n" +
-			"}";
+			"}", dummy);
 
 		Mono<String> response = client.post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())

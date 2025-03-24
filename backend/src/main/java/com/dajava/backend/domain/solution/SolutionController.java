@@ -19,7 +19,7 @@ public class SolutionController {
 
 	@PostMapping("/ux-solution")
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public String getUXSolution() {
-		return solutionService.getAISolution();
+	public String getUXSolution(String dummy) {
+		return solutionService.getAISolution(dummy);
 	}
 }
