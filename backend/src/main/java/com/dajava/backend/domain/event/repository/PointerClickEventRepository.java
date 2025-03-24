@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.home.repository;
+package com.dajava.backend.domain.event.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

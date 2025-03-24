@@ -1,6 +1,4 @@
-package com.dajava.backend.domain.home.service;
-
-import com.dajava.backend.domain.event.SessionData;
+package com.dajava.backend.domain.event.service;
 
 /**
  * EventLogService

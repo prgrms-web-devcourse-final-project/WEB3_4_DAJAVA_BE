@@ -1,8 +1,8 @@
-package com.dajava.backend.domain.home.service;
+package com.dajava.backend.domain.event.service;
 
 import org.springframework.stereotype.Service;
 
-import com.dajava.backend.domain.home.repository.SessionDataRepository;
+import com.dajava.backend.domain.event.repository.SessionDataRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
