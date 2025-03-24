@@ -32,7 +32,16 @@ public class PointerMoveEvent extends BaseTimeEntity {
 	int clientY;
 
 	@Column(nullable = false)
+	String pageUrl;
+
+	@Column(nullable = false)
 	int browserWidth;
+
+	@Column(nullable = false)
+	String sessionId;
+
+	@Column(nullable = false)
+	String memberSerialNumber;
 
 	@ManyToOne
 	@JoinColumn(name = "session_data_id")
@@ -41,13 +50,19 @@ public class PointerMoveEvent extends BaseTimeEntity {
 	public static PointerMoveEvent create(
 		int clientX,
 		int clientY,
+		String pageUrl,
 		int browserWidth,
+		String sessionId,
+		String memberSerialNumber,
 		SessionData sessionData
 	) {
 		PointerMoveEvent event = PointerMoveEvent.builder()
 			.clientX(clientX)
 			.clientY(clientY)
+			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
+			.sessionId(sessionId)
+			.memberSerialNumber(memberSerialNumber)
 			.sessionData(sessionData)
 			.build();
 		sessionData.addMoveEvent(event); // 양방향 연관관계 설정

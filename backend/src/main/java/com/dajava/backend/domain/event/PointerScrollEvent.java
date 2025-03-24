@@ -29,7 +29,16 @@ public class PointerScrollEvent extends BaseTimeEntity {
 	int scrollY;
 
 	@Column(nullable = false)
+	String pageUrl;
+
+	@Column(nullable = false)
 	int browserWidth;
+
+	@Column(nullable = false)
+	String sessionId;
+
+	@Column(nullable = false)
+	String memberSerialNumber;
 
 	@ManyToOne
 	@JoinColumn(name = "session_data_id")
@@ -37,12 +46,18 @@ public class PointerScrollEvent extends BaseTimeEntity {
 
 	public static PointerScrollEvent create(
 		int scrollY,
+		String pageUrl,
 		int browserWidth,
+		String sessionId,
+		String memberSerialNumber,
 		SessionData sessionData
 	) {
 		PointerScrollEvent event = PointerScrollEvent.builder()
 			.scrollY(scrollY)
+			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
+			.sessionId(sessionId)
+			.memberSerialNumber(memberSerialNumber)
 			.sessionData(sessionData)
 			.build();
 		sessionData.addScrollEvent(event); // 양방향 연관관계 설정
