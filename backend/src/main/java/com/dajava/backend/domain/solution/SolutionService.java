@@ -9,9 +9,9 @@ import reactor.core.publisher.Mono;
 public class SolutionService {
 	@Value("${DAJAVA_AI_API_KEY}")
 	private String apiKey;
-
 	@Value("${DAJAVA_AI_API_URL}")
 	private String apiUrl;
+
 	public String getAISolution() {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
