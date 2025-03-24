@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
 import com.dajava.backend.global.common.BaseTimeEntity;
+import com.dajava.backend.global.utils.PasswordUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -62,7 +63,7 @@ public class Solution extends BaseTimeEntity {
 		return Solution.builder()
 			.serialNumber(createSerialNumber())
 			.email(request.email())
-			.password(request.password())
+			.password(PasswordUtils.hashPassword(request.password()))
 			.url(request.url())
 			.startDate(request.startDate())
 			.endDate(request.endDate())
