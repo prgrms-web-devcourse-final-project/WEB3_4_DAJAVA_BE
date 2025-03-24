@@ -30,8 +30,11 @@ public class SolutionService {
 	public String getAISolution(String refineData) {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
-			.defaultHeader("Content-Type", "application/json")
+			.defaultHeader("Content-Type", "application/json")	//요청 본문(requestBody) 형식 지정
 			.build();
+
+		//요청 본문(JSON 형식)
+		//Gemini API 요청 본문 형식 준수
 		String requestBody = String.format("{\n" +
 			"  \"contents\": [\n" +
 			"    {\n" +
@@ -42,10 +45,12 @@ public class SolutionService {
 			"  ]\n" +
 			"}", refineData);
 
-		Mono<String> response = client.post()
+		Mono<String> response = client.post()	//POST 메서드를 사용하여 API에 데이터를 전달 후 응답 대기
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
 			.bodyValue(requestBody)
 			.retrieve()
+			//TODO: 원래 JSON인 데이터를 String으로 형변환되어 Swagger에서 JSON 형태로 보이는 현상 해결 필요
+			//		=> DTO에 형식 지정해서 DTO로 받아와야 함
 			.bodyToMono(String.class);
 
 		String result = response.block();
