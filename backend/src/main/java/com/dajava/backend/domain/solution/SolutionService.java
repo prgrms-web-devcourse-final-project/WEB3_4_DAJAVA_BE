@@ -1,29 +1,42 @@
 package com.dajava.backend.domain.solution;
 
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+@Service
 public class SolutionService {
-	private final String apiKey = "YOUR_OPENAI_API_KEY";
-	private final String apiUrl = "https://api.openai.com/v1/completions";
+	@Value("${DAJAVA_AI_API_KEY}")
+	private String apiKey;
 
-	public String getAISolution(String logData) {
+	@Value("${DAJAVA_AI_API_URL}")
+	private String apiUrl;
+	public String getAISolution() {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
-			.defaultHeader("Authorization", "Bearer " + apiKey)
+			.defaultHeader("Content-Type", "application/json")
 			.build();
-
-		Map<String, Object> requestBody = Map.of(
-			"model", "text-davinci-003",
-			"prompt", "다음 로그 데이터를 분석하여 UX 개선 솔루션을 제안해줘:\n" + logData,
-			"max_tokens", 150
-		);
+		String requestBody = "{\n" +
+			"  \"contents\": [\n" +
+			"    {\n" +
+			"      \"parts\": [\n" +
+			"        {\"text\": \"너는 내가 물었던 질문들을 기억하면서 머신러닝이 가능하니?\"}\n" +
+			"      ]\n" +
+			"    }\n" +
+			"  ]\n" +
+			"}";
 
 		Mono<String> response = client.post()
+			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
 			.bodyValue(requestBody)
 			.retrieve()
 			.bodyToMono(String.class);
-		return response.block();
+
+		String result = response.block();
+		System.out.println("Gemini AI 응답: " + result);
+		return result;
 	}
 }
+
+
