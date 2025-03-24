@@ -9,6 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Gemini 솔루션 요청 컨트롤러 클래스
+ * @author jhon S, sungkibum
+ * @since 2025-03-24
+ */
 @RequestMapping("/v1")
 @Tag(name = "HomeController", description = "API 샘플 컨트롤러")
 @RestController
@@ -17,9 +22,16 @@ public class SolutionController {
 	@Autowired
 	private SolutionService solutionService;
 
+	/**
+	 * UX 개선 솔루션을 얻기 위한 API
+	 * @param refineData
+	 * @return result(response.block())
+	 * @author jhon S, sungkibum
+	 * @since 2025-03-24
+	 */
 	@PostMapping("/ux-solution")
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public String getUXSolution(String dummy) {
-		return solutionService.getAISolution(dummy);
+	public String getUXSolution(String refineData) {
+		return solutionService.getAISolution(refineData);
 	}
 }

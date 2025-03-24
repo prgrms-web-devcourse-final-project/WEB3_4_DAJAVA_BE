@@ -7,6 +7,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+/**
+ * Gemini 솔루션 활용을 위한 서비스 클래스
+ * @author jhon S, sungkibum
+ * @since 2025-03-24
+ */
 @Service
 @Slf4j
 public class SolutionService {
@@ -15,7 +20,14 @@ public class SolutionService {
 	@Value("${DAJAVA_AI_API_URL}")
 	private String apiUrl;
 
-	public String getAISolution(String dummy) {
+	/**
+	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
+	 * @param refineData
+	 * @return result(response.block())
+	 * @author jhon S, sungkibum
+	 * @since 2025-03-24
+	 */
+	public String getAISolution(String refineData) {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
 			.defaultHeader("Content-Type", "application/json")
@@ -28,7 +40,7 @@ public class SolutionService {
 			"      ]\n" +
 			"    }\n" +
 			"  ]\n" +
-			"}", dummy);
+			"}", refineData);
 
 		Mono<String> response = client.post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
