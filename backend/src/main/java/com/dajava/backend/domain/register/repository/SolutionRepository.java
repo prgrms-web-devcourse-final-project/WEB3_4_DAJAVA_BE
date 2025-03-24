@@ -13,6 +13,8 @@ import com.dajava.backend.domain.register.entity.Solution;
  * SolutionRepository
  * Solution Entity 에 대한 Spring Data Jpa 인터페이스
  *
+ * @author ChoiHyunSan
+ * @since 2025-03-24
  */
 @Repository
 public interface SolutionRepository extends JpaRepository<Solution, Long> {
