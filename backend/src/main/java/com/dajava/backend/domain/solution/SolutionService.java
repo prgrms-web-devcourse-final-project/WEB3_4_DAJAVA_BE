@@ -1,13 +1,12 @@
 package com.dajava.backend.domain.solution;
 
-import org.springframework.stereotype.Service;
+import java.util.Map;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-@Service
 public class SolutionService {
-
-	//TODO: API Key env파일화
-	private final String apiKey = "AIzaSyBfPXGPaKsMdXTQGDiegusqet3AvJXXShE";  // OpenAI API 키
-	private final String apiUrl = "https://api.openai.com/v1/completions";  // OpenAI API URL
+	private final String apiKey = "YOUR_OPENAI_API_KEY";
+	private final String apiUrl = "https://api.openai.com/v1/completions";
 
 	public String getAISolution(String logData) {
 		WebClient client = WebClient.builder()
@@ -15,13 +14,16 @@ public class SolutionService {
 			.defaultHeader("Authorization", "Bearer " + apiKey)
 			.build();
 
-		String prompt = "다음 로그 데이터를 분석하여 UX 개선 솔루션을 제안해줘:\n" + logData;
+		Map<String, Object> requestBody = Map.of(
+			"model", "text-davinci-003",
+			"prompt", "다음 로그 데이터를 분석하여 UX 개선 솔루션을 제안해줘:\n" + logData,
+			"max_tokens", 150
+		);
 
 		Mono<String> response = client.post()
-			.bodyValue("{"model":"text-davinci-003","prompt":"" + prompt + "","max_tokens":150}")
+			.bodyValue(requestBody)
 			.retrieve()
 			.bodyToMono(String.class);
-
-		return response.block();  // 응답을 기다리고 결과를 반환
+		return response.block();
 	}
 }
