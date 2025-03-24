@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
+import com.dajava.backend.domain.event.service.EventLogService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 
 /**
  * EventLog 의 컨트롤러 입니다.
@@ -20,7 +22,10 @@ import io.swagger.v3.oas.annotations.Operation;
  */
 @RestController
 @RequestMapping("/v1/logs")
+@RequiredArgsConstructor
 public class EventLogController {
+
+	private final EventLogService eventLogService;
 
 	/**
 	 * Click(Touch) 이벤트 로깅
@@ -32,6 +37,7 @@ public class EventLogController {
 	public String logClick(
 		@RequestBody PointerClickEventRequest clickEventRequest
 	) {
+		eventLogService.createClickEvent(clickEventRequest);
 		return "클릭 이벤트 수신 완료";
 	}
 
@@ -45,6 +51,7 @@ public class EventLogController {
 	public String logMovement(
 		@RequestBody PointerMoveEventRequest moveEventRequest
 	) {
+		eventLogService.createMoveEvent(moveEventRequest);
 		return "이동 이벤트 수신 완료";
 	}
 
@@ -58,6 +65,7 @@ public class EventLogController {
 	public String logScroll(
 		@RequestBody PointerScrollEventRequest scrollEventRequest
 	) {
+		eventLogService.createScrollEvent(scrollEventRequest);
 		return "스크롤 이벤트 수신 완료";
 	}
 }
