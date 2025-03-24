@@ -3,9 +3,12 @@ package com.dajava.backend.domain.solution;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 public class SolutionService {
 	@Value("${DAJAVA_AI_API_KEY}")
 	private String apiKey;
@@ -34,7 +37,7 @@ public class SolutionService {
 			.bodyToMono(String.class);
 
 		String result = response.block();
-		System.out.println("Gemini AI 응답: " + result);
+		log.info("Gemini AI 응답: " + result);
 		return result;
 	}
 }
