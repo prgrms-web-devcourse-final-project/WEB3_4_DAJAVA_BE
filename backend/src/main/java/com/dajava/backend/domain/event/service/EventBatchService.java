@@ -1,7 +1,9 @@
 package com.dajava.backend.domain.event.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +63,31 @@ public class EventBatchService {
 
 		sessionDataRepository.save(sessionData);
 		sessionDataService.removeFromCache(sessionDataKey);
+	}
+
+	/**
+	 * 배치 처리 로직을 스케쥴러와 연결하기 위한 메서드입니다.
+	 */
+	@Transactional
+	public void processAllPendingEvents() {
+		Set<SessionDataKey> activeSessionKeys = collectActiveSessionKeys();
+		log.info("일괄 처리할 활성 세션 수: {}", activeSessionKeys.size());
+
+		for (SessionDataKey key : activeSessionKeys) {
+			try {
+				processBatchForSession(key);
+			} catch (Exception e) {
+				log.error("세션 {} 처리 중 오류 발생: {}", key, e.getMessage(), e);
+			}
+		}
+	}
+
+	/**
+	 * eventBuffer 에서 활성 상태인 Session Set 을 가져오기 위한 메서드입니다.
+	 * @return Set 현재 활성 상태인 Session 의 키 Set 입니다.
+	 */
+	public Set<SessionDataKey> collectActiveSessionKeys() {
+		return new HashSet<>(eventBuffer.getAllActiveSessionKeys());
 	}
 
 	/**

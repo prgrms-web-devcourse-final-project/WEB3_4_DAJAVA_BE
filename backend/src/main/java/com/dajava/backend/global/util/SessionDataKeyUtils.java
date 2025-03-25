@@ -2,27 +2,47 @@ package com.dajava.backend.global.util;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 
+/**
+ * key와 SessionDataKey DTO간의 변환 유틸입니다.
+ * @author Metronon, nodonghui
+ */
 public final class SessionDataKeyUtils {
+	private static final String DELIMITER = "|";
 
 	private SessionDataKeyUtils() {
-		// 유틸 클래스는 생성 불가하게 막기
 	}
 
 	/**
-	 * "id|url|memberNumber" 형태의 key 문자열을 SessionDataKey 객체로 변환합니다.
-	 * 잘못된 형식일 경우 null을 반환합니다.
+	 * SessionDataKey 객체를 구분자(|)를 이용한 문자열로 변환합니다.
 	 *
-	 * @param key 버퍼 내부 key 문자열
-	 * @return SessionDataKey 또는 null
+	 * @param sessionDataKey SessionDataKey 객체 (null이면 안 됨)
+	 * @return 변환된 문자열 (예: "sessionId|pageUrl|memberSerialNumber")
+	 * @throws IllegalArgumentException sessionDataKey 가 null 인 경우
+	 */
+	public static String toKey(SessionDataKey sessionDataKey) {
+		if (sessionDataKey == null) {
+			throw new IllegalArgumentException("sessionDataKey 는 null 이거나 비어있을 수 없습니다.");
+		}
+		return sessionDataKey.sessionId() + DELIMITER
+			+ sessionDataKey.pageUrl() + DELIMITER
+			+ sessionDataKey.memberSerialNumber();
+	}
+
+	/**
+	 * 구분자(|)로 결합된 문자열을 SessionDataKey 객체로 변환합니다.
+	 *
+	 * @param key 변환할 문자열
+	 * @return 변환된 SessionDataKey 객체
+	 * @throws IllegalArgumentException key 가 null 이거나 형식이 올바르지 않은 경우
 	 */
 	public static SessionDataKey parseKey(String key) {
 		if (key == null || key.isEmpty()) {
-			return null;
+			throw new IllegalArgumentException("Key 문자열은 null 이거나 비어있을 수 없습니다");
 		}
 
 		String[] parts = key.split("\\|");
 		if (parts.length != 3) {
-			return null;
+			throw new IllegalArgumentException("올바르지 않은 키 형식: " + key);
 		}
 
 		String sessionId = parts[0];
