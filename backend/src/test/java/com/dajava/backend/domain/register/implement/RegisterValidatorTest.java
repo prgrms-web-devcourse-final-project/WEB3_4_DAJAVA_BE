@@ -45,7 +45,7 @@ class RegisterValidatorTest {
 
 		// when & then
 		assertThrows(RegisterException.class, () -> {
-			validator.validate(request);
+			validator.validateCreateRequest(request);
 		});
 	}
 
@@ -68,7 +68,7 @@ class RegisterValidatorTest {
 
 		// when & then
 		assertThrows(RegisterException.class, () -> {
-			validator.validate(request);
+			validator.validateCreateRequest(request);
 		});
 	}
 }
