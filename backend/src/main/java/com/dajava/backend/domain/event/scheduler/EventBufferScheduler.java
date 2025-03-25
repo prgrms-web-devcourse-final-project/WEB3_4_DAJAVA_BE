@@ -1,5 +1,7 @@
 package com.dajava.backend.domain.event.scheduler;
 
+
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.service.EventLogService;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 import com.dajava.backend.global.component.buffer.EventQueueBuffer;
+import com.dajava.backend.global.util.SessionDataKeyUtils;
 
 import lombok.RequiredArgsConstructor;
 /**
@@ -57,7 +60,7 @@ public class EventBufferScheduler {
 				continue; // 아직 활동 중인 세션
 			}
 
-			SessionDataKey sessionKey = parseKey(key);
+			SessionDataKey sessionKey = SessionDataKeyUtils.parseKey(key);
 			if (sessionKey == null) {
 				continue;
 			}
@@ -71,21 +74,28 @@ public class EventBufferScheduler {
 		}
 	}
 
-	/**
-	 * "id|url|memberNumber" 형태로 존재하는 key 데이터를 분리해 SessionDataKey 객체로 변환합니다.
-	 * key 데이터가 아닌 경우 null을 반환합니다.
-	 * @param key 버퍼 내부 이벤트 dto 데이터를 찾는 key데이터
-	 * @return SessionDataKey
-	 */
-	private SessionDataKey parseKey(String key) {
-		String[] parts = key.split("\\|");
-		if (parts.length != 3) {
-			return null;
-		}
-
-		String sessionId = parts[0];
-		String pageUrl = parts[1];
-		String memberSerialNumber = parts[2];
-		return new SessionDataKey(sessionId, pageUrl, memberSerialNumber);
+	@Scheduled(fixedRate = 60_000) // 1분마다 실행
+	public  <T> void flushAllEventBuffers() {
+		flushEventLog(eventBuffer.getClickBuffer());
+		flushEventLog(eventBuffer.getMoveBuffer());
+		flushEventLog(eventBuffer.getScrollBuffer());
 	}
+
+	private <T> void flushEventLog(EventQueueBuffer<T> buffer) {
+		for (String key : new ArrayList<>(buffer.getLastUpdatedMap().keySet())) {
+			Long lastUpdated = buffer.getLastUpdatedMap().get(key);
+
+			SessionDataKey sessionKey = SessionDataKeyUtils.parseKey(key);
+			if (sessionKey == null) {
+				continue;
+			}
+
+			List<T> staleEvents = buffer.flushEvents(sessionKey);
+
+			// TODO: 이벤트 저장 (타입에 따라 분기 가능)
+			eventLogService.saveAll(staleEvents);
+		}
+	}
+
+
 }
