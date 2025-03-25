@@ -13,9 +13,11 @@ import lombok.NonNull;
 public record RegistersInfoResponse(
 	@Schema(description = "등록된 솔루션(RegisterInfo)을 리스트 형태로 반환", required = true)
 	@NonNull
-	List<RegisterInfo> registers
+	List<RegisterInfo> registerInfos
 ) {
-	public static RegistersInfoResponse create() {
-		return RegistersInfoResponse.builder().build();
+	public static RegistersInfoResponse create(List<RegisterInfo> registerInfos) {
+		return RegistersInfoResponse.builder()
+			.registerInfos(registerInfos)
+			.build();
 	}
 }

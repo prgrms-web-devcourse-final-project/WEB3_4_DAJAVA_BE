@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.register.converter;
 
+import com.dajava.backend.domain.register.RegisterInfo;
 import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
 import com.dajava.backend.domain.register.entity.Solution;
 
@@ -11,6 +12,10 @@ import com.dajava.backend.domain.register.entity.Solution;
  * @since 2025-03-24
  */
 public class RegisterConverter {
+
+	public static RegisterInfo toRegisterInfo(Solution solution) {
+		return RegisterInfo.builder().build();
+	}
 
 	public static RegisterCreateResponse toSolutionCreateResponse(final Solution solution) {
 		return RegisterCreateResponse.builder()
