@@ -12,8 +12,10 @@ import org.mockito.ArgumentCaptor;
 
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.service.EventBatchService;
 import com.dajava.backend.domain.event.service.EventLogService;
 import com.dajava.backend.global.component.buffer.EventBuffer;
+
 /*
  * 스케줄러 통합테스트 입니다.
  *
@@ -24,6 +26,7 @@ public class EventBufferSchedulerTest {
 
 	private EventLogService eventLogService;
 	private EventBuffer eventBuffer;
+	private EventBatchService eventBatchService;
 	private EventBufferScheduler scheduler;
 
 	final long inactivityThresholdMs = 10 * 60 * 1000; // 10분
@@ -32,7 +35,7 @@ public class EventBufferSchedulerTest {
 	void setUp() {
 		eventLogService = mock(EventLogService.class);
 		eventBuffer = new EventBuffer();
-		scheduler = new EventBufferScheduler(eventLogService, eventBuffer);
+		scheduler = new EventBufferScheduler(eventLogService, eventBatchService, eventBuffer);
 	}
 
 	@Test
