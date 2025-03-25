@@ -60,6 +60,7 @@ public class EventBatchService {
 		processScrollEvents(sessionDataKey, sessionData);
 
 		sessionDataRepository.save(sessionData);
+		sessionDataService.removeFromCache(sessionDataKey);
 	}
 
 	/**

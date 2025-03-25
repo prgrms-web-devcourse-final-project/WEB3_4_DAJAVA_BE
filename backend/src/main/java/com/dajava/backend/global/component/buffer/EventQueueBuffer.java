@@ -1,16 +1,19 @@
 package com.dajava.backend.global.component.buffer;
 
+import static com.dajava.backend.global.util.SessionDataKeyUtil.*;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.global.util.SessionDataKeyUtil;
 
 import lombok.Getter;
 
@@ -19,32 +22,24 @@ import lombok.Getter;
  */
 @Getter
 public class EventQueueBuffer<T> {
-
 	private final Map<String, Queue<T>> bufferMap = new ConcurrentHashMap<>();
 	private final Map<String, Long> lastUpdatedMap = new ConcurrentHashMap<>();
-	private final Map<String, SessionDataKey> activeKeyMap = new ConcurrentHashMap<>();
-
-	private String getKey(SessionDataKey sessionDataKey) {
-		return sessionDataKey.sessionId() + "|" + sessionDataKey.pageUrl() + "|" + sessionDataKey.memberSerialNumber();
-	}
 
 	public void addEvent(SessionDataKey sessionDataKey, T event) {
-		String key = getKey(sessionDataKey);
-		activeKeyMap.putIfAbsent(key, sessionDataKey);
+		String key = toKey(sessionDataKey);
 		bufferMap.computeIfAbsent(key, k -> new ConcurrentLinkedQueue<>()).add(event);
 		lastUpdatedMap.put(key, System.currentTimeMillis());
 	}
 
 	public List<T> getEvents(SessionDataKey sessionDataKey) {
-		String key = getKey(sessionDataKey);
+		String key = toKey(sessionDataKey);
 		Queue<T> queue = bufferMap.getOrDefault(key, new ConcurrentLinkedQueue<>());
 		return new ArrayList<>(queue);
 	}
 
 	public List<T> flushEvents(SessionDataKey sessionDataKey) {
-		String key = getKey(sessionDataKey);
+		String key = toKey(sessionDataKey);
 		Queue<T> queue = bufferMap.remove(key);
-		activeKeyMap.remove(key);
 		if (queue == null) {
 			return Collections.emptyList();
 		}
@@ -60,7 +55,6 @@ public class EventQueueBuffer<T> {
 	public void clearAll() {
 		bufferMap.clear();
 		lastUpdatedMap.clear();
-		activeKeyMap.clear();
 	}
 
 	/**
@@ -73,9 +67,11 @@ public class EventQueueBuffer<T> {
 
 	/**
 	 * SessionDataKey 객체로 변환후 Set 으로 반환합니다.
-	 * @return Set buffer의 키 형식에 맞게 변환 및 반환
+	 * @return Set buffer 의 키 형식에 맞게 변환 및 반환
 	 */
 	public Set<SessionDataKey> getActiveSessionKeys() {
-		return new HashSet<>(activeKeyMap.values());
+		return getActiveKeys().stream()
+			.map(SessionDataKeyUtil::fromKey)
+			.collect(Collectors.toSet());
 	}
 }
