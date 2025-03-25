@@ -1,9 +1,16 @@
 package com.dajava.backend.domain.solution;
 
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
@@ -15,11 +22,15 @@ import reactor.core.publisher.Flux;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SolutionService {
 	@Value("${DAJAVA_AI_API_KEY}")
 	private String apiKey;
 	@Value("${DAJAVA_AI_API_URL}")
 	private String apiUrl;
+
+	@Autowired
+	private final SolutionData solutionData;
 
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
@@ -55,7 +66,26 @@ public class SolutionService {
 			.bodyToMono(String.class);
 
 		String result = response.block();
-		log.info("Gemini AI 응답: " + result);
+		// JSON 파싱 및 contents 추출
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			JsonNode rootNode = objectMapper.readTree(result);
+			// 필요한 값 추출
+			String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
+			if (text != null) {
+				String contents = text.toString();
+				Solutions solutions = new Solutions();
+				solutions.setText(contents);
+				solutionData.save(solutions);
+				log.info("Gemini AI 응답 성공, DB 저장 완료!");
+			} else {
+				log.error("Gemini AI 응답에 'contents' 필드가 없습니다.");
+			}
+		} catch (IOException e) {
+			log.error("Gemini AI 응답 JSON 파싱 오류: " + e.getMessage());
+		} catch (Exception e){
+			log.error("Gemini AI 응답 처리 중 오류 발생: " + e.getMessage());
+		}
 		return result;
 	}
 	/**
