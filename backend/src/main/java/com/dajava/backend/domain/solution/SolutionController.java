@@ -40,7 +40,7 @@ public class SolutionController {
 
 	@PostMapping(value = "/ux-solutions", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public Flux<String> getUXSolutions(@RequestBody String refineData) {
+	public Flux<String> getUXSolutions(String refineData) {
 		return solutionService.getAISolutions(refineData);
 	}
 }

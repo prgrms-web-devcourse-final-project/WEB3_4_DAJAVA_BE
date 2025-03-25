@@ -78,8 +78,8 @@ public class SolutionService {
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
 			.bodyValue(requestBody)
 			.retrieve()
-			.bodyToFlux(String.class) // Mono → Flux로 변경
-			.doOnNext(response -> log.info("Gemini AI 응답: " + response)); // 각 응답을 로깅
+			.bodyToFlux(String.class)
+			.doOnNext(response -> log.info("Gemini AI 응답: " + response));
 	}
 }
 
