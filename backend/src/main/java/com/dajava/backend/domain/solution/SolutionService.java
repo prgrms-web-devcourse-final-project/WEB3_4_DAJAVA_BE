@@ -30,7 +30,7 @@ public class SolutionService {
 	private String apiUrl;
 
 	@Autowired
-	private final SolutionData solutionData;
+	private final SolutionRepository solutionRepository;
 
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
@@ -74,9 +74,9 @@ public class SolutionService {
 			String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
 			if (text != null) {
 				String contents = text.toString();
-				Solutions solutions = new Solutions();
-				solutions.setText(contents);
-				solutionData.save(solutions);
+				SolutionEntity solutionEntity = new SolutionEntity();
+				solutionEntity.setText(contents);
+				solutionRepository.save(solutionEntity);
 				log.info("Gemini AI 응답 성공, DB 저장 완료!");
 			} else {
 				log.error("Gemini AI 응답에 'contents' 필드가 없습니다.");

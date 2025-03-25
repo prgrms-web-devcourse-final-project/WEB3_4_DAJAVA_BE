@@ -12,10 +12,12 @@ import lombok.Getter;
 import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "AISolution")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
