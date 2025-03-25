@@ -13,6 +13,8 @@ import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.RegisterDeleteResponse;
 import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.RegisterModifyResponse;
+import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Order;
 import com.dajava.backend.domain.register.entity.Solution;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
@@ -51,7 +53,7 @@ public class RegisterService {
 		return toSolutionCreateResponse(newSolution);
 	}
 
-	public RegisterModifyResponse registerSolution(RegisterModifyRequest request, Long solutionId) {
+	public RegisterModifyResponse modifySolution(RegisterModifyRequest request, Long solutionId) {
 		solutionValidator.validate(request);
 
 		LocalDateTime newEndDate = request.solutionCompleteDate();
@@ -62,5 +64,10 @@ public class RegisterService {
 	public RegisterDeleteResponse deleteSolution(Long solutionId) {
 
 		return RegisterDeleteResponse.create();
+	}
+
+	public RegistersInfoResponse getRegisterList(RegistersInfoRequest request) {
+
+		return RegistersInfoResponse.create();
 	}
 }

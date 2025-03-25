@@ -3,6 +3,7 @@ package com.dajava.backend.domain.register.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,8 @@ import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.RegisterDeleteResponse;
 import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.RegisterModifyResponse;
+import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
 import com.dajava.backend.domain.register.service.RegisterService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,14 +67,14 @@ public class RegisterController {
 	 */
 	@Operation(
 		summary = "솔루션 수정 요청",
-		description = "솔루션 폼 정보를 기반으로 등록 후 일련 번호 등 등록 정보를 반환합니다.")
+		description = "솔루션 요청 정보를 수저합니다.")
 	@PatchMapping("/v1/register/{solutionId}")
 	@ResponseStatus(HttpStatus.OK)
 	public RegisterModifyResponse modify(
 		@RequestBody RegisterModifyRequest request,
 		@PathVariable Long solutionId
 	) {
-		return registerService.registerSolution(request, solutionId);
+		return registerService.modifySolution(request, solutionId);
 	}
 
 	/**
@@ -79,13 +82,28 @@ public class RegisterController {
 	 * @return 삭제 결과 (SolutionDeleteResponse)
 	 */
 	@Operation(
-		summary = "솔루션 요청",
-		description = "솔루션 폼 정보를 기반으로 등록 후 일련 번호 등 등록 정보를 반환합니다.")
+		summary = "솔루션 삭제 요청",
+		description = "특정 솔루션을 삭제요청합니다.")
 	@DeleteMapping("/v1/register/{solutionId}")
 	@ResponseStatus(HttpStatus.OK)
 	public RegisterDeleteResponse modify(
 		@PathVariable Long solutionId
 	) {
 		return registerService.deleteSolution(solutionId);
+	}
+
+	/**
+	 * 솔루션 리스트 조회 요청 API
+	 * @return 솔루션 리스트 (RegistersInfoResponse)
+	 */
+	@Operation(
+		summary = "솔루션 리스트 조회 요청",
+		description = "페이징된 솔루션의 리스트를 반환합니다.")
+	@GetMapping("/v1/registers")
+	@ResponseStatus(HttpStatus.OK)
+	public RegistersInfoResponse list(
+		@RequestBody RegistersInfoRequest request
+	) {
+		return registerService.getRegisterList(request);
 	}
 }
