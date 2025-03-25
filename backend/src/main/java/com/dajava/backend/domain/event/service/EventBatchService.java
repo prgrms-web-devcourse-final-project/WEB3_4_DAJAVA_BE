@@ -42,11 +42,29 @@ public class EventBatchService {
 	private final SessionDataRepository sessionDataRepository;
 
 	/**
+	 * 활성 세션 배치 처리 메서드
+	 * isInactive 값이 false 로, 캐시가 제거되지 않습니다.
+	 */
+	@Transactional
+	public void processActiveBatchForSession(SessionDataKey key) {
+		processBatchForSession(key, false);
+	}
+
+	/**
+	 * 비활성 세선 배치 처리 메서드
+	 * isInactive 값이 true 로, 캐시가 제거됩니다.
+	 */
+	@Transactional
+	public void processInactiveBatchForSession(SessionDataKey key) {
+		processBatchForSession(key, true);
+	}
+
+	/**
 	 * 각 이벤트 타입의 저장 로직을 배치화한 로직입니다.
 	 * @param sessionDataKey sessionData 객체 생성 및 캐싱을 위해 주입합니다.
 	 */
 	@Transactional
-	public void processBatchForSession(SessionDataKey sessionDataKey) {
+	public void processBatchForSession(SessionDataKey sessionDataKey, boolean isInactive) {
 		log.info("{} 세션 이벤트 일괄 처리 시작", sessionDataKey);
 
 		int totalPendingEvents = countPendingEvents(sessionDataKey);
@@ -61,25 +79,10 @@ public class EventBatchService {
 		processMoveEvents(sessionDataKey, sessionData);
 		processScrollEvents(sessionDataKey, sessionData);
 
-		sessionDataRepository.save(sessionData);
-		sessionDataService.removeFromCache(sessionDataKey);
-	}
-
-	/**
-	 * 배치 처리 로직을 스케쥴러와 연결하기 위한 메서드입니다.
-	 */
-	@Transactional
-	public void processAllPendingEvents() {
-		Set<SessionDataKey> activeSessionKeys = collectActiveSessionKeys();
-		log.info("일괄 처리할 활성 세션 수: {}", activeSessionKeys.size());
-
-		for (SessionDataKey key : activeSessionKeys) {
-			try {
-				processBatchForSession(key);
-			} catch (Exception e) {
-				log.error("세션 {} 처리 중 오류 발생: {}", key, e.getMessage(), e);
-			}
+		if (isInactive) {
+			sessionDataService.removeFromCache(sessionDataKey);
 		}
+		sessionDataRepository.save(sessionData);
 	}
 
 	/**

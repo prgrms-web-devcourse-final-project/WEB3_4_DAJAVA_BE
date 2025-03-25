@@ -8,7 +8,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
@@ -34,12 +33,13 @@ public class EventBufferSchedulerTest {
 	@BeforeEach
 	void setUp() {
 		eventLogService = mock(EventLogService.class);
+		eventBatchService = mock(EventBatchService.class);  // EventBatchService mock 추가
 		eventBuffer = new EventBuffer();
 		scheduler = new EventBufferScheduler(eventLogService, eventBatchService, eventBuffer);
 	}
 
 	@Test
-	@DisplayName("스케줄러 타임아웃 통합 테스트 ")
+	@DisplayName("스케줄러 타임아웃 통합 테스트")
 	void t1() {
 		// given
 		SessionDataKey oldSessionKey = new SessionDataKey("session1", "https://example.com", "user001");
@@ -59,7 +59,7 @@ public class EventBufferSchedulerTest {
 		eventBuffer.getClickBuffer().addEvent(oldSessionKey, oldEvent);
 		eventBuffer.getClickBuffer().getLastUpdatedMap().put(
 			"session1|https://example.com|user001",
-			System.currentTimeMillis() - inactivityThresholdMs - 1
+			System.currentTimeMillis() - inactivityThresholdMs * 2
 		);
 
 		// 활성 세션 이벤트 추가
@@ -73,11 +73,11 @@ public class EventBufferSchedulerTest {
 		scheduler.flushInactiveEventBuffers();
 
 		// then
-		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-		verify(eventLogService, times(1)).saveAll(captor.capture());
+		// 이제 eventLogService 대신 eventBatchService를 검증
+		verify(eventBatchService, times(1)).processInactiveBatchForSession(eq(oldSessionKey));
 
-		List<PointerClickEventRequest> flushedEvents = captor.getValue();
-		assertThat(flushedEvents).containsExactly(oldEvent);
+		// 활성 세션은 처리되지 않았는지 확인
+		verify(eventBatchService, never()).processInactiveBatchForSession(eq(activeSessionKey));
 
 		// 활성 세션 이벤트는 여전히 남아 있음
 		List<PointerClickEventRequest> remaining = eventBuffer.getClickBuffer().getEvents(activeSessionKey);
