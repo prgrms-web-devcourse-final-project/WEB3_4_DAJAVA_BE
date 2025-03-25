@@ -3,11 +3,16 @@ package com.dajava.backend.domain.register.service;
 import static com.dajava.backend.domain.register.constant.RegisterConstant.*;
 import static com.dajava.backend.domain.register.converter.RegisterConverter.*;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.RegisterDeleteResponse;
+import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.RegisterModifyResponse;
 import com.dajava.backend.domain.register.entity.Order;
 import com.dajava.backend.domain.register.entity.Solution;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
@@ -35,7 +40,6 @@ public class RegisterService {
 
 	@Transactional
 	public RegisterCreateResponse createSolution(final RegisterCreateRequest request) {
-
 		solutionValidator.validate(request);
 
 		Solution newSolution = solutionRepository.save(Solution.create(request, DEFAULT_SOLUTION_DURATION));
@@ -45,5 +49,18 @@ public class RegisterService {
 		log.info("Order 엔티티 생성 : {} ", newOrder);
 
 		return toSolutionCreateResponse(newSolution);
+	}
+
+	public RegisterModifyResponse registerSolution(RegisterModifyRequest request, Long solutionId) {
+		solutionValidator.validate(request);
+
+		LocalDateTime newEndDate = request.solutionCompleteDate();
+
+		return RegisterModifyResponse.create();
+	}
+
+	public RegisterDeleteResponse deleteSolution(Long solutionId) {
+
+		return RegisterDeleteResponse.create();
 	}
 }

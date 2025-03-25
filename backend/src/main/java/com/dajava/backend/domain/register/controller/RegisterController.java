@@ -2,6 +2,9 @@ package com.dajava.backend.domain.register.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.RegisterDeleteResponse;
+import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.RegisterModifyResponse;
 import com.dajava.backend.domain.register.service.RegisterService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,20 +25,20 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * RegisterController
- * "/v1/solution" 로 들어오는 신청 관련 API 컨트롤러
+ * "/v1/register" 로 들어오는 신청 관련 API 컨트롤러
  * 신청관련 요청을 처리
  *
  * @author ChoiHyunSan
  * @since 2025-03-24
  */
 @Slf4j
-@RequestMapping(value = "/v1/register", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "RegisterController", description = "API 신청 폼 컨트롤러")
 @RestController
 @RequiredArgsConstructor
 public class RegisterController {
 
-	private final RegisterService solutionService;
+	private final RegisterService registerService;
 
 	/**
 	 * 솔루션 신청 폼 접수 API
@@ -40,14 +46,46 @@ public class RegisterController {
 	 * @return 신청 결과 (SolutionCreateResponse)
 	 */
 	@Operation(
-		summary = "솔루션 요청",
+		summary = "솔루션 등록 요청",
 		description = "솔루션 폼 정보를 기반으로 등록 후 일련 번호 등 등록 정보를 반환합니다.")
-	@PostMapping
+	@PostMapping("/v1/register")
 	@ResponseStatus(HttpStatus.OK)
 	public RegisterCreateResponse create(
 		@RequestBody RegisterCreateRequest request
 	) {
 		log.info(request.toString());
-		return solutionService.createSolution(request);
+		return registerService.createSolution(request);
+	}
+
+	/**
+	 * 솔루션 수정 요청 API
+	 * @param request 수정 데이터 (SolutionModifyRequest)
+	 * @return 수정 결과 (SolutionModifyResponse)
+	 */
+	@Operation(
+		summary = "솔루션 수정 요청",
+		description = "솔루션 폼 정보를 기반으로 등록 후 일련 번호 등 등록 정보를 반환합니다.")
+	@PatchMapping("/v1/register/{solutionId}")
+	@ResponseStatus(HttpStatus.OK)
+	public RegisterModifyResponse modify(
+		@RequestBody RegisterModifyRequest request,
+		@PathVariable Long solutionId
+	) {
+		return registerService.registerSolution(request, solutionId);
+	}
+
+	/**
+	 * 솔루션 삭제 요청 API
+	 * @return 삭제 결과 (SolutionDeleteResponse)
+	 */
+	@Operation(
+		summary = "솔루션 요청",
+		description = "솔루션 폼 정보를 기반으로 등록 후 일련 번호 등 등록 정보를 반환합니다.")
+	@DeleteMapping("/v1/register/{solutionId}")
+	@ResponseStatus(HttpStatus.OK)
+	public RegisterDeleteResponse modify(
+		@PathVariable Long solutionId
+	) {
+		return registerService.deleteSolution(solutionId);
 	}
 }

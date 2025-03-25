@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.SolutionRepository;
 
@@ -27,6 +28,10 @@ public class RegisterValidator {
 
 	private final SolutionRepository solutionRepository;
 
+	/**
+	 * 솔루션 등록 요청 검증 메서드
+	 * @param request 솔루션 등록 요청 DTO
+	 */
 	public void validate(final RegisterCreateRequest request) {
 
 		// Request Data 유효성 검증
@@ -38,6 +43,14 @@ public class RegisterValidator {
 		if (!solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
 			throw new RegisterException(ALREADY_REGISTER_URL);
 		}
+	}
+
+	/**
+	 * 솔루션 수정 요청 검증 메서드
+	 * @param request 솔루션 수정 요청 DTO
+	 */
+	public void validate(RegisterModifyRequest request) {
+		
 	}
 
 	private boolean isValidEmail(final String email) {
