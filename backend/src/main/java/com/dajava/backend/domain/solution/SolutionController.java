@@ -3,6 +3,7 @@ package com.dajava.backend.domain.solution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.MediaType;
@@ -23,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class SolutionController {
 	@Autowired
 	private SolutionService solutionService;
-
 	/**
 	 * UX 개선 솔루션을 얻기 위한 API
 	 * @param refineData
@@ -33,13 +33,13 @@ public class SolutionController {
 	 */
 	@PostMapping("/ux-solution")
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public String getUXSolution(String refineData) {
+	public String getUXSolution(@RequestParam("refineData") String refineData) {
 		return solutionService.getAISolution(refineData);
 	}
 
 	@PostMapping(value = "/ux-solutions", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public Flux<String> getUXSolutions(String refineData) {
+	public Flux<String> getUXSolutions(@RequestParam("refineData") String refineData) {
 		return solutionService.getAISolutions(refineData);
 	}
 }

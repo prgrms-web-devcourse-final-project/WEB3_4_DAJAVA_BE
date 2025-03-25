@@ -69,11 +69,10 @@ public class SolutionService {
 			.defaultHeader("Content-Type", "application/json")
 			.build();
 
-		String requestBody = String.format("{\n" +
-			"  \"contents\": [\n" +
-			"    {\n" +
-			"      \"parts\": [\n" +
-			"        {\"text\": \"%s\"}\n" +
+		String requestBody = String.format("{" +
+			"  \"contents\": [" +
+			"    {parts: [\n" +
+			"        {\"text\": \"%S\"}\n" +
 			"      ]\n" +
 			"    }\n" +
 			"  ]\n" +
