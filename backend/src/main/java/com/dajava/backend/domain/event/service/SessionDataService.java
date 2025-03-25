@@ -44,5 +44,10 @@ public class SessionDataService {
 				})
 		);
 	}
+
+	// DB에 반영 완료시 Cache 에서 제거하는 로직
+	public void removeFromCache(SessionDataKey key) {
+		sessionCache.remove(key);
+	}
 }
 

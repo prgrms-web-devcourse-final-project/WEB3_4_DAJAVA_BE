@@ -1,6 +1,8 @@
 package com.dajava.backend.global.component.buffer;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -10,6 +12,7 @@ import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 
 import lombok.Getter;
+
 /**
  * 리포지드에 저장하기 전 이벤트 데이터를 임시 저장하는 버퍼 데이터 구조 입니다.
  */
@@ -23,15 +26,15 @@ public class EventBuffer {
 
 	// add
 	public void addClickEvent(PointerClickEventRequest event, SessionDataKey sessionDataKey) {
-		clickBuffer.addEvent( sessionDataKey, event);
+		clickBuffer.addEvent(sessionDataKey, event);
 	}
 
 	public void addMoveEvent(PointerMoveEventRequest event, SessionDataKey sessionDataKey) {
-		moveBuffer.addEvent( sessionDataKey, event);
+		moveBuffer.addEvent(sessionDataKey, event);
 	}
 
 	public void addScrollEvent(PointerScrollEventRequest event, SessionDataKey sessionDataKey) {
-		scrollBuffer.addEvent( sessionDataKey, event);
+		scrollBuffer.addEvent(sessionDataKey, event);
 	}
 
 	// get
@@ -67,5 +70,14 @@ public class EventBuffer {
 		scrollBuffer.clearAll();
 	}
 
+	// 활성 세션 목록 반환 메서드
+	public Set<SessionDataKey> getAllActiveSessionKeys() {
+		Set<SessionDataKey> activeSessionKeys = new HashSet<>();
 
+		activeSessionKeys.addAll(clickBuffer.getActiveSessionKeys());
+		activeSessionKeys.addAll(moveBuffer.getActiveSessionKeys());
+		activeSessionKeys.addAll(scrollBuffer.getActiveSessionKeys());
+
+		return activeSessionKeys;
+	}
 }
