@@ -14,7 +14,15 @@ import com.dajava.backend.domain.register.entity.Solution;
 public class RegisterConverter {
 
 	public static RegisterInfo toRegisterInfo(Solution solution) {
-		return RegisterInfo.builder().build();
+		return RegisterInfo.builder()
+			.id(solution.getId())
+			.serialNumber(solution.getSerialNumber())
+			.email(solution.getEmail())
+			.url(solution.getUrl())
+			.isCompleted(solution.isSolutionComplete())
+			.solutionDate(solution.getCreateDate())
+			.solutionCompleteDate(solution.getEndDate())
+			.build();
 	}
 
 	public static RegisterCreateResponse toSolutionCreateResponse(final Solution solution) {
