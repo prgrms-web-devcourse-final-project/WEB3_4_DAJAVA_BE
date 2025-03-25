@@ -30,3 +30,4 @@ public interface EventLogService {
 
 	void createScrollEvent(PointerScrollEventRequest scrollEventRequest);
 }
+
