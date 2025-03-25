@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 /**
  * Gemini 솔루션 활용을 위한 서비스 클래스
@@ -52,6 +53,35 @@ public class SolutionService {
 		log.info("Gemini AI 응답: " + result);
 		return result;
 	}
+	/**
+	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드 (Flux 적용)
+	 * @param refineData
+	 * @return Flux<String> (비동기 응답 스트림)
+	 */
+	public Flux<String> getAISolutions(String refineData) {
+		WebClient client = WebClient.builder()
+			.baseUrl(apiUrl)
+			.defaultHeader("Content-Type", "application/json")
+			.build();
+
+		String requestBody = String.format("{\n" +
+			"  \"contents\": [\n" +
+			"    {\n" +
+			"      \"parts\": [\n" +
+			"        {\"text\": \"%s\"}\n" +
+			"      ]\n" +
+			"    }\n" +
+			"  ]\n" +
+			"}", refineData);
+
+		return client.post()
+			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
+			.bodyValue(requestBody)
+			.retrieve()
+			.bodyToFlux(String.class) // Mono → Flux로 변경
+			.doOnNext(response -> log.info("Gemini AI 응답: " + response)); // 각 응답을 로깅
+	}
 }
+
 
 
