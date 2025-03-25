@@ -7,6 +7,11 @@ import java.util.List;
 
 import com.dajava.backend.domain.event.PointerScrollEvent;
 
+/**
+ * 스크롤 이벤트를 분석합니다.
+ * 이상 데이터인 경우 true를 반환합니다.
+ * @author NohDongHui
+ */
 public class ScrollEventAnalyzer {
 
 	private static final long TIME_WINDOW_MS = 3000;
@@ -14,14 +19,20 @@ public class ScrollEventAnalyzer {
 	private static final int MIN_EVENT_COUNT = 3;
 	private static final int RAGE_THRESHOLD_PER_WINDOW = 3; // 윈도우 안에서 3번 이상 rage scroll
 
+	private static final int MIN_DIRECTION_CHANGES = 3; //방향 전환 횟수
+
+	private static final int SCROLL_BOTTOM_THRESHOLD = 2000; // 컨텐츠 소모 정도 감지하는 기준
+
 	/**
 	 * rage scroll을 감지합니다.
 	 * 짫은 시간 내 여러번 rage scroll이 있는 경우
 	 * @param events PointerClickEvent 리스트
 	 * @return 비정상적인 클릭 이벤트가 있을 경우 true 반환 아닌경우 false
 	 */
-	public int countRageScrollBursts(List<PointerScrollEvent> events) {
-		if (events == null || events.size() < MIN_EVENT_COUNT) return 0;
+	public boolean countRageScrollBursts(List<PointerScrollEvent> events) {
+		if (events == null || events.size() < MIN_EVENT_COUNT) {
+			return false;
+		}
 
 		//db에서 오름차순 정렬해 가져옴
 
@@ -44,9 +55,15 @@ public class ScrollEventAnalyzer {
 			}
 		}
 
-		return rageBurstCount;
+		return rageBurstCount > 0;
 	}
 
+	/**
+	 * rage scroll을 감지합니다.
+	 * 짫은 시간 내 여러번 rage scroll이 있는 경우
+	 * @param window PointerScrollEvent 리스트
+	 * @return TIME_WINDOW_MS 동안 rage scroll 횟수 반환
+	 */
 	private int countRageScrolls(List<PointerScrollEvent> window) {
 		int count = 0;
 		int i = 0;
@@ -88,5 +105,56 @@ public class ScrollEventAnalyzer {
 		int min = events.stream().mapToInt(PointerScrollEvent::getScrollY).min().orElse(0);
 		int max = events.stream().mapToInt(PointerScrollEvent::getScrollY).max().orElse(0);
 		return Math.abs(max - min);
+	}
+
+	/**
+	 * 왕복 스크롤 여부를 감지합니다.
+	 *
+	 * @param events 시간순으로 정렬된 PointerScrollEvent 리스트
+	 * @return 왕복 스크롤이 감지되면 true
+	 */
+	public boolean detectBackAndForthScroll(List<PointerScrollEvent> events) {
+		if (events == null || events.size() < 2) {
+			return false;
+		}
+
+		int directionChanges = 0;
+		Integer prevY = null;
+		Integer prevDirection = null; // 1: down, -1: up
+
+		for (PointerScrollEvent event : events) {
+			int currentY = event.getScrollY();
+
+			if (prevY != null) {
+				int delta = currentY - prevY;
+				int direction = Integer.compare(delta, 0); // 1: down, -1: up, 0: no move
+
+				if (direction != 0 && prevDirection != null && direction != prevDirection) {
+					directionChanges++;
+				}
+
+				if (direction != 0) {
+					prevDirection = direction;
+				}
+			}
+
+			prevY = currentY;
+		}
+
+		return directionChanges >= MIN_DIRECTION_CHANGES;
+	}
+
+	/**
+	 * 컨텐츠 소모율 감지
+	 * 모든 스크롤 Y값이 특정 threshold 이하일 경우 true 반환
+	 * 프론트에서 scrollHeight 받을 수 있음 값이 아닌 비율로 측정하게 바꿀수 있음
+	 * @param events 스크롤 이벤트 목록 (시간순 정렬 가정)
+	 * @return 상단 반복 스크롤 감지 시 true
+	 */
+	public boolean detectTopRepeatScroll(List<PointerScrollEvent> events) {
+		if (events == null || events.isEmpty()) return false;
+
+		return events.stream()
+			.allMatch(e -> e.getScrollY() <= SCROLL_BOTTOM_THRESHOLD);
 	}
 }
