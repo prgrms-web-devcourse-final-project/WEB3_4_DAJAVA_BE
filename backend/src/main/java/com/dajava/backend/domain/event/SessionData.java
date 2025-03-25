@@ -70,4 +70,20 @@ public class SessionData extends BaseTimeEntity {
 	public void addScrollEvent(PointerScrollEvent event) {
 		pointerScrollEvents.add(event);
 	}
+
+	public static SessionData create(String pageUrl, String sessionId, String memberSerialNumber) {
+		SessionData session = new SessionData();
+		session.pageUrl = pageUrl;
+		session.sessionId = sessionId;
+		session.memberSerialNumber = memberSerialNumber;
+
+		session.isOutlier = false;
+		session.isMissingValue = false;
+		session.isVerified = false;
+
+		// 리스트는 이미 초기화되어 있음 (@Builder.Default 또는 생성자 내부에서)
+
+		return session;
+	}
 }
+

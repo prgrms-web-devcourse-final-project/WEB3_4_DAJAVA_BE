@@ -10,7 +10,9 @@ import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 
 import lombok.Getter;
-
+/**
+ * 리포지드에 저장하기 전 이벤트 데이터를 임시 저장하는 버퍼 데이터 구조 입니다.
+ */
 @Getter
 @Component
 public class EventBuffer {

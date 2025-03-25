@@ -10,13 +10,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 
+import lombok.Getter;
+/**
+ * 3가지 로그 데이터를 제네릭 방식으로 저장하는 자료 구조 입니다.
+ */
+@Getter
 public class EventQueueBuffer<T> {
 
 	private final Map<String, Queue<T>> bufferMap = new ConcurrentHashMap<>();
 	private final Map<String, Long> lastUpdatedMap = new ConcurrentHashMap<>();
 
 	private String getKey(SessionDataKey sessionDataKey) {
-		return sessionDataKey.pageUrl() + "|" + sessionDataKey.memberSerialNumber() + "|" + sessionDataKey.sessionId();
+		return sessionDataKey.sessionId() + "|" + sessionDataKey.pageUrl() + "|" + sessionDataKey.memberSerialNumber();
 	}
 
 	public void addEvent(SessionDataKey sessionDataKey, T event) {

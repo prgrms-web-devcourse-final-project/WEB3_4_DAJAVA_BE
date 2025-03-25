@@ -69,3 +69,4 @@ public class PointerClickEvent extends BaseTimeEntity {
 		return event;
 	}
 }
+
