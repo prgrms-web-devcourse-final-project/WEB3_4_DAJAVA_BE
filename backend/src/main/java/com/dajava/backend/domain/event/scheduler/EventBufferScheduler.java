@@ -112,3 +112,4 @@ public class EventBufferScheduler {
 		return latest;
 	}
 }
+
