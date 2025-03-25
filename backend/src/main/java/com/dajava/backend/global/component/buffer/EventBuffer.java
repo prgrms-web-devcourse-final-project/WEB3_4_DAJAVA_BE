@@ -74,9 +74,9 @@ public class EventBuffer {
 	public Set<SessionDataKey> getAllActiveSessionKeys() {
 		Set<SessionDataKey> activeSessionKeys = new HashSet<>();
 
-		clickBuffer.getActiveSessionKeys().forEach(activeSessionKeys::add);
-		moveBuffer.getActiveSessionKeys().forEach(activeSessionKeys::add);
-		scrollBuffer.getActiveSessionKeys().forEach(activeSessionKeys::add);
+		activeSessionKeys.addAll(clickBuffer.getActiveSessionKeys());
+		activeSessionKeys.addAll(moveBuffer.getActiveSessionKeys());
+		activeSessionKeys.addAll(scrollBuffer.getActiveSessionKeys());
 
 		return activeSessionKeys;
 	}

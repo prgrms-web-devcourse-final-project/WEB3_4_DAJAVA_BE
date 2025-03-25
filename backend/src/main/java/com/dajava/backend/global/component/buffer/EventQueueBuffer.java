@@ -22,6 +22,7 @@ public class EventQueueBuffer<T> {
 
 	private final Map<String, Queue<T>> bufferMap = new ConcurrentHashMap<>();
 	private final Map<String, Long> lastUpdatedMap = new ConcurrentHashMap<>();
+	private final Map<String, SessionDataKey> activeKeyMap = new ConcurrentHashMap<>();
 
 	private String getKey(SessionDataKey sessionDataKey) {
 		return sessionDataKey.sessionId() + "|" + sessionDataKey.pageUrl() + "|" + sessionDataKey.memberSerialNumber();
@@ -29,6 +30,7 @@ public class EventQueueBuffer<T> {
 
 	public void addEvent(SessionDataKey sessionDataKey, T event) {
 		String key = getKey(sessionDataKey);
+		activeKeyMap.putIfAbsent(key, sessionDataKey);
 		bufferMap.computeIfAbsent(key, k -> new ConcurrentLinkedQueue<>()).add(event);
 		lastUpdatedMap.put(key, System.currentTimeMillis());
 	}
@@ -42,6 +44,7 @@ public class EventQueueBuffer<T> {
 	public List<T> flushEvents(SessionDataKey sessionDataKey) {
 		String key = getKey(sessionDataKey);
 		Queue<T> queue = bufferMap.remove(key);
+		activeKeyMap.remove(key);
 		if (queue == null) {
 			return Collections.emptyList();
 		}
@@ -57,6 +60,7 @@ public class EventQueueBuffer<T> {
 	public void clearAll() {
 		bufferMap.clear();
 		lastUpdatedMap.clear();
+		activeKeyMap.clear();
 	}
 
 	/**
@@ -72,13 +76,6 @@ public class EventQueueBuffer<T> {
 	 * @return Set buffer의 키 형식에 맞게 변환 및 반환
 	 */
 	public Set<SessionDataKey> getActiveSessionKeys() {
-		Set<SessionDataKey> keys = new HashSet<>();
-		for (String key : getActiveKeys()) {
-			String[] parts = key.split("\\|");
-			if (parts.length == 3) {
-				keys.add(new SessionDataKey(parts[0], parts[1], parts[2]));
-			}
-		}
-		return keys;
+		return new HashSet<>(activeKeyMap.values());
 	}
 }
