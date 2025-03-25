@@ -59,7 +59,7 @@ public class EventBufferSchedulerTest {
 		eventBuffer.getClickBuffer().addEvent(oldSessionKey, oldEvent);
 		eventBuffer.getClickBuffer().getLastUpdatedMap().put(
 			"session1|https://example.com|user001",
-			System.currentTimeMillis() - inactivityThresholdMs - 1
+			System.currentTimeMillis() - inactivityThresholdMs * 2
 		);
 
 		// 활성 세션 이벤트 추가

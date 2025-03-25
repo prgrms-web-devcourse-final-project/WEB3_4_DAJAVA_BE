@@ -46,7 +46,7 @@ public class EventBatchService {
 	 * @param sessionDataKey sessionData 객체 생성 및 캐싱을 위해 주입합니다.
 	 */
 	@Transactional
-	public void processBatchForSession(SessionDataKey sessionDataKey) {
+	public void processBatchForSession(SessionDataKey sessionDataKey, boolean inactive) {
 		log.info("{} 세션 이벤트 일괄 처리 시작", sessionDataKey);
 
 		int totalPendingEvents = countPendingEvents(sessionDataKey);
@@ -61,8 +61,10 @@ public class EventBatchService {
 		processMoveEvents(sessionDataKey, sessionData);
 		processScrollEvents(sessionDataKey, sessionData);
 
+		if (inactive) {
+			sessionDataService.removeFromCache(sessionDataKey);
+		}
 		sessionDataRepository.save(sessionData);
-		sessionDataService.removeFromCache(sessionDataKey);
 	}
 
 	/**
@@ -75,7 +77,8 @@ public class EventBatchService {
 
 		for (SessionDataKey key : activeSessionKeys) {
 			try {
-				processBatchForSession(key);
+				boolean inactive = false;
+				processBatchForSession(key, inactive);
 			} catch (Exception e) {
 				log.error("세션 {} 처리 중 오류 발생: {}", key, e.getMessage(), e);
 			}
