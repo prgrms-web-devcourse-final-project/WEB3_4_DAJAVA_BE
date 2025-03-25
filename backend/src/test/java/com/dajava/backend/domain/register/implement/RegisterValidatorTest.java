@@ -14,8 +14,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.register.exception.SolutionException;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.SolutionRepository;
 
 @ActiveProfiles("test")
@@ -35,7 +35,7 @@ class RegisterValidatorTest {
 	@Test
 	@DisplayName("SolutionCreateRequest-실패 : Email 형식이 잘못 됨")
 	void t1() {
-		SolutionCreateRequest request = new SolutionCreateRequest(
+		RegisterCreateRequest request = new RegisterCreateRequest(
 			"invalid-email", // 잘못된 형식의 이메일
 			"password123",
 			"localhost:3000/test",
@@ -44,7 +44,7 @@ class RegisterValidatorTest {
 		);
 
 		// when & then
-		assertThrows(SolutionException.class, () -> {
+		assertThrows(RegisterException.class, () -> {
 			validator.validate(request);
 		});
 	}
@@ -54,7 +54,7 @@ class RegisterValidatorTest {
 	void t2() {
 		// given
 		String validUrl = "localhost:3000/test";
-		SolutionCreateRequest request = new SolutionCreateRequest(
+		RegisterCreateRequest request = new RegisterCreateRequest(
 			"test@example.com",
 			"password123",
 			validUrl,
@@ -67,7 +67,7 @@ class RegisterValidatorTest {
 			.thenReturn(false);
 
 		// when & then
-		assertThrows(SolutionException.class, () -> {
+		assertThrows(RegisterException.class, () -> {
 			validator.validate(request);
 		});
 	}

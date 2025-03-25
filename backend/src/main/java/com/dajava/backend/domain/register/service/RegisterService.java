@@ -6,8 +6,8 @@ import static com.dajava.backend.domain.register.converter.RegisterConverter.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
 import com.dajava.backend.domain.register.entity.Order;
 import com.dajava.backend.domain.register.entity.Solution;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
@@ -34,7 +34,7 @@ public class RegisterService {
 	private final RegisterValidator solutionValidator;
 
 	@Transactional
-	public SolutionCreateResponse createSolution(final SolutionCreateRequest request) {
+	public RegisterCreateResponse createSolution(final RegisterCreateRequest request) {
 
 		solutionValidator.validate(request);
 

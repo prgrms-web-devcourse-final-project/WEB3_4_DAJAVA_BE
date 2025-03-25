@@ -3,7 +3,7 @@ package com.dajava.backend.domain.register.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.global.common.BaseTimeEntity;
 import com.dajava.backend.global.utils.PasswordUtils;
 
@@ -57,7 +57,7 @@ public class Solution extends BaseTimeEntity {
 	private boolean isSolutionComplete;
 
 	public static Solution create(
-		final SolutionCreateRequest request,
+		final RegisterCreateRequest request,
 		final int duration
 	) {
 		return Solution.builder()
