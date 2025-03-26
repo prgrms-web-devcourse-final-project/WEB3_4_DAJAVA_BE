@@ -39,7 +39,7 @@ public class SolutionController {
 	@PostMapping(value = "/solutions/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
 
-	public Mono<SolutionDto> getUXSolution(@RequestBody List<Map<String, Object>> sessionData) {
+	public Mono<SolutionResponseDto> getUXSolution(@RequestBody List<Map<String, Object>> sessionData) {
 		// Todo.. DTO 화
 		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionData);
 		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
