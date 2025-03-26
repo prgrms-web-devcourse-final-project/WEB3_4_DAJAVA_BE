@@ -109,6 +109,3 @@ public class SolutionService {
 			.doOnNext(response -> log.info("Gemini AI 응답 (멀티턴): " + response));
 	}
 }
-
-
-
