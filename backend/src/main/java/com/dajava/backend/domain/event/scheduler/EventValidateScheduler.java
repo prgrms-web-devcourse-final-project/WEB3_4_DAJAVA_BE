@@ -38,9 +38,14 @@ public class EventValidateScheduler {
 
 		// 2. 가져온 세션을 반복문으로 처리
 		for (SessionData sessionData : sessionDataList) {
-			clickEventAnalyzer.analyze(sessionData);
-			moveEventAnalyzer.analyze(sessionData);
-			scrollEventAnalyzer.analyze(sessionData);
+			boolean clickResult = clickEventAnalyzer.analyze(sessionData);
+			boolean moveResult = moveEventAnalyzer.analyze(sessionData);
+			boolean scrollResult = scrollEventAnalyzer.analyze(sessionData);
+
+			if (clickResult || moveResult || scrollResult) {
+				sessionData.setOutlier();
+			}
+			sessionData.endSession();
 		}
 	}
 }

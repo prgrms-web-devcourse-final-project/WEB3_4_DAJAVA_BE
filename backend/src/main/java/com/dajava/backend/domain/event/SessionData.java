@@ -100,11 +100,20 @@ public class SessionData extends BaseTimeEntity {
 		return session;
 	}
 
+	// 세션 종료시 (데이터 받기 중단) 호출 메서드
 	public void endSession() {
 		if (this.isSessionEnded) {
 			throw new IllegalStateException("세션이 이미 종료되었습니다.");
 		}
 		this.isSessionEnded = true;
+	}
+
+	// 세션 검증시 (이상치 여부 판단) 호출 메서드
+	public void setOutlier() {
+		if (this.isOutlier) {
+			throw new IllegalStateException("이미 이상치 여부 값이 참입니다.");
+		}
+		this.isOutlier = true;
 	}
 }
 
