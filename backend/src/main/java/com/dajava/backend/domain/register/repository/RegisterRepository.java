@@ -7,17 +7,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.dajava.backend.domain.register.entity.Solution;
+import com.dajava.backend.domain.register.entity.Register;
 
 /**
- * SolutionRepository
- * Solution Entity 에 대한 Spring Data Jpa 인터페이스
+ * RegisterRepository
+ * Register Entity 에 대한 Spring Data Jpa 인터페이스
  *
  * @author ChoiHyunSan
  * @since 2025-03-24
  */
 @Repository
-public interface SolutionRepository extends JpaRepository<Solution, Long> {
+public interface RegisterRepository extends JpaRepository<Register, Long> {
 
 	/**
 	 * Url 경로를 통해 이미 존재하는지 체크
@@ -30,7 +30,7 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
 		             (select s2.endDate from Solution s2 
 		              where s2.url = :url 
 		              order by s2.createDate desc limit 1) < :pastDate
-		      from Solution s
+		      from Register s
 		      where s.url = :url
 		""")
 	boolean checkUrlAvailability(

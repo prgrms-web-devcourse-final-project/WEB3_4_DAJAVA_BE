@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,7 +37,7 @@ class RegisterControllerTest {
 	void t1() throws Exception {
 		// given
 		LocalDateTime now = LocalDateTime.now();
-		SolutionCreateRequest request = new SolutionCreateRequest(
+		RegisterCreateRequest request = new RegisterCreateRequest(
 			"test@example.com",
 			"password123",
 			"localhost:3000/test",
@@ -58,7 +58,7 @@ class RegisterControllerTest {
 	void t2() throws Exception {
 		// given
 		LocalDateTime now = LocalDateTime.now();
-		SolutionCreateRequest request = new SolutionCreateRequest(
+		RegisterCreateRequest request = new RegisterCreateRequest(
 			"invalid-email", // 잘못된 이메일
 			"password123",
 			"localhost:3000/test",
@@ -79,7 +79,7 @@ class RegisterControllerTest {
 	void t3() throws Exception {
 		// given
 		LocalDateTime now = LocalDateTime.now();
-		SolutionCreateRequest request = new SolutionCreateRequest(
+		RegisterCreateRequest request = new RegisterCreateRequest(
 			"chsan626@gmail.com",
 			"password123!",
 			"localhost:3000/test123",

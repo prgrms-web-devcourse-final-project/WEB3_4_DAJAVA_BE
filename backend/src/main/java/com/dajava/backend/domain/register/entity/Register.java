@@ -3,7 +3,7 @@ package com.dajava.backend.domain.register.entity;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.global.common.BaseTimeEntity;
 import com.dajava.backend.global.utils.PasswordUtils;
 
@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class Solution extends BaseTimeEntity {
+public class Register extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,11 +56,11 @@ public class Solution extends BaseTimeEntity {
 	@Column(nullable = false)
 	private boolean isSolutionComplete;
 
-	public static Solution create(
-		final SolutionCreateRequest request,
+	public static Register create(
+		final RegisterCreateRequest request,
 		final int duration
 	) {
-		return Solution.builder()
+		return Register.builder()
 			.serialNumber(createSerialNumber())
 			.email(request.email())
 			.password(PasswordUtils.hashPassword(request.password()))

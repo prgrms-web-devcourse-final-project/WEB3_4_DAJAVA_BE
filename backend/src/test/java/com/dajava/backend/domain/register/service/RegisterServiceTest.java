@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
-import com.dajava.backend.domain.register.repository.SolutionRepository;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -21,12 +21,12 @@ class RegisterServiceTest {
 	RegisterService service;
 
 	@Autowired
-	SolutionRepository repository;
+	RegisterRepository repository;
 
 	@Test
 	@DisplayName("솔루션 생성")
 	public void t1() {
-		SolutionCreateRequest request = new SolutionCreateRequest(
+		RegisterCreateRequest request = new RegisterCreateRequest(
 			"chsan626@gmail.com",
 			"password123!",
 			"localhost:3000/test123",
@@ -34,7 +34,7 @@ class RegisterServiceTest {
 			LocalDateTime.now().plusDays(7)
 		);
 
-		SolutionCreateResponse response = service.createSolution(request);
+		RegisterCreateResponse response = service.createSolution(request);
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(1, repository.findAll().size());
 	}

@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.dajava.backend.domain.home.exception.SampleException;
-import com.dajava.backend.domain.register.exception.SolutionException;
+import com.dajava.backend.domain.register.exception.RegisterException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,8 +20,8 @@ public class GlobalExceptionHandler {
 			.body(ErrorData.create(e.getMessage()));
 	}
 
-	@ExceptionHandler(SolutionException.class)
-	public ResponseEntity<ErrorData> handleSolutionException(SolutionException e) {
+	@ExceptionHandler(RegisterException.class)
+	public ResponseEntity<ErrorData> handleSolutionException(RegisterException e) {
 		log.error("Solution Error, message : {}", e.getMessage());
 		return ResponseEntity.status(e.errorCode.getHttpStatus())
 			.body(ErrorData.create(e.getMessage()));

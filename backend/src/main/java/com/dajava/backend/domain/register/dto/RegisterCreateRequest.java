@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 
 @Schema(description = "솔루션 생성 요청 DTO")
-public record SolutionCreateRequest(
+public record RegisterCreateRequest(
 	@Schema(description = "사용자 이메일", example = "user@example.com", required = true)
 	@NonNull
 	String email,
