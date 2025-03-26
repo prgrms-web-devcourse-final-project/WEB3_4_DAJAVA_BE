@@ -35,6 +35,7 @@ public class EventLogServiceImpl implements EventLogService {
 	private final SessionDataRepository sessionDataRepository;
 	private final SessionDataService sessionDataService;
 	private final EventBuffer eventBuffer;
+	private final EventBatchService eventBatchService;
 
 	/**
 	 * 제네릭 형으로 저장된 버퍼의 클릭, 무브, 스크롤 이벤트 리스트를 저장합니다.
@@ -201,6 +202,21 @@ public class EventLogServiceImpl implements EventLogService {
 
 		// 스크롤 이벤트 버퍼링
 		eventBuffer.addScrollEvent(request, sessionDataKey);
+	}
+
+	@Override
+	@Transactional
+	public void expireSession(String sessionId) {
+		log.info("세션 종료");
+
+		SessionData data = sessionDataRepository.findBySessionId(sessionId)
+			.orElseThrow();
+
+		SessionDataKey sessionDataKey = new SessionDataKey(
+			data.getSessionId(), data.getPageUrl(), data.getMemberSerialNumber()
+		);
+
+		eventBatchService.processInactiveBatchForSession(sessionDataKey);
 	}
 }
 
