@@ -72,5 +72,12 @@ public class PointerClickEvent extends BaseTimeEntity {
 		sessionData.addClickEvent(event); // 양방향 연관관계 설정
 		return event;
 	}
+
+	public void setOutlier() {
+		if (this.isOutlier) {
+			throw new IllegalStateException("이미 이상치 여부 값이 참입니다.");
+		}
+		this.isOutlier = true;
+	}
 }
 

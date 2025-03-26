@@ -3,6 +3,8 @@ package com.dajava.backend.domain.event;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import com.dajava.backend.global.common.BaseTimeEntity;
 
 import jakarta.persistence.CascadeType;
@@ -11,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,14 +56,20 @@ public class SessionData extends BaseTimeEntity {
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
+	@OrderBy("createDate ASC")
+	@BatchSize(size = 100)
 	private List<PointerClickEvent> pointerClickEvents = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
+	@OrderBy("createDate ASC")
+	@BatchSize(size = 1000)
 	private List<PointerMoveEvent> pointerMoveEvents = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
+	@OrderBy("createDate ASC")
+	@BatchSize(size = 100)
 	private List<PointerScrollEvent> pointerScrollEvents = new ArrayList<>();
 
 	public void addClickEvent(PointerClickEvent event) {
