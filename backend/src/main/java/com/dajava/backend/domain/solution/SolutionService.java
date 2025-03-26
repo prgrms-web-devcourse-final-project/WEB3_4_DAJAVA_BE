@@ -45,19 +45,10 @@ public class SolutionService {
 			.defaultHeader("Content-Type", "application/json")
 			.build();
 
-		String requestBody = String.format("{\n" +
-			"  \"contents\": [\n" +
-			"    {\n" +
-			"      \"parts\": [\n" +
-			"        {\"text\": \"%s\"}\n" +
-			"      ]\n" +
-			"    }\n" +
-			"  ]\n" +
-			"}", refineData);
 
 		return client.post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
-			.bodyValue(requestBody)
+			.bodyValue(refineData)
 			.retrieve()
 			.bodyToMono(String.class)
 			.flatMap(result -> {
