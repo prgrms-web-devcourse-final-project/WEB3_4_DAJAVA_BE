@@ -27,8 +27,8 @@ public class SolutionEntity extends BaseTimeEntity {
 	private Long id;
 	@Column(columnDefinition = "TEXT",name = "text", nullable = false)
 	private String text;
-	// @Column(name = "sessionId", nullable = false)
-	// private String sessionId;
-	// @Column(name = "registerId", nullable = false)
-	// private String registerId;
+	@Column(name = "sessionId", nullable = false)
+	private String sessionId;
+	@Column(name = "registerId", nullable = false)
+	private String registerId;
 }
