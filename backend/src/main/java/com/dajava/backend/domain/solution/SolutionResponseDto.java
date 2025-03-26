@@ -4,6 +4,5 @@ import lombok.Data;
 
 @Data
 public class SolutionResponseDto {
-	private Long id;
 	private String text;
 }

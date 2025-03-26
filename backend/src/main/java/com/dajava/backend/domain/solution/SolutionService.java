@@ -42,11 +42,9 @@ public class SolutionService {
 	public Mono<SolutionResponseDto> getAISolution(String refineData) {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
-			.defaultHeader("Content-Type", "application/json")	//요청 본문(requestBody) 형식 지정
+			.defaultHeader("Content-Type", "application/json")
 			.build();
 
-		//요청 본문(JSON 형식)
-		//Gemini API 요청 본문 형식 준수
 		String requestBody = String.format("{\n" +
 			"  \"contents\": [\n" +
 			"    {\n" +
@@ -57,36 +55,37 @@ public class SolutionService {
 			"  ]\n" +
 			"}", refineData);
 
-		Mono<String> response = client.post()	//POST 메서드를 사용하여 API에 데이터를 전달 후 응답 대기
+		return client.post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
 			.bodyValue(requestBody)
 			.retrieve()
-			//TODO: 원래 JSON인 데이터를 String으로 형변환되어 Swagger에서 JSON 형태로 보이는 현상 해결 필요
-			//		=> DTO에 형식 지정해서 DTO로 받아와야 함
-			.bodyToMono(String.class);
-
-		String result = response.block();
-		// JSON 파싱 및 contents 추출
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			JsonNode rootNode = objectMapper.readTree(result);
-			// 필요한 값 추출
-			String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
-			if (text != null) {
-				String contents = text.toString();
-				SolutionEntity solutionEntity = new SolutionEntity();
-				solutionEntity.setText(contents);
-				solutionRepository.save(solutionEntity);
-				log.info("Gemini AI 응답 성공, DB 저장 완료!");
-			} else {
-				log.error("Gemini AI 응답에 'contents' 필드가 없습니다.");
-			}
-		} catch (IOException e) {
-			log.error("Gemini AI 응답 JSON 파싱 오류: " + e.getMessage());
-		} catch (Exception e){
-			log.error("Gemini AI 응답 처리 중 오류 발생: " + e.getMessage());
-		}
-		return result;
+			.bodyToMono(String.class)
+			.flatMap(result -> {
+				// JSON 파싱 및 DB 저장
+				ObjectMapper objectMapper = new ObjectMapper();
+				try {
+					JsonNode rootNode = objectMapper.readTree(result);
+					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
+					if (text != null) {
+						String contents = text.toString();
+						SolutionEntity solutionEntity = new SolutionEntity();
+						solutionEntity.setText(contents);
+						solutionRepository.save(solutionEntity);
+						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
+						solutionResponseDto.setText(contents);
+						return Mono.just(solutionResponseDto); // Dto에 엔티티 값 담아 Mono로 반환
+					} else {
+						log.error("Gemini AI 응답에 'contents' 필드가 없습니다.");
+						return Mono.error(new RuntimeException("Gemini AI 응답에 'contents' 필드가 없습니다."));
+					}
+				} catch (IOException e) {
+					log.error("Gemini AI 응답 JSON 파싱 오류: " + e.getMessage());
+					return Mono.error(new RuntimeException("Gemini AI 응답 JSON 파싱 오류: " + e.getMessage()));
+				} catch (Exception e) {
+					log.error("Gemini AI 응답 처리 중 오류 발생: " + e.getMessage());
+					return Mono.error(new RuntimeException("Gemini AI 응답 처리 중 오류 발생: " + e.getMessage()));
+				}
+			});
 	}
 
 
