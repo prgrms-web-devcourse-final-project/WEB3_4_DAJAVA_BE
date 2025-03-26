@@ -34,12 +34,20 @@ public class ClickEventAnalyzer implements Analyzer {
 		"container", "wrapper", "background"
 	);
 
+	/**
+	 * 클릭 이벤트를 검증해 이상치가 존재하는지 판단하는 구현체
+	 * @param sessionData 세션 데이터의 클릭 이벤트를 가져오기 위함
+	 * @return boolean true 인 경우 해당 세션 데이터의 클릭 이벤트는 이상치임
+	 */
 	@Override
 	public boolean analyze(SessionData sessionData) {
-		detectRageClicks(sessionData.getPointerClickEvents());
-		detectSuspiciousClicks(sessionData.getPointerClickEvents());
+		boolean analyzeResult1 = detectRageClicks(sessionData.getPointerClickEvents());
+		boolean analyzeResult2 = detectSuspiciousClicks(sessionData.getPointerClickEvents());
 
-		// 해당하는 경우, sessionData의 isVerified를 true로 변경
+		if (analyzeResult1 || analyzeResult2) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -53,11 +61,12 @@ public class ClickEventAnalyzer implements Analyzer {
 			return false;
 		}
 
-		// 1. 시간순 정렬 db 에서 정렬하서 가저옴
+		// 1. 시간순 정렬 db 에서 정렬해 가져옴
 
-		// rage click이 일어난 로그 이벤트 리스트 2번 일어났음 rageGroups 리스트 크기는 2
+		// rage Click 이 일어난 로그 이벤트 리스트
+		// 2번 발생했다면 rageGroups 리스트 크기는 2
 		List<List<PointerClickEvent>> rageGroups = new ArrayList<>();
-		// rageClick인지 검사하는 윈도우 리스트
+		// rage Click 인지 검사하는 윈도우 리스트
 		LinkedList<PointerClickEvent> window = new LinkedList<>();
 
 		for (PointerClickEvent current : clickEvents) {
@@ -68,18 +77,24 @@ public class ClickEventAnalyzer implements Analyzer {
 				window.removeFirst();
 			}
 
-			//current 기준 ±10px 넘는 경우 inRange 리스트에서 삭제
+			// current 기준 ±10px 넘는 경우 inRange 리스트에서 삭제
 			List<PointerClickEvent> inRange = window.stream()
 				.filter(e -> isInProximity(e, current))
 				.toList();
 
-			//필터링 후 남은 데이터 사이즈가 MIN_CLICK_COUNT를 넘기면 rage click으로 간주
+			// 필터링 후 남은 데이터 사이즈가 MIN_CLICK_COUNT를 넘기면 rage click으로 간주
 			if (inRange.size() >= MIN_CLICK_COUNT) {
 				rageGroups.add(new ArrayList<>(inRange));
 				window.clear(); // 감지 후 윈도우 초기화 (중복 방지)
 			}
 		}
-		//rage 그룹이 존재하면 true 반환 아니면 false
+
+		// rage 그룹에 존재하는 모든 클릭 이벤트의 이상치 플래그 변경
+		rageGroups.stream()
+			.flatMap(List::stream)
+			.forEach(PointerClickEvent::setOutlier);
+
+		// rage 그룹이 존재하면 true 반환 아니면 false
 		return !rageGroups.isEmpty();
 	}
 
@@ -126,6 +141,11 @@ public class ClickEventAnalyzer implements Analyzer {
 		// onclick 속성 없음 (추가로 hasOnClick() 같은 게 있으면 활용 가능)
 		boolean hasOnClick = lowerTag.contains("onclick");
 
-		return (tagMatch || classMatch) && !hasOnClick;
+		// 클릭 이벤트가 이상치 조건을 만족하면 이상치 플래그 변경 및 true 반환
+		if ((tagMatch || classMatch) && !hasOnClick) {
+			event.setOutlier();
+			return true;
+		}
+		return false;
 	}
 }
