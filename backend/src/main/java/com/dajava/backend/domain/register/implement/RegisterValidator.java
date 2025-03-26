@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
-import com.dajava.backend.domain.register.entity.Solution;
+import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
-import com.dajava.backend.domain.register.repository.SolutionRepository;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RegisterValidator {
 
-	private final SolutionRepository solutionRepository;
+	private final RegisterRepository solutionRepository;
 
 	/**
 	 * 솔루션 등록 요청 검증 메서드
@@ -53,7 +53,7 @@ public class RegisterValidator {
 	 * @param request    솔루션 수정 요청 DTO
 	 * @param solutionId 대상 솔루션 ID
 	 */
-	public Solution validateModifyRequest(RegisterModifyRequest request, Long solutionId) {
+	public Register validateModifyRequest(RegisterModifyRequest request, Long solutionId) {
 
 		// 수정 사항에 대한 구체적인 방안이 나오지 않았으므로 아직은 체크하지 않음
 
@@ -68,7 +68,7 @@ public class RegisterValidator {
 	 * @param solutionId 대상 솔루션 ID
 	 * @return 조회된 솔루션
 	 */
-	public Solution validateDeleteRequest(Long solutionId) {
+	public Register validateDeleteRequest(Long solutionId) {
 		return solutionRepository.findById(solutionId).orElseThrow(
 			() -> new RegisterException(SOLUTION_NOT_FOUND)
 		);

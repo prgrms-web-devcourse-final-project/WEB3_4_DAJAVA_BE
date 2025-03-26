@@ -18,7 +18,7 @@ import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
-import com.dajava.backend.domain.register.repository.SolutionRepository;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 @ActiveProfiles("test")
 class RegisterValidatorTest {
@@ -27,7 +27,7 @@ class RegisterValidatorTest {
 	private RegisterValidator validator;
 
 	@Mock
-	private SolutionRepository repository;
+	private RegisterRepository repository;
 
 	@BeforeEach
 	void setUp() {

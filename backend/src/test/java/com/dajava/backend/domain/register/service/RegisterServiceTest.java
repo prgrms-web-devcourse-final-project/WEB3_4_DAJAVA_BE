@@ -15,8 +15,8 @@ import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
 import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
-import com.dajava.backend.domain.register.entity.Solution;
-import com.dajava.backend.domain.register.repository.SolutionRepository;
+import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -26,7 +26,7 @@ class RegisterServiceTest {
 	RegisterService service;
 
 	@Autowired
-	SolutionRepository repository;
+	RegisterRepository repository;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -57,7 +57,7 @@ class RegisterServiceTest {
 		// 솔루션 하나를 미리 생성
 		t1();
 
-		Solution solution = repository.findAll().get(0);
+		Register solution = repository.findAll().get(0);
 		Long solutionId = solution.getId();
 		RegisterModifyRequest request = new RegisterModifyRequest(
 			solution.getEndDate().plusDays(3)
@@ -65,7 +65,7 @@ class RegisterServiceTest {
 		int curDuration = solution.getDuration();
 
 		service.modifySolution(request, solutionId);
-		Solution modifiedSolution = repository.findById(solutionId).get();
+		Register modifiedSolution = repository.findById(solutionId).get();
 
 		Assertions.assertNotNull(modifiedSolution);
 		Assertions.assertEquals(curDuration + 72, modifiedSolution.getDuration());

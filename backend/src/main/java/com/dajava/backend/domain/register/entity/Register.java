@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class Solution extends BaseTimeEntity {
+public class Register extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,10 +61,10 @@ public class Solution extends BaseTimeEntity {
 	@Column(nullable = false)
 	private boolean isSolutionComplete;
 
-	public static Solution create(
+	public static Register create(
 		final RegisterCreateRequest request
 	) {
-		return Solution.builder()
+		return Register.builder()
 			.serialNumber(createSerialNumber())
 			.email(request.email())
 			.password(PasswordUtils.hashPassword(request.password()))

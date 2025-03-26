@@ -19,10 +19,10 @@ import com.dajava.backend.domain.register.dto.RegisterModifyResponse;
 import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
 import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Order;
-import com.dajava.backend.domain.register.entity.Solution;
+import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
 import com.dajava.backend.domain.register.repository.OrderRepository;
-import com.dajava.backend.domain.register.repository.SolutionRepository;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RegisterService {
 
-	private final SolutionRepository solutionRepository;
+	private final RegisterRepository solutionRepository;
 	private final OrderRepository orderRepository;
 	private final RegisterValidator solutionValidator;
 
@@ -53,7 +53,7 @@ public class RegisterService {
 	public RegisterCreateResponse createSolution(final RegisterCreateRequest request) {
 		solutionValidator.validateCreateRequest(request);
 
-		Solution newSolution = solutionRepository.save(Solution.create(request));
+		Register newSolution = solutionRepository.save(Register.create(request));
 		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
 
 		log.info("Solution 엔티티 생성 : {} ", newSolution);
@@ -73,7 +73,7 @@ public class RegisterService {
 	@Transactional
 	public RegisterModifyResponse modifySolution(RegisterModifyRequest request, Long solutionId) {
 
-		Solution targetSolution = solutionValidator.validateModifyRequest(request, solutionId);
+		Register targetSolution = solutionValidator.validateModifyRequest(request, solutionId);
 		targetSolution.updateEndDate(request.solutionCompleteDate());
 
 		log.info("Solution endDate 수정 성공, Target Solution : {}, New endDate : {}",
@@ -90,7 +90,7 @@ public class RegisterService {
 	 */
 	@Transactional
 	public RegisterDeleteResponse deleteSolution(Long solutionId) {
-		Solution targetSolution = solutionValidator.validateDeleteRequest(solutionId);
+		Register targetSolution = solutionValidator.validateDeleteRequest(solutionId);
 
 		log.info("Solution endDate 삭제 성공, Target Solution : {} ", solutionId);
 		return RegisterDeleteResponse.create();
