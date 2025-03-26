@@ -39,7 +39,7 @@ public class SolutionService {
 	 * @author jhon S, sungkibum
 	 * @since 2025-03-24
 	 */
-	public String getAISolution(String refineData) {
+	public Mono<SolutionResponseDto> getAISolution(String refineData) {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
 			.defaultHeader("Content-Type", "application/json")	//요청 본문(requestBody) 형식 지정

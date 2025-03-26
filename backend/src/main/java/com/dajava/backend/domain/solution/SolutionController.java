@@ -17,6 +17,7 @@ import reactor.core.publisher.Flux;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 /**
  * Gemini 솔루션 요청 컨트롤러 클래스
@@ -33,15 +34,20 @@ public class SolutionController {
 	private SolutionService solutionService;
 	/**
 	 * UX 개선 솔루션을 얻기 위한 API
-	 * @param refineData
+	 * @param sessionData
 	 * @return result(response.block())
 	 * @author jhon S, sungkibum
 	 * @since 2025-03-24
 	 */
 	@PostMapping("/solution")
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public String getUXSolution(@RequestParam("refineData") String refineData) {
-		return solutionService.getAISolution(refineData);
+	public Mono<SolutionResponseDto> getUXSolution(@RequestBody List<Map<String, Object>> sessionData) {
+		log.info("Received sessionData: " + sessionData.toString());
+		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionData);
+		log.info("Generated prompt: " + prompt);
+		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
+		log.info("Constructed refineData: " + constructedRefineData);
+		return solutionService.getAISolution(constructedRefineData);
 	}
 
 
