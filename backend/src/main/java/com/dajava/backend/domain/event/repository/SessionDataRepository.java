@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.event.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,5 +20,7 @@ public interface SessionDataRepository extends JpaRepository<SessionData, Long> 
 	);
 
 	Optional<SessionData> findBySessionId(String sessionId);
+
+	List<SessionData> findEndedSession();
 }
 

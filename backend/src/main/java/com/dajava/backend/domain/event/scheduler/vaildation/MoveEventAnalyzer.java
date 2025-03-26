@@ -5,17 +5,29 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.dajava.backend.domain.event.PointerMoveEvent;
+import com.dajava.backend.domain.event.SessionData;
+
 /**
  * 무브 이벤트를 분석합니다.
  * 이상 데이터인 경우 true를 반환합니다.
  * @author NohDongHui
  */
-public class MoveEventAnalyzer {
+@Component
+public class MoveEventAnalyzer implements Analyer {
 
 	private static final long TIME_WINDOW_MS = 3000;
 	private static final int TURN_THRESHOLD = 4;
 	private static final double ANGLE_THRESHOLD_DEGREES = 90.0;
+
+	@Override
+	public void analyse(SessionData sessionData) {
+		detectZigzagMovementByAngle(sessionData.getPointerMoveEvents());
+
+		// 해당하는 경우, sessionData의 isVerified를 true로 변경
+	}
 
 	/**
 	 * 짫은 시간 내 여러 방향으로 움직인지 검출합니다.
@@ -24,7 +36,8 @@ public class MoveEventAnalyzer {
 	 * @author NohDongHui
 	 */
 	public boolean detectZigzagMovementByAngle(List<PointerMoveEvent> events) {
-		if (events == null || events.size() < 3) return false;
+		if (events == null || events.size() < 3)
+			return false;
 
 		// db에서 시간 오름차순 정렬해 가져옴
 
@@ -88,7 +101,8 @@ public class MoveEventAnalyzer {
 			double mag1 = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
 			double mag2 = Math.sqrt(other.dx * other.dx + other.dy * other.dy);
 
-			if (mag1 == 0 || mag2 == 0) return 0; // 움직임이 없으면 각도 없음
+			if (mag1 == 0 || mag2 == 0)
+				return 0; // 움직임이 없으면 각도 없음
 
 			double cosTheta = dot / (mag1 * mag2);
 			cosTheta = Math.max(-1, Math.min(1, cosTheta)); // 안전하게 clamp 부동 소수점 계산 문제
@@ -96,6 +110,5 @@ public class MoveEventAnalyzer {
 			return Math.toDegrees(Math.acos(cosTheta)); // 코사인 역함수로 각도 계산,라디안 → 도(degree)
 		}
 	}
-
 
 }

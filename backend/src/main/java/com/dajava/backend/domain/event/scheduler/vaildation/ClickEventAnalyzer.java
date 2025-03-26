@@ -2,19 +2,22 @@ package com.dajava.backend.domain.event.scheduler.vaildation;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.PointerClickEvent;
+import com.dajava.backend.domain.event.SessionData;
+
 /**
  * 클릭 이벤트를 분석합니다.
  * 이상 데이터인 경우 true를 반환합니다.
  * @author NohDongHui
  */
-public class ClickEventAnalyzer {
+@Component
+public class ClickEventAnalyzer implements Analyer {
 
 	//5초 내 클릭 한지 감지
 	private static final int TIME_THRESHOLD_MS = 5000;
@@ -30,6 +33,14 @@ public class ClickEventAnalyzer {
 	private static final List<String> SUSPICIOUS_CLASS_KEYWORDS = List.of(
 		"container", "wrapper", "background"
 	);
+
+	@Override
+	public void analyse(SessionData sessionData) {
+		detectRageClicks(sessionData.getPointerClickEvents());
+		detectSuspiciousClicks(sessionData.getPointerClickEvents());
+
+		// 해당하는 경우, sessionData의 isVerified를 true로 변경
+	}
 
 	/**
 	 * Rage Click으로 의심되는 클릭 그룹들을 탐지합니다.
@@ -101,7 +112,8 @@ public class ClickEventAnalyzer {
 
 	private boolean isSuspiciousClick(PointerClickEvent event) {
 		String tag = "div"; //event.getClickTag(); 현재 이벤트 객체에 태그 필드 없음
-		if (tag == null || tag.isBlank()) return false;
+		if (tag == null || tag.isBlank())
+			return false;
 
 		String lowerTag = tag.toLowerCase();
 
