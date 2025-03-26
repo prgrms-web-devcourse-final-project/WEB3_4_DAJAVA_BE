@@ -2,6 +2,7 @@ package com.dajava.backend.domain.event.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -13,7 +14,7 @@ public record PointerClickEventRequest(
 	@NotNull String pageUrl,
 	@NotNull String memberSerialNumber,
 	@NotNull Long timestamp,
-	@NotNull int browserWidth,
+	@NotNull Integer browserWidth,
 	@JsonAlias("x") @NotNull Integer clientX,
 	@JsonAlias("y") @NotNull Integer clientY
 ) {

@@ -13,7 +13,7 @@ public record PointerMoveEventRequest(
 	@NotNull String pageUrl,
 	@NotNull String memberSerialNumber,
 	@NotNull Long timestamp,
-	@NotNull int browserWidth,
+	@NotNull Integer browserWidth,
 	@JsonAlias("x") @NotNull Integer clientX,
 	@JsonAlias("y") @NotNull Integer clientY
 ) {
