@@ -179,3 +179,4 @@ public class EventBatchServiceTest {
 		verify(sessionDataRepository, times(1)).save(sessionData);
 	}
 }
+

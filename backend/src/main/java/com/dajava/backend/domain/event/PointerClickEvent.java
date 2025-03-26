@@ -47,6 +47,9 @@ public class PointerClickEvent extends BaseTimeEntity {
 	@JoinColumn(name = "session_data_id")
 	private SessionData sessionData;
 
+	@Column(nullable = false)
+	boolean isOutlier;
+
 	public static PointerClickEvent create(
 		int clientX,
 		int clientY,
@@ -63,6 +66,7 @@ public class PointerClickEvent extends BaseTimeEntity {
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)
 			.memberSerialNumber(memberSerialNumber)
+			.isOutlier(false)
 			.sessionData(sessionData)
 			.build();
 		sessionData.addClickEvent(event); // 양방향 연관관계 설정

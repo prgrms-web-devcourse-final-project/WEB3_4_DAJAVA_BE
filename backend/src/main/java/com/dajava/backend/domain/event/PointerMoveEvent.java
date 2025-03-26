@@ -43,6 +43,9 @@ public class PointerMoveEvent extends BaseTimeEntity {
 	@Column(nullable = false)
 	String memberSerialNumber;
 
+	@Column(nullable = false)
+	boolean isOutlier;
+
 	@ManyToOne
 	@JoinColumn(name = "session_data_id")
 	private SessionData sessionData;
@@ -63,6 +66,7 @@ public class PointerMoveEvent extends BaseTimeEntity {
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)
 			.memberSerialNumber(memberSerialNumber)
+			.isOutlier(false)
 			.sessionData(sessionData)
 			.build();
 		sessionData.addMoveEvent(event); // 양방향 연관관계 설정
