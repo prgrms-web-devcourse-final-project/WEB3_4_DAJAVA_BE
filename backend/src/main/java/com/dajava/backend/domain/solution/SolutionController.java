@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.MediaType;
 
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Flux;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Slf4j
 public class SolutionController {
 	private final SolutionService solutionService;
-
 	/**
 	 * UX 개선 솔루션을 얻기 위한 API (Mono 반환)
 	 *
@@ -40,28 +38,13 @@ public class SolutionController {
 	 */
 	@PostMapping(value = "/solutions/json", produces = MediaType.APPLICATION_JSON_VALUE)
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public Mono<String> getUXSolution(@RequestBody List<Map<String, Object>> sessionData) {
-		log.info("Received sessionData: {}", sessionData);
+
+	public Mono<SolutionDto> getUXSolution(@RequestBody List<Map<String, Object>> sessionData) {
+		// Todo.. DTO 화
 		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionData);
-		log.info("Generated prompt: {}", prompt);
 		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
-		log.info("Constructed refineData: {}", constructedRefineData);
-		return solutionService.getAISolutions(constructedRefineData)
-			.collectList()
-			.map(list -> String.join("\n", list));
-	}
-	/**
-	 * UX 개선 솔루션을 얻기 위한 API (Flux 반환 - 스트리밍 지원)
-	 * @param sessionData 사용자 세션 로그 데이터
-	 * @return AI 모델이 분석한 UX 개선 솔루션 (Flux<String>)
-	 */
-	@PostMapping(value = "/solutions/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API (스트리밍)", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public Flux<String> getUXSolutions(@RequestBody List<Map<String, Object>> sessionData) {
+		log.info("Generated prompt: {}", prompt);
 		log.info("Received sessionData: {}", sessionData);
-		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionData);
-		log.info("Generated prompt: {}", prompt);
-		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
 		log.info("Constructed refineData: {}", constructedRefineData);
 		return solutionService.getAISolutions(constructedRefineData);
 	}
