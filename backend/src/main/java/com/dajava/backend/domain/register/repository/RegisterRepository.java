@@ -26,13 +26,16 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	 * @return 존재 여부
 	 */
 	@Query("""
-		      select count(s) = 0 or 
-		             (select s2.endDate from Solution s2 
-		              where s2.url = :url 
-		              order by s2.createDate desc limit 1) < :pastDate
-		      from Register s
-		      where s.url = :url
-		""")
+      SELECT CASE 
+             WHEN COUNT(s) = 0 THEN true
+             WHEN (SELECT s2.endDate FROM Register s2 
+                  WHERE s2.url = :url 
+                  ORDER BY s2.createDate DESC LIMIT 1) < :pastDate THEN true
+             ELSE false
+             END
+      FROM Register s
+      WHERE s.url = :url
+    """)
 	boolean checkUrlAvailability(
 		@Param("url") String url,
 		@Param("pastDate") LocalDateTime pastDate);
