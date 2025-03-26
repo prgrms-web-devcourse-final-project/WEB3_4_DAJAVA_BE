@@ -41,5 +41,6 @@ src/main/resources/application-secret.yml
 
 db_dev.mv.db
 .env
+../.DS_Store
 
 
