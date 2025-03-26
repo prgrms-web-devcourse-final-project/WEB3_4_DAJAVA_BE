@@ -3,21 +3,20 @@ package com.dajava.backend.domain.solution;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.MediaType;
 
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Flux;
-
 import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
-
+import reactor.core.publisher.Flux;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Gemini 솔루션 요청 컨트롤러 클래스
@@ -30,39 +29,30 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequiredArgsConstructor
 @Slf4j
 public class SolutionController {
-	private final SolutionService solutionService;
-
+	@Autowired
+	private SolutionService solutionService;
 	/**
-	 * UX 개선 솔루션을 얻기 위한 API (Mono 반환)
-	 *
-	 * @param sessionData 사용자 세션 로그 데이터
-	 * @return AI 모델이 분석한 UX 개선 솔루션 (Mono<String>)
+	 * UX 개선 솔루션을 얻기 위한 API
+	 * @param refineData
+	 * @return result(response.block())
+	 * @author jhon S, sungkibum
+	 * @since 2025-03-24
 	 */
-	@PostMapping(value = "/solutions/json", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping("/solution")
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public Mono<String> getUXSolution(@RequestBody List<Map<String, Object>> sessionData) {
-		log.info("Received sessionData: {}", sessionData);
-		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionData);
-		log.info("Generated prompt: {}", prompt);
-		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
-		log.info("Constructed refineData: {}", constructedRefineData);
-		return solutionService.getAISolutions(constructedRefineData)
-			.collectList()
-			.map(list -> String.join("\n", list));
+	public String getUXSolution(@RequestParam("refineData") String refineData) {
+		return solutionService.getAISolution(refineData);
 	}
-	/**
-	 * UX 개선 솔루션을 얻기 위한 API (Flux 반환 - 스트리밍 지원)
-	 * @param sessionData 사용자 세션 로그 데이터
-	 * @return AI 모델이 분석한 UX 개선 솔루션 (Flux<String>)
-	 */
-	@PostMapping(value = "/solutions/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API (스트리밍)", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
+
+
+	@PostMapping(value = "/solutions", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
 	public Flux<String> getUXSolutions(@RequestBody List<Map<String, Object>> sessionData) {
-		log.info("Received sessionData: {}", sessionData);
+		log.info("Received sessionData: " + sessionData.toString());
 		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionData);
-		log.info("Generated prompt: {}", prompt);
+		log.info("Generated prompt: " + prompt);
 		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
-		log.info("Constructed refineData: {}", constructedRefineData);
+		log.info("Constructed refineData: " + constructedRefineData);
 		return solutionService.getAISolutions(constructedRefineData);
 	}
 }
