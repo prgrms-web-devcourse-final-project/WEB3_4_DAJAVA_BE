@@ -34,16 +34,16 @@ public class SolutionController {
 	private SolutionService solutionService;
 	/**
 	 * UX 개선 솔루션을 얻기 위한 API
-	 * @param sessionData
+	 * @param sessionDatas
 	 * @return result(response.block())
 	 * @author jhon S, sungkibum
 	 * @since 2025-03-24
 	 */
 	@PostMapping("/solution")
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
-	public Mono<SolutionResponseDto> getUXSolution(@RequestBody List<Map<String, Object>> sessionData) {
-		log.info("Received sessionData: " + sessionData.toString());
-		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionData);
+	public Mono<SolutionResponseDto> getUXSolution(@RequestBody List<SolutionRequestDto> sessionDatas) {
+		log.info("Received sessionData: " + sessionDatas.toString());
+		String prompt = String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요: %s", sessionDatas);
 		log.info("Generated prompt: " + prompt);
 		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
 		log.info("Constructed refineData: " + constructedRefineData);
