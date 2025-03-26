@@ -38,6 +38,7 @@ public class SessionDataService {
 						.memberSerialNumber(k.memberSerialNumber())
 						.isOutlier(false)
 						.isMissingValue(false)
+						.isSessionEnded(false)
 						.isVerified(false)
 						.build();
 					return sessionDataRepository.save(newSession);
