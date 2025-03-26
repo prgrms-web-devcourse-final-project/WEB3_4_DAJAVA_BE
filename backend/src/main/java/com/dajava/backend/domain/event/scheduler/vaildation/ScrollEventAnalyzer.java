@@ -5,14 +5,18 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.dajava.backend.domain.event.PointerScrollEvent;
+import com.dajava.backend.domain.event.SessionData;
 
 /**
  * 스크롤 이벤트를 분석합니다.
- * 이상 데이터인 경우 true를 반환합니다.
+ * 이상 데이터인 경우 true 를 반환합니다.
  * @author NohDongHui
  */
-public class ScrollEventAnalyzer {
+@Component
+public class ScrollEventAnalyzer implements Analyzer {
 
 	private static final long TIME_WINDOW_MS = 3000;
 	private static final int MIN_SCROLL_DELTA = 300; // 변경됨
@@ -22,6 +26,14 @@ public class ScrollEventAnalyzer {
 	private static final int MIN_DIRECTION_CHANGES = 3; //방향 전환 횟수
 
 	private static final int SCROLL_BOTTOM_THRESHOLD = 2000; // 컨텐츠 소모 정도 감지하는 기준
+
+	@Override
+	public boolean analyze(SessionData sessionData) {
+		detectBackAndForthScroll(sessionData.getPointerScrollEvents());
+		detectTopRepeatScroll(sessionData.getPointerScrollEvents());
+
+		// 해당하는 경우, sessionData의 isVerified를 true로 변경
+	}
 
 	/**
 	 * rage scroll을 감지합니다.
@@ -152,7 +164,8 @@ public class ScrollEventAnalyzer {
 	 * @return 상단 반복 스크롤 감지 시 true
 	 */
 	public boolean detectTopRepeatScroll(List<PointerScrollEvent> events) {
-		if (events == null || events.isEmpty()) return false;
+		if (events == null || events.isEmpty())
+			return false;
 
 		return events.stream()
 			.allMatch(e -> e.getScrollY() <= SCROLL_BOTTOM_THRESHOLD);
