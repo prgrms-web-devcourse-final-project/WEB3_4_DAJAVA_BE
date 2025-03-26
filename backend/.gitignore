@@ -43,3 +43,4 @@ db_dev.mv.db
 .env
 
 
+.DS_Store
