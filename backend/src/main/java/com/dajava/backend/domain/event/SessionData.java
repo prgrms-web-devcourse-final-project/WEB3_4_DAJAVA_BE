@@ -43,7 +43,11 @@ public class SessionData extends BaseTimeEntity {
 	@Column(nullable = false)
 	String memberSerialNumber;
 
-	// 이상치, 결측치 검증을 했는지 확인하는 boolean 값
+	// 해당 세션이 종료되었는지 확인하는 boolean flag
+	@Column(nullable = false)
+	boolean isSessionEnded;
+
+	// 이상치, 결측치 검증을 했는지 확인하는 boolean flag
 	@Column(nullable = false)
 	boolean isVerified;
 
@@ -79,11 +83,19 @@ public class SessionData extends BaseTimeEntity {
 
 		session.isOutlier = false;
 		session.isMissingValue = false;
+		session.isSessionEnded = false;
 		session.isVerified = false;
 
 		// 리스트는 이미 초기화되어 있음 (@Builder.Default 또는 생성자 내부에서)
 
 		return session;
+	}
+
+	public void endSession() {
+		if (this.isSessionEnded) {
+			throw new IllegalStateException("세션이 이미 종료되었습니다.");
+		}
+		this.isSessionEnded = true;
 	}
 }
 
