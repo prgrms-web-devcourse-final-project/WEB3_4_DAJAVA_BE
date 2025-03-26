@@ -1,2 +1,9 @@
 /db_dev.mv.db
 .DS_Store
+/.idea/.gitignore
+/.idea/checkstyle-idea.xml
+/.idea/DAJAVA.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
