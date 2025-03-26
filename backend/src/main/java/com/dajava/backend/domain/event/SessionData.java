@@ -90,5 +90,12 @@ public class SessionData extends BaseTimeEntity {
 
 		return session;
 	}
+
+	public void endSession() {
+		if (this.isSessionEnded) {
+			throw new IllegalStateException("세션이 이미 종료되었습니다.");
+		}
+		this.isSessionEnded = true;
+	}
 }
 

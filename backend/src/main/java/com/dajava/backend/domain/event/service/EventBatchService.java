@@ -81,6 +81,8 @@ public class EventBatchService {
 
 		if (isInactive) {
 			sessionDataService.removeFromCache(sessionDataKey);
+			// 세션 종료 flag 값 true 로 변경
+			sessionData.endSession();
 		}
 		sessionDataRepository.save(sessionData);
 	}
