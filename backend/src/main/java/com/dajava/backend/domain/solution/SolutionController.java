@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,10 +34,11 @@ import reactor.core.publisher.Mono;
 public class SolutionController {
 	@Autowired
 	private SolutionService solutionService;
+
 	/**
 	 * UX 개선 솔루션을 얻기 위한 API
 	 * @param sessionDatas
-	 * @return result(response.block())
+	 * @return result(response.block ())
 	 * @author jhon S, sungkibum
 	 * @since 2025-03-24
 	 */
@@ -50,7 +53,6 @@ public class SolutionController {
 		return solutionService.getAISolution(constructedRefineData);
 	}
 
-
 	@PostMapping(value = "/solutions", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	@Operation(summary = "UX 개선 솔루션을 얻기 위한 API", description = "AI 모델에 로그 데이터를 보내 UX 개선 솔루션을 받아옵니다.")
 	public Flux<String> getUXSolutions(@RequestBody List<Map<String, Object>> sessionData) {
@@ -60,5 +62,11 @@ public class SolutionController {
 		String constructedRefineData = String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
 		log.info("Constructed refineData: " + constructedRefineData);
 		return solutionService.getAISolutions(constructedRefineData);
+	}
+
+	@GetMapping("/solution/{serialNumber}/{password}")
+	@Operation(summary = "최종 솔루션을 얻기 위한 API(Gemini 자연어 솔루션)", description = "최종 UI 개선 솔루션을 조회합니다.")
+	public SolutionInfoResponse getSolution(@PathVariable String serialNumber, @PathVariable String password) {
+		return solutionService.getSolution(serialNumber, password);
 	}
 }

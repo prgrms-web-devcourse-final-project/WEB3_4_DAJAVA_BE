@@ -1,12 +1,17 @@
 package com.dajava.backend.domain.solution;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ResponseStatusException;
 
+import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,6 +36,9 @@ public class SolutionService {
 
 	@Autowired
 	private final SolutionRepository solutionRepository;
+
+	@Autowired
+	private final RegisterRepository registerRepository;
 
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
@@ -97,5 +105,18 @@ public class SolutionService {
 			.retrieve()
 			.bodyToFlux(String.class)
 			.doOnNext(response -> log.info("Gemini AI 응답 (멀티턴): " + response));
+	}
+
+	public SolutionInfoResponse getSolution(String serialNumber, String password) {
+		Register findRegister = registerRepository.findBySerialNumber(serialNumber);
+		Long id = findRegister.getId();
+		Optional<SolutionEntity> opSolutionEntity = solutionRepository.findById(id);
+		if (opSolutionEntity.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "솔루션을 찾을 수 없습니다.");
+		} else {
+			SolutionEntity solutionEntity = opSolutionEntity.get();
+			return new SolutionInfoResponse(solutionEntity.getText());
+		}
+
 	}
 }
