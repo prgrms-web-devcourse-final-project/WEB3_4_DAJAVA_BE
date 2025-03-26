@@ -17,5 +17,7 @@ public interface SessionDataRepository extends JpaRepository<SessionData, Long> 
 	Optional<SessionData> findByPageUrlAndSessionIdAndMemberSerialNumber(
 		String pageUrl, String sessionId, String memberSerialNumber
 	);
+
+	Optional<SessionData> findBySessionId(String sessionId);
 }
 

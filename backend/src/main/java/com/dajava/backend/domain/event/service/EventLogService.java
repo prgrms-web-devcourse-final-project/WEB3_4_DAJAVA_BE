@@ -2,7 +2,6 @@ package com.dajava.backend.domain.event.service;
 
 import java.util.List;
 
-import com.dajava.backend.domain.event.SessionData;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
@@ -29,5 +28,7 @@ public interface EventLogService {
 	void createMoveEvent(PointerMoveEventRequest moveEventRequest);
 
 	void createScrollEvent(PointerScrollEventRequest scrollEventRequest);
+
+	void expireSession(String sessionId);
 }
 
