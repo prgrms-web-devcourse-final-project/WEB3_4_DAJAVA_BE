@@ -2,7 +2,7 @@ package com.dajava.backend.domain.event.scheduler.vaildation;
 
 import com.dajava.backend.domain.event.SessionData;
 
-public interface Analyer {
+public interface Analyzer {
 
-	void analyse(SessionData sessionData);
+	boolean analyze(SessionData sessionData);
 }

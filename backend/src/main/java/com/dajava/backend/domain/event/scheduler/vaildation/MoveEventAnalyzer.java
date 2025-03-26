@@ -16,14 +16,14 @@ import com.dajava.backend.domain.event.SessionData;
  * @author NohDongHui
  */
 @Component
-public class MoveEventAnalyzer implements Analyer {
+public class MoveEventAnalyzer implements Analyzer {
 
 	private static final long TIME_WINDOW_MS = 3000;
 	private static final int TURN_THRESHOLD = 4;
 	private static final double ANGLE_THRESHOLD_DEGREES = 90.0;
 
 	@Override
-	public void analyse(SessionData sessionData) {
+	public boolean analyze(SessionData sessionData) {
 		detectZigzagMovementByAngle(sessionData.getPointerMoveEvents());
 
 		// 해당하는 경우, sessionData의 isVerified를 true로 변경

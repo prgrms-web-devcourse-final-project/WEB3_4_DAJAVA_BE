@@ -12,11 +12,11 @@ import com.dajava.backend.domain.event.SessionData;
 
 /**
  * 스크롤 이벤트를 분석합니다.
- * 이상 데이터인 경우 true를 반환합니다.
+ * 이상 데이터인 경우 true 를 반환합니다.
  * @author NohDongHui
  */
 @Component
-public class ScrollEventAnalyzer implements Analyer {
+public class ScrollEventAnalyzer implements Analyzer {
 
 	private static final long TIME_WINDOW_MS = 3000;
 	private static final int MIN_SCROLL_DELTA = 300; // 변경됨
@@ -28,7 +28,7 @@ public class ScrollEventAnalyzer implements Analyer {
 	private static final int SCROLL_BOTTOM_THRESHOLD = 2000; // 컨텐츠 소모 정도 감지하는 기준
 
 	@Override
-	public void analyse(SessionData sessionData) {
+	public boolean analyze(SessionData sessionData) {
 		detectBackAndForthScroll(sessionData.getPointerScrollEvents());
 		detectTopRepeatScroll(sessionData.getPointerScrollEvents());
 

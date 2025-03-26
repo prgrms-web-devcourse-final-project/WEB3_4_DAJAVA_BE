@@ -17,7 +17,7 @@ import com.dajava.backend.domain.event.SessionData;
  * @author NohDongHui
  */
 @Component
-public class ClickEventAnalyzer implements Analyer {
+public class ClickEventAnalyzer implements Analyzer {
 
 	//5초 내 클릭 한지 감지
 	private static final int TIME_THRESHOLD_MS = 5000;
@@ -35,7 +35,7 @@ public class ClickEventAnalyzer implements Analyer {
 	);
 
 	@Override
-	public void analyse(SessionData sessionData) {
+	public boolean analyze(SessionData sessionData) {
 		detectRageClicks(sessionData.getPointerClickEvents());
 		detectSuspiciousClicks(sessionData.getPointerClickEvents());
 
