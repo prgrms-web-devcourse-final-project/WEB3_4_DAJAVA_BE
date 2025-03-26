@@ -2,12 +2,16 @@ package com.dajava.backend.domain.event.scheduler.vaildation;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.PointerMoveEvent;
+import com.dajava.backend.domain.event.PointerScrollEvent;
 import com.dajava.backend.domain.event.SessionData;
 
 /**
@@ -23,9 +27,11 @@ public class MoveEventAnalyzer implements Analyzer {
 	private static final double ANGLE_THRESHOLD_DEGREES = 90.0;
 
 	@Override
+	@Transactional
 	public boolean analyze(SessionData sessionData) {
-		detectZigzagMovementByAngle(sessionData.getPointerMoveEvents());
+		List<PointerMoveEvent> events = sessionData.getPointerMoveEvents();
 
+		return detectZigzagMovementByAngle(events);
 		// 해당하는 경우, sessionData의 isVerified를 true로 변경
 	}
 
@@ -42,6 +48,7 @@ public class MoveEventAnalyzer implements Analyzer {
 		// db에서 시간 오름차순 정렬해 가져옴
 
 		LinkedList<PointerMoveEvent> window = new LinkedList<>();
+		Set<PointerMoveEvent> outliers = new HashSet<>();
 
 		for (PointerMoveEvent current : events) {
 			window.addLast(current);
@@ -71,10 +78,17 @@ public class MoveEventAnalyzer implements Analyzer {
 					if (angle >= ANGLE_THRESHOLD_DEGREES) {
 						turnCount++;
 					}
+
+					// 각도가 큰 변곡점에 해당하는 이벤트 2개 모두 추가
+					PointerMoveEvent e1 = window.get(i - 1);
+					PointerMoveEvent e2 = window.get(i);
+					outliers.add(e1);
+					outliers.add(e2);
 				}
 
 				if (turnCount >= TURN_THRESHOLD) {
-					return true; // 혼란스러운 궤적 탐지됨
+					convertEventsIsOutlier(new ArrayList<>(outliers));
+					return true;
 				}
 			}
 		}
@@ -84,6 +98,12 @@ public class MoveEventAnalyzer implements Analyzer {
 
 	private boolean isOutOfTimeRange(PointerMoveEvent first, PointerMoveEvent current) {
 		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > TIME_WINDOW_MS;
+	}
+
+	void convertEventsIsOutlier(List<PointerMoveEvent> events) {
+		for (PointerMoveEvent e : events) {
+			e.setOutlier();
+		}
 	}
 
 	// 내부 벡터 클래스 (2D)
@@ -112,3 +132,4 @@ public class MoveEventAnalyzer implements Analyzer {
 	}
 
 }
+
