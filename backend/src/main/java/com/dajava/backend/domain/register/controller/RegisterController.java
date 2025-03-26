@@ -32,12 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RegisterController {
 
-	private final RegisterService solutionService;
+	private final RegisterService registerService;
 
 	/**
 	 * 솔루션 신청 폼 접수 API
-	 * @param request 신청 데이터 (SolutionCreateRequest)
-	 * @return 신청 결과 (SolutionCreateResponse)
+	 * @param request 신청 데이터 (RegisterCreateRequest)
+	 * @return 신청 결과 (RegisterCreateResponse)
 	 */
 	@Operation(
 		summary = "솔루션 요청",
@@ -48,6 +48,6 @@ public class RegisterController {
 		@RequestBody RegisterCreateRequest request
 	) {
 		log.info(request.toString());
-		return solutionService.createSolution(request);
+		return registerService.createRegister(request);
 	}
 }

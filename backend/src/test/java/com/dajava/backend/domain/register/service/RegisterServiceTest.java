@@ -34,7 +34,7 @@ class RegisterServiceTest {
 			LocalDateTime.now().plusDays(7)
 		);
 
-		RegisterCreateResponse response = service.createSolution(request);
+		RegisterCreateResponse response = service.createRegister(request);
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(1, repository.findAll().size());
 	}

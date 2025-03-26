@@ -12,9 +12,9 @@ import com.dajava.backend.domain.register.entity.Register;
  */
 public class RegisterConverter {
 
-	public static RegisterCreateResponse toSolutionCreateResponse(final Register solution) {
+	public static RegisterCreateResponse toRegisterCreateResponse(final Register register) {
 		return RegisterCreateResponse.builder()
-			.serialNumber(solution.getSerialNumber())
+			.serialNumber(register.getSerialNumber())
 			.build();
 	}
 }

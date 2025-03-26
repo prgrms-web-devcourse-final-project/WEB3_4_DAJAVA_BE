@@ -29,21 +29,21 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RegisterService {
 
-	private final RegisterRepository solutionRepository;
+	private final RegisterRepository registerRepository;
 	private final OrderRepository orderRepository;
-	private final RegisterValidator solutionValidator;
+	private final RegisterValidator registerValidator;
 
 	@Transactional
-	public RegisterCreateResponse createSolution(final RegisterCreateRequest request) {
+	public RegisterCreateResponse createRegister(final RegisterCreateRequest request) {
 
-		solutionValidator.validate(request);
+		registerValidator.validate(request);
 
-		Register newSolution = solutionRepository.save(Register.create(request, DEFAULT_SOLUTION_DURATION));
+		Register newRegister= registerRepository.save(Register.create(request, DEFAULT_REGISTER_DURATION));
 		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
 
-		log.info("Solution 엔티티 생성 : {} ", newSolution);
+		log.info("Register 엔티티 생성 : {} ", newRegister);
 		log.info("Order 엔티티 생성 : {} ", newOrder);
 
-		return toSolutionCreateResponse(newSolution);
+		return toRegisterCreateResponse(newRegister);
 	}
 }
