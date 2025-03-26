@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Flux;
 
 /**
  * Gemini 솔루션 활용을 위한 서비스 클래스
@@ -52,8 +51,6 @@ public class SolutionService {
 			.baseUrl(apiUrl)
 			.defaultHeader("Content-Type", "application/json")
 			.build();
-
-
 		return client.post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
 			.bodyValue(refineData)
@@ -88,24 +85,6 @@ public class SolutionService {
 	}
 
 
-	/**
-	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드 (Flux 적용)
-	 * @param refineData
-	 * @return Flux<String> (비동기 응답 스트림)
-	 */
-	public Flux<String> getAISolutions(String refineData) {
-		WebClient client = WebClient.builder()
-			.baseUrl(apiUrl)
-			.defaultHeader("Content-Type", "application/json")
-			.build();
-
-		return client.post()
-			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
-			.bodyValue(refineData) // refineData 자체가 멀티턴 형식의 JSON이라고 가정
-			.retrieve()
-			.bodyToFlux(String.class)
-			.doOnNext(response -> log.info("Gemini AI 응답 (멀티턴): " + response));
-	}
 
 	public SolutionInfoResponse getSolution(String serialNumber, String password) {
 		Register findRegister = registerRepository.findBySerialNumber(serialNumber);
