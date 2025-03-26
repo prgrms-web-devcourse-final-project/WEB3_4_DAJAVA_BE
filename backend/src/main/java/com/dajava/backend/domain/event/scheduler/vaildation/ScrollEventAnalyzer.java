@@ -210,7 +210,9 @@ public class ScrollEventAnalyzer implements Analyzer {
 
 	void convertEventsIsOutlier(List<PointerScrollEvent> events) {
 		for (PointerScrollEvent e : events) {
-			e.setOutlier();
+			if (!Boolean.TRUE.equals(e.isOutlier())) {
+				e.setOutlier(); // 또는 e.setOutlier(); ← 내부에서 true 처리 시
+			}
 		}
 	}
 }

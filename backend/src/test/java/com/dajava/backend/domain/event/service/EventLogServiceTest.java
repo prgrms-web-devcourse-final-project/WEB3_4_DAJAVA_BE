@@ -29,14 +29,15 @@ public class EventLogServiceTest {
 	private SessionDataService sessionDataService;
 	private EventBuffer eventBuffer;
 	private EventLogService eventLogService;
-
+	private EventBatchService eventBatchService;
 
 	@BeforeEach
 	void setUp() {
 		sessionDataRepository = mock(SessionDataRepository.class);
 		sessionDataService = mock(SessionDataService.class);
 		eventBuffer = mock(EventBuffer.class);
-		eventLogService = new EventLogServiceImpl(sessionDataRepository, sessionDataService, eventBuffer);
+		eventBatchService = mock(EventBatchService.class);
+		eventLogService = new EventLogServiceImpl(sessionDataRepository, sessionDataService, eventBuffer,eventBatchService);
 	}
 
 	@Test

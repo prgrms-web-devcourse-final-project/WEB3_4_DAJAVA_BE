@@ -149,3 +149,4 @@ public class ClickEventAnalyzer implements Analyzer {
 		return false;
 	}
 }
+
