@@ -84,9 +84,7 @@ public class SolutionService {
 			});
 	}
 
-
-
-	public SolutionInfoResponse getSolution(String serialNumber, String password) {
+	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = registerRepository.findBySerialNumber(serialNumber);
 		Long id = findRegister.getId();
 		Optional<SolutionEntity> opSolutionEntity = solutionRepository.findById(id);

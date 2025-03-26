@@ -48,9 +48,9 @@ public class SolutionController {
 		return solutionService.getAISolution(constructedRefineData);
 	}
 
-	@GetMapping("/solution/{serialNumber}/{password}")
+	@GetMapping("/solutioninfo/{serialNumber}/{password}")
 	@Operation(summary = "최종 솔루션을 얻기 위한 API(Gemini 자연어 솔루션)", description = "최종 UI 개선 솔루션을 조회합니다.")
-	public SolutionInfoResponse getSolution(@PathVariable String serialNumber, @PathVariable String password) {
-		return solutionService.getSolution(serialNumber, password);
+	public SolutionInfoResponse getSolutionInfo(@PathVariable String serialNumber, @PathVariable String password) {
+		return solutionService.getSolutionInfo(serialNumber, password);
 	}
 }

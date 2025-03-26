@@ -9,9 +9,12 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
 
-	// Solution
-	INVALID_SOLUTION_REQUEST(HttpStatus.BAD_REQUEST, "요청 값에 대한 유효성 검증에 실패하였습니다"),
+	// Register
+	INVALID_REGISTER_REQUEST(HttpStatus.BAD_REQUEST, "요청 값에 대한 유효성 검증에 실패하였습니다"),
 	ALREADY_REGISTER_URL(HttpStatus.BAD_REQUEST, "이미 등록되어 있습니다"),
+
+
+	//Solution
 
 	// Sample
 	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");

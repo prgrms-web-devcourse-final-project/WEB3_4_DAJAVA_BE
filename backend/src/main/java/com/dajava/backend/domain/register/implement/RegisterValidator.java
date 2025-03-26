@@ -25,17 +25,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RegisterValidator {
 
-	private final RegisterRepository solutionRepository;
+	private final RegisterRepository registerRepository;
 
 	public void validate(final RegisterCreateRequest request) {
 
 		// Request Data 유효성 검증
 		if (!isValidEmail(request.email()) || !isValidDate(request.startDate(), request.endDate())) {
-			throw new RegisterException(INVALID_SOLUTION_REQUEST);
+			throw new RegisterException(INVALID_REGISTER_REQUEST);
 		}
 
 		// 2. Url 등록 가능 여부 체크
-		if (!solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
+		if (!registerRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
 			throw new RegisterException(ALREADY_REGISTER_URL);
 		}
 	}
