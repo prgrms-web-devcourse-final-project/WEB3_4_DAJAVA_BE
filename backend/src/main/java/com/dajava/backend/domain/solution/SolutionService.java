@@ -88,6 +88,8 @@ public class SolutionService {
 		}
 		return result;
 	}
+
+
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드 (Flux 적용)
 	 * @param refineData
@@ -99,21 +101,12 @@ public class SolutionService {
 			.defaultHeader("Content-Type", "application/json")
 			.build();
 
-		String requestBody = String.format("{" +
-			"  \"contents\": [" +
-			"    {parts: [\n" +
-			"        {\"text\": \"%S\"}\n" +
-			"      ]\n" +
-			"    }\n" +
-			"  ]\n" +
-			"}", refineData);
-
 		return client.post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
-			.bodyValue(requestBody)
+			.bodyValue(refineData) // refineData 자체가 멀티턴 형식의 JSON이라고 가정
 			.retrieve()
 			.bodyToFlux(String.class)
-			.doOnNext(response -> log.info("Gemini AI 응답: " + response));
+			.doOnNext(response -> log.info("Gemini AI 응답 (멀티턴): " + response));
 	}
 }
 
