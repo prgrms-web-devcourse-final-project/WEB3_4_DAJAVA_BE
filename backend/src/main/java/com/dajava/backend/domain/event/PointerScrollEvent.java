@@ -40,8 +40,6 @@ public class PointerScrollEvent extends BaseTimeEntity {
 	@Column(nullable = false)
 	String memberSerialNumber;
 
-	@Column(nullable = false)
-	boolean isOutlier;
 
 	@ManyToOne
 	@JoinColumn(name = "session_data_id")
@@ -61,18 +59,11 @@ public class PointerScrollEvent extends BaseTimeEntity {
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)
 			.memberSerialNumber(memberSerialNumber)
-			.isOutlier(false)
 			.sessionData(sessionData)
 			.build();
 		sessionData.addScrollEvent(event); // 양방향 연관관계 설정
 		return event;
 	}
 
-	public void setOutlier() {
-		if (this.isOutlier) {
-			throw new IllegalStateException("이미 이상치 여부 값이 참입니다.");
-		}
-		this.isOutlier = true;
-	}
 
 }

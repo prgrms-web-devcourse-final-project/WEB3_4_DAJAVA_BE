@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.event.scheduler.vaildation;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -74,10 +75,10 @@ public class ScrollEventAnalyzerTest {
 
 
 		// when
-		boolean result = analyzer.countRageScrollBursts(events);
+		List<PointerScrollEvent> result = analyzer.countRageScrollBursts(events);
 
 		// then
-		assertThat(result).isTrue(); // rage scroll 감지되어야 함
+		assertThat(result).isNotEmpty();
 	}
 
 	@Test
@@ -93,10 +94,10 @@ public class ScrollEventAnalyzerTest {
 
 
 		// when
-		boolean result = analyzer.countRageScrollBursts(events);
+		List<PointerScrollEvent> result =  analyzer.countRageScrollBursts(events);
 
 		// then
-		assertThat(result).isFalse(); // rage scroll 감지되어야 함
+		assertThat(result).isEmpty();
 	}
 
 
@@ -116,9 +117,9 @@ public class ScrollEventAnalyzerTest {
 			testScrollEvent(now.plusMillis(100),  100)
 		);
 
-		boolean result = analyzer.detectBackAndForthScroll(events);
+		List<PointerScrollEvent> result = analyzer.getBackAndForthScrollOutliers(events);
 
-		assertThat(result).isTrue();
+		assertThat(result).isNotEmpty();
 
 	}
 
@@ -135,9 +136,9 @@ public class ScrollEventAnalyzerTest {
 
 		);
 
-		boolean result = analyzer.detectBackAndForthScroll(events);
+		List<PointerScrollEvent> result = analyzer.getBackAndForthScrollOutliers(events);
 
-		assertThat(result).isFalse();
+		assertThat(result).isEmpty();
 
 	}
 
@@ -154,9 +155,9 @@ public class ScrollEventAnalyzerTest {
 
 		);
 
-		boolean result = analyzer.detectTopRepeatScroll(events);
+		List<PointerScrollEvent> result = analyzer.getTopRepeatScrollOutliers(events);
 
-		assertThat(result).isTrue();
+		assertThat(result).isNotEmpty();
 
 	}
 }

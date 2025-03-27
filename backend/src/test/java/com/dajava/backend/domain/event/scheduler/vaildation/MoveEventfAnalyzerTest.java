@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.event.scheduler.vaildation;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
@@ -61,6 +62,7 @@ public class MoveEventfAnalyzerTest {
 			testMoveEvent(now.plusMillis(500), 120, 100)  // → 오른쪽 (꺾임 4회 이상)
 		);
 
-		assertTrue(analyzer.detectZigzagMovementByAngle(events));
+		List<PointerMoveEvent> result = analyzer.detectZigzagMovementByAngle(events);
+		assertThat(result).isNotEmpty();
 	}
 }

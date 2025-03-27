@@ -1,7 +1,6 @@
 package com.dajava.backend.domain.event.scheduler.vaildation;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -64,11 +63,11 @@ public class ClickEventAnalyzerTest {
 			testClickEvent(now.plusMillis(2000), 103, 99)
 		);
 
-		assertTrue(analyzer.detectRageClicks(events));
+		assertThat(analyzer.getRageClicks(events)).isNotEmpty();
 	}
 
 	@Test
-	@DisplayName("rageClick이 일어나지 않은 경우 테스트 (기준 시간 안에 여러번 클릭 x)")
+	@DisplayName("rageClick이 일어나지 않은 경우 테스트 (시간 초과)")
 	void t2() {
 		Instant now = Instant.now();
 		List<PointerClickEvent> events = List.of(
@@ -77,11 +76,11 @@ public class ClickEventAnalyzerTest {
 			testClickEvent(now.plusMillis(12000), 103, 99)
 		);
 
-		assertFalse(analyzer.detectRageClicks(events));
+		assertThat(analyzer.getRageClicks(events)).isEmpty();
 	}
 
 	@Test
-	@DisplayName("rageClick이 일어나지 않은 경우 테스트 (기준 범위를 넘는 경우)")
+	@DisplayName("rageClick이 일어나지 않은 경우 테스트 (위치 기준 초과)")
 	void detectRageClicks_withClicksOutsideProximity_returnsFalse() {
 		Instant now = Instant.now();
 		List<PointerClickEvent> events = List.of(
@@ -90,11 +89,11 @@ public class ClickEventAnalyzerTest {
 			testClickEvent(now.plusMillis(2000), 200, 200)
 		);
 
-		assertFalse(analyzer.detectRageClicks(events));
+		assertThat(analyzer.getRageClicks(events)).isEmpty();
 	}
 
 	@Test
-	@DisplayName("rageClick이 일어나지 않은 경우 테스트 (빠르게 눌렀지만 기준보다 적게 누른 경우)")
+	@DisplayName("rageClick이 일어나지 않은 경우 테스트 (클릭 수 부족)")
 	void detectRageClicks_withLessThanMinClickCount_returnsFalse() {
 		Instant now = Instant.now();
 		List<PointerClickEvent> events = List.of(
@@ -102,14 +101,12 @@ public class ClickEventAnalyzerTest {
 			testClickEvent(now.plusMillis(1000), 102, 101)
 		);
 
-		assertFalse(analyzer.detectRageClicks(events));
+		assertThat(analyzer.getRageClicks(events)).isEmpty();
 	}
 
-
-
-	//@Test
+	@Test
+	@DisplayName("의심 클릭이 감지되는 경우 테스트")
 	void detectSuspiciousClicks_shouldReturnTrue_whenClickTagIsDivWithoutOnClick() {
-
 		PointerClickEvent event = PointerClickEvent.builder()
 			.clientX(100)
 			.clientY(200)
@@ -117,13 +114,11 @@ public class ClickEventAnalyzerTest {
 			.browserWidth(1920)
 			.sessionId("test-session")
 			.memberSerialNumber("member-123")
-			//.clickTag("div") // clickTag가 "div"이므로 의심 클릭 대상
+			// .clickTag("div") → 나중에 구현되면 반영
 			.build();
 
-		// when
-		boolean result = analyzer.detectSuspiciousClicks(List.of(event));
+		List<PointerClickEvent> result = analyzer.getSuspiciousClicks(List.of(event));
 
-		// then
-		assertThat(result).isTrue(); // div는 SUSPICIOUS_TAGS에 있고, onclick도 없으므로 true
+		assertThat(result).isNotEmpty();
 	}
 }

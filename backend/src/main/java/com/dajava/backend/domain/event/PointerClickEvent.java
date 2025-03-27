@@ -47,8 +47,6 @@ public class PointerClickEvent extends BaseTimeEntity {
 	@JoinColumn(name = "session_data_id")
 	private SessionData sessionData;
 
-	@Column(nullable = false)
-	boolean isOutlier;
 
 	public static PointerClickEvent create(
 		int clientX,
@@ -66,19 +64,13 @@ public class PointerClickEvent extends BaseTimeEntity {
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)
 			.memberSerialNumber(memberSerialNumber)
-			.isOutlier(false)
 			.sessionData(sessionData)
 			.build();
 		sessionData.addClickEvent(event); // 양방향 연관관계 설정
 		return event;
 	}
 
-	public void setOutlier() {
-		if (this.isOutlier) {
-			throw new IllegalStateException("이미 이상치 여부 값이 참입니다.");
-		}
-		this.isOutlier = true;
-	}
+
 
 	@Override
 	public String toString() {
@@ -90,7 +82,6 @@ public class PointerClickEvent extends BaseTimeEntity {
 			", browserWidth=" + browserWidth +
 			", sessionId='" + sessionId + '\'' +
 			", memberSerialNumber='" + memberSerialNumber + '\'' +
-			", isOutlier=" + isOutlier +
 			'}';
 	}
 }

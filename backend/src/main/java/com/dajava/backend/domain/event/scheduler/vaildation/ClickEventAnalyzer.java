@@ -2,13 +2,17 @@ package com.dajava.backend.domain.event.scheduler.vaildation;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.PointerClickEvent;
+import com.dajava.backend.domain.event.PointerMoveEvent;
 import com.dajava.backend.domain.event.SessionData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class ClickEventAnalyzer implements Analyzer {
+public class ClickEventAnalyzer implements Analyzer<PointerClickEvent> {
 
 	//5초 내 클릭 한지 감지
 	private static final int TIME_THRESHOLD_MS = 5000;
@@ -40,17 +44,19 @@ public class ClickEventAnalyzer implements Analyzer {
 	/**
 	 * 클릭 이벤트를 검증해 이상치가 존재하는지 판단하는 구현체
 	 * @param sessionData 세션 데이터의 클릭 이벤트를 가져오기 위함
-	 * @return boolean true 인 경우 해당 세션 데이터의 클릭 이벤트는 이상치임
+	 * @return 이상치 데이터를  중복없이 반환함
 	 */
 	@Override
-	public boolean analyze(SessionData sessionData) {
-		boolean analyzeResult1 = detectRageClicks(sessionData.getPointerClickEvents());
-		boolean analyzeResult2 = detectSuspiciousClicks(sessionData.getPointerClickEvents());
+	public List<PointerClickEvent> analyze(SessionData sessionData) {
+		List<PointerClickEvent> rageClicks = getRageClicks(sessionData.getPointerClickEvents());
+		List<PointerClickEvent> suspiciousClicks = getSuspiciousClicks(sessionData.getPointerClickEvents());
 
-		if (analyzeResult1 || analyzeResult2) {
-			return true;
-		}
-		return false;
+		// 중복 제거를 위해 Set 사용
+		Set<PointerClickEvent> resultSet = new HashSet<>();
+		resultSet.addAll(rageClicks);
+		resultSet.addAll(suspiciousClicks);
+
+		return new ArrayList<>(resultSet);
 	}
 
 	/**
@@ -59,48 +65,37 @@ public class ClickEventAnalyzer implements Analyzer {
 	 * @param clickEvents 클릭 이벤트 리스트 (동일 사용자/세션 기준)
 	 * @return Rage Click으로 판단된 클릭 그룹 리스트
 	 */
-	public boolean detectRageClicks(List<PointerClickEvent> clickEvents) {
+	public List<PointerClickEvent> getRageClicks(List<PointerClickEvent> clickEvents) {
 		if (clickEvents == null || clickEvents.size() < MIN_CLICK_COUNT) {
-			return false;
+			return Collections.emptyList();
 		}
 
 		// 1. 시간순 정렬 db 에서 정렬해 가져옴
 
-		// rage Click 이 일어난 로그 이벤트 리스트
-		// 2번 발생했다면 rageGroups 리스트 크기는 2
-		List<List<PointerClickEvent>> rageGroups = new ArrayList<>();
-		// rage Click 인지 검사하는 윈도우 리스트
+		Set<PointerClickEvent> rageClicks = new HashSet<>();
 		LinkedList<PointerClickEvent> window = new LinkedList<>();
 
 		for (PointerClickEvent current : clickEvents) {
 			window.addLast(current);
 
-			// 윈도우 조건: createDate 5초 이내, 위치 ±10px
 			while (!window.isEmpty() && isOutOfTimeRange(window.getFirst(), current)) {
 				window.removeFirst();
 			}
 
-			// current 기준 ±10px 넘는 경우 inRange 리스트에서 삭제
 			List<PointerClickEvent> inRange = window.stream()
 				.filter(e -> isInProximity(e, current))
 				.toList();
 
-			// 필터링 후 남은 데이터 사이즈가 MIN_CLICK_COUNT를 넘기면 rage click으로 간주
 			if (inRange.size() >= MIN_CLICK_COUNT) {
-				rageGroups.add(new ArrayList<>(inRange));
-				window.clear(); // 감지 후 윈도우 초기화 (중복 방지)
+				rageClicks.addAll(inRange);
+				window.clear(); // 중복 감지 방지
 			}
 		}
 
-		// rage 그룹에 존재하는 모든 클릭 이벤트의 이상치 플래그 변경
-		rageGroups.stream()
-			.flatMap(List::stream)
-			.forEach(PointerClickEvent::setOutlier);
 
-		log.info("클릭 이벤트 로깅: {}", rageGroups);
+		log.info("감지된 rage click 이벤트 수: {}", rageClicks.size());
 
-		// rage 그룹이 존재하면 true 반환 아니면 false
-		return !rageGroups.isEmpty();
+		return new ArrayList<>(rageClicks);
 	}
 
 	private boolean isOutOfTimeRange(PointerClickEvent first, PointerClickEvent current) {
@@ -116,22 +111,22 @@ public class ClickEventAnalyzer implements Analyzer {
 	 * 비정상적인 클릭 이벤트를 필터링합니다.
 	 *
 	 * @param events PointerClickEvent 리스트
-	 * @return 비정상적인 클릭 이벤트가 있을 경우 true 반환 아닌경우 false
+	 * @return 이상치 데이터 리스트 중복 없이 반환
 	 */
-	public boolean detectSuspiciousClicks(List<PointerClickEvent> events) {
+	public List<PointerClickEvent> getSuspiciousClicks(List<PointerClickEvent> events) {
 		if (events == null || events.isEmpty()) {
-			return false;
+			return Collections.emptyList();
 		}
 
-		List<PointerClickEvent> suspiciousClicks = events.stream()
+		return events.stream()
 			.filter(this::isSuspiciousClick)
-			.toList();
-
-		return !suspiciousClicks.isEmpty();
+			.collect(Collectors.toList());
 	}
 
 	private boolean isSuspiciousClick(PointerClickEvent event) {
-		String tag = "div"; //event.getClickTag(); 현재 이벤트 객체에 태그 필드 없음
+		// TODO: event.getClickTag()로 실제 태그 받아오도록 변경 예정
+		String tag = "div"; // 현재는 하드코딩되어 있음
+
 		if (tag == null || tag.isBlank()) {
 			return false;
 		}
@@ -144,14 +139,14 @@ public class ClickEventAnalyzer implements Analyzer {
 		// class 속성에 의미 없는 단어가 포함되어 있거나
 		boolean classMatch = SUSPICIOUS_CLASS_KEYWORDS.stream().anyMatch(lowerTag::contains);
 
-		// onclick 속성 없음 (추가로 hasOnClick() 같은 게 있으면 활용 가능)
+		// onclick 속성 없음 (임시 방식, 향후 별도 필드로 분리 권장)
 		boolean hasOnClick = lowerTag.contains("onclick");
 
-		// 클릭 이벤트가 이상치 조건을 만족하면 이상치 플래그 변경 및 true 반환
+		// 클릭 이벤트가 이상치 조건을 만족하면 플래그 설정 및 true 반환
 		if ((tagMatch || classMatch) && !hasOnClick) {
-			event.setOutlier();
 			return true;
 		}
+
 		return false;
 	}
 }

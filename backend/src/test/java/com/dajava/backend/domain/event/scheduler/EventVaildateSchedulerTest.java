@@ -23,6 +23,7 @@ import com.dajava.backend.domain.event.scheduler.vaildation.ScrollEventAnalyzer;
  */
 public class EventVaildateSchedulerTest {
 
+
 	private EventValidateScheduler scheduler;
 
 	private SessionDataRepository sessionDataRepository;
@@ -80,4 +81,5 @@ public class EventVaildateSchedulerTest {
 		verify(sessionDataRepository).findEndedSession();
 		verifyNoInteractions(clickEventAnalyzer, moveEventAnalyzer, scrollEventAnalyzer);
 	}
+
 }

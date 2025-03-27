@@ -1,16 +1,25 @@
 package com.dajava.backend.domain.event.scheduler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.dajava.backend.domain.event.PointerClickEvent;
+import com.dajava.backend.domain.event.PointerEvent;
+import com.dajava.backend.domain.event.PointerMoveEvent;
+import com.dajava.backend.domain.event.PointerScrollEvent;
 import com.dajava.backend.domain.event.SessionData;
+import com.dajava.backend.domain.event.SolutionData;
+import com.dajava.backend.domain.event.converter.PointerEventConverter;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
+import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.event.scheduler.vaildation.ClickEventAnalyzer;
 import com.dajava.backend.domain.event.scheduler.vaildation.MoveEventAnalyzer;
 import com.dajava.backend.domain.event.scheduler.vaildation.ScrollEventAnalyzer;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EventValidateScheduler {
 
 	private final SessionDataRepository sessionDataRepository;
+	private final SolutionDataRepository solutionDataRepository;
 
 	private final ClickEventAnalyzer clickEventAnalyzer;
 	private final MoveEventAnalyzer moveEventAnalyzer;
@@ -28,6 +38,7 @@ public class EventValidateScheduler {
 	// 비활성 상태 간주 시간 (10분)
 	private static final long VALIDATE_END_SESSION_MS = 10 * 60 * 1000;
 
+	@Transactional
 	@Scheduled(fixedRate = VALIDATE_END_SESSION_MS)
 	public void endedSessionValidate() {
 
@@ -38,15 +49,22 @@ public class EventValidateScheduler {
 
 		// 2. 가져온 세션을 반복문으로 처리
 		for (SessionData sessionData : sessionDataList) {
-			boolean clickResult = clickEventAnalyzer.analyze(sessionData);
-			boolean moveResult = moveEventAnalyzer.analyze(sessionData);
-			boolean scrollResult = scrollEventAnalyzer.analyze(sessionData);
+			String serialNumber = sessionData.getMemberSerialNumber();
+			SolutionData solutionData=SolutionData.create(serialNumber);
 
-			if (clickResult || moveResult || scrollResult) {
-				sessionData.setOutlier();
-			}
+			List<PointerClickEvent> clickResult = clickEventAnalyzer.analyze(sessionData);
+			List<PointerMoveEvent> moveResult = moveEventAnalyzer.analyze(sessionData);
+			List<PointerScrollEvent> scrollResult = scrollEventAnalyzer.analyze(sessionData);
+
 			sessionData.setVerified();
+
+			List<PointerEvent> pointerEvents = PointerEventConverter.toPointerEvents(clickResult, moveResult, scrollResult, solutionData);
+
+			solutionData.addPointerEvents(pointerEvents);
+
+			solutionDataRepository.save(solutionData);
 		}
 	}
-}
 
+
+}

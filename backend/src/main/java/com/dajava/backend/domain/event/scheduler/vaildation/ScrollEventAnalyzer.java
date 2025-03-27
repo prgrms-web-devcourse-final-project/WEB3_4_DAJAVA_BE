@@ -2,13 +2,17 @@ package com.dajava.backend.domain.event.scheduler.vaildation;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dajava.backend.domain.event.PointerMoveEvent;
 import com.dajava.backend.domain.event.PointerScrollEvent;
 import com.dajava.backend.domain.event.SessionData;
 
@@ -18,7 +22,7 @@ import com.dajava.backend.domain.event.SessionData;
  * @author NohDongHui
  */
 @Component
-public class ScrollEventAnalyzer implements Analyzer {
+public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 
 	private static final long TIME_WINDOW_MS = 3000;
 	private static final int MIN_SCROLL_DELTA = 300; // 변경됨
@@ -30,32 +34,38 @@ public class ScrollEventAnalyzer implements Analyzer {
 	private static final int SCROLL_BOTTOM_THRESHOLD = 2000; // 컨텐츠 소모 정도 감지하는 기준
 
 	@Override
-	@Transactional
-	public boolean analyze(SessionData sessionData) {
+	public List<PointerScrollEvent> analyze(SessionData sessionData) {
 		List<PointerScrollEvent> events = sessionData.getPointerScrollEvents();
 
-		return detectBackAndForthScroll(events)
-			|| detectTopRepeatScroll(events)
-			|| countRageScrollBursts(events);
-		// 해당하는 경우, sessionData의 isVerified를 true로 변경
+		List<PointerScrollEvent> rageScrolls = countRageScrollBursts(events);
+		List<PointerScrollEvent> backAndForthScrolls = getBackAndForthScrollOutliers(events);
+		List<PointerScrollEvent> topRepeatScroll = getTopRepeatScrollOutliers(events);
+
+		Set<PointerScrollEvent> resultSet = new HashSet<>();
+
+		resultSet.addAll(rageScrolls);
+		resultSet.addAll(backAndForthScrolls);
+		resultSet.addAll(topRepeatScroll);
+
+		return new ArrayList<>(resultSet);
 	}
 
 	/**
 	 * rage scroll을 감지합니다.
 	 * 짫은 시간 내 여러번 rage scroll이 있는 경우
 	 * @param events PointerClickEvent 리스트
-	 * @return 비정상적인 클릭 이벤트가 있을 경우 true 반환 아닌경우 false
+	 * @return rage scroll 에 해당하는 이벤트 반환
 	 */
-	public boolean countRageScrollBursts(List<PointerScrollEvent> events) {
+	public List<PointerScrollEvent> countRageScrollBursts(List<PointerScrollEvent> events) {
 		if (events == null || events.size() < MIN_EVENT_COUNT) {
-			return false;
+			return Collections.emptyList();
 		}
 
 		//db에서 오름차순 정렬해 가져옴
 
 		LinkedList<PointerScrollEvent> window = new LinkedList<>();
 		int rageBurstCount = 0;
-		List<PointerScrollEvent> detectedOutliers = new ArrayList<>();
+		Set<PointerScrollEvent> detectedOutliers = new HashSet<>();
 
 		for (PointerScrollEvent current : events) {
 			window.addLast(current);
@@ -76,11 +86,9 @@ public class ScrollEventAnalyzer implements Analyzer {
 			}
 		}
 
-		if (!detectedOutliers.isEmpty()) {
-			convertEventsIsOutlier(detectedOutliers);
-		}
+		List<PointerScrollEvent> result = new ArrayList<>(detectedOutliers);
 
-		return rageBurstCount > 0;
+		return result;
 	}
 
 	/**
@@ -138,16 +146,16 @@ public class ScrollEventAnalyzer implements Analyzer {
 	 * @param events 시간순으로 정렬된 PointerScrollEvent 리스트
 	 * @return 왕복 스크롤이 감지되면 true
 	 */
-	public boolean detectBackAndForthScroll(List<PointerScrollEvent> events) {
+	public List<PointerScrollEvent> getBackAndForthScrollOutliers(List<PointerScrollEvent> events) {
 		if (events == null || events.size() < 2) {
-			return false;
+			return Collections.emptyList();
 		}
 
 		int directionChanges = 0;
 		Integer prevY = null;
 		Integer prevDirection = null; // 1: down, -1: up
 
-		List<PointerScrollEvent> outlierCandidates = new ArrayList<>();
+		Set<PointerScrollEvent> outliers = new HashSet<>();
 
 		for (PointerScrollEvent event : events) {
 			int currentY = event.getScrollY();
@@ -158,7 +166,7 @@ public class ScrollEventAnalyzer implements Analyzer {
 
 				if (direction != 0 && prevDirection != null && direction != prevDirection) {
 					directionChanges++;
-					outlierCandidates.add(event);
+					outliers.add(event);
 				}
 
 				if (direction != 0) {
@@ -170,49 +178,34 @@ public class ScrollEventAnalyzer implements Analyzer {
 		}
 
 		if (directionChanges >= MIN_DIRECTION_CHANGES) {
-			convertEventsIsOutlier(outlierCandidates);
-			return true;
+			return new ArrayList<>(outliers);
 		}
 
-		return false;
+		return Collections.emptyList();
 	}
 
 	/**
 	 * 컨텐츠 소모율 감지
-	 * 모든 스크롤 Y값이 특정 threshold 이하일 경우 true 반환
+	 * 모든 스크롤 Y값이 특정 threshold 이하일 경우 이상치 반환
 	 * 프론트에서 scrollHeight 받을 수 있음 값이 아닌 비율로 측정하게 바꿀수 있음
 	 * @param events 스크롤 이벤트 목록 (시간순 정렬 가정)
-	 * @return 상단 반복 스크롤 감지 시 true
+	 * @return 상단 반복 스크롤 감지 시 이상치 반환
 	 */
-	public boolean detectTopRepeatScroll(List<PointerScrollEvent> events) {
-
+	public List<PointerScrollEvent> getTopRepeatScrollOutliers(List<PointerScrollEvent> events) {
 		if (events == null || events.isEmpty()) {
-			return false;
+			return Collections.emptyList();
 		}
 
 		boolean allUnderThreshold = events.stream()
 			.allMatch(e -> e.getScrollY() <= SCROLL_BOTTOM_THRESHOLD);
 
 		if (allUnderThreshold) {
-			// 모든 이벤트가 임계값 이하일 때 → 가장 큰 scrollY 가진 이벤트 추출
-			PointerScrollEvent maxScrollYEvent = events.stream()
-				.max(Comparator.comparingInt(PointerScrollEvent::getScrollY))
-				.orElse(null);
-
-			convertEventsIsOutlier(List.of(maxScrollYEvent));
-
-			return true;
+			// 이상치 판단: 상단 근처에서만 스크롤이 반복됨
+			return new ArrayList<>(events);
 		}
 
-		return false;
-
+		return Collections.emptyList();
 	}
 
-	void convertEventsIsOutlier(List<PointerScrollEvent> events) {
-		for (PointerScrollEvent e : events) {
-			if (!Boolean.TRUE.equals(e.isOutlier())) {
-				e.setOutlier(); // 또는 e.setOutlier(); ← 내부에서 true 처리 시
-			}
-		}
-	}
+
 }
