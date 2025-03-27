@@ -1,7 +1,11 @@
 package com.dajava.backend.domain.register.service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
@@ -12,7 +16,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 백엔드 서버 시작시 현재 날짜 기준으로 서비스 진행중인 Register 정보를 캐싱 리스트에 캐싱합니다.
+ * 백엔드 서버 시작시 현재 날짜 기준으로 서비스 진행중인 Register 의 serialNumber 를 캐싱 Set 에 캐싱합니다.
+ * @author Metronon
+ * @since 2025-03-27
  */
 @Service
 @Slf4j
@@ -20,15 +26,30 @@ public class RegisterCacheService {
 	private final RegisterRepository registerRepository;
 
 	@Getter
-	private List<Register> registerCache;
+	private Set<String> serialNumberCache;
 
 	public RegisterCacheService(RegisterRepository registerRepository) {
 		this.registerRepository = registerRepository;
+		this.serialNumberCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
 	}
 
 	public void refreshCache() {
 		LocalDateTime now = LocalDateTime.now();
-		this.registerCache = registerRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(now, now);
-		log.info("Register 캐시 갱신 완료 - {} 건", registerCache.size());
+		List<Register> activeRegisters = registerRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(now,
+			now);
+
+		Set<String> newCache = new HashSet<>();
+		for (Register register : activeRegisters) {
+			newCache.add(register.getSerialNumber());
+		}
+
+		this.serialNumberCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
+		this.serialNumberCache.addAll(newCache);
+
+		log.info("Register serialNumber 캐시 갱신 완료 - {} 건", serialNumberCache.size());
+	}
+
+	public boolean isValidSerialNumber(String serialNumber) {
+		return serialNumberCache.contains(serialNumber);
 	}
 }

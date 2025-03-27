@@ -36,6 +36,12 @@ dependencies {
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
+
+    // json 처리
+    implementation("org.json:json:20250107")
+
+    // IO 유틸
+    implementation("commons-io:commons-io:2.18.0")
 }
 
 tasks.named('test') {

@@ -16,6 +16,11 @@ import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 서버 시작 직후 및 매 정각 + 1초 마다 Register 관련 캐싱 Set 을 Refresh 하는 스케쥴러입니다.
+ * @author Metronon
+ * @since 2025-03-27
+ */
 @WebListener
 @Slf4j
 public class SchedulerInitializer implements ServletContextListener {
