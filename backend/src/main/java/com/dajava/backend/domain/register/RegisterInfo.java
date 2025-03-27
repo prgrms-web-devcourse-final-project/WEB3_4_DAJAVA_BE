@@ -5,8 +5,10 @@ import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 
 @Builder
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class RegisterInfo {
 	private Long id;

@@ -13,8 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -99,5 +102,34 @@ class RegisterControllerTest {
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	@DisplayName("솔루션 수정 : 성공")
+	void t4() throws Exception {
+		t1();
+		mockMvc.perform(patch("/v1/register/1")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
+				.content(objectMapper.writeValueAsString(new RegisterModifyRequest(LocalDateTime.now().plusDays(3L)))))
+			.andExpect(status().isOk());
+	}
+
+	@Test
+	@DisplayName("솔루션 조회 : 성공")
+	void t6() throws Exception {
+		t1();
+
+		RegistersInfoRequest request = new RegistersInfoRequest(
+			10, 0
+		);
+
+		ResultActions resultActions = mockMvc.perform(get("/v1/registers")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk());
+
+		resultActions.andExpect(jsonPath("$.registerInfos").isNotEmpty());
 	}
 }
