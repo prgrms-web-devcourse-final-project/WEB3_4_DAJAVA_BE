@@ -56,6 +56,9 @@ public class RegisterValidator {
 	public Register validateModifyRequest(RegisterModifyRequest request, Long solutionId) {
 
 		// 수정 사항에 대한 구체적인 방안이 나오지 않았으므로 아직은 체크하지 않음
+		if (request.solutionCompleteDate().getMinute() != 0 || request.solutionCompleteDate().getSecond() != 0) {
+			throw new RegisterException(INVALID_REGISTER_REQUEST);
+		}
 
 		return solutionRepository.findById(solutionId).orElseThrow(
 			() -> new RegisterException(SOLUTION_NOT_FOUND)
@@ -105,6 +108,17 @@ public class RegisterValidator {
 		if (start == null || end == null) {
 			return false;
 		}
-		return !end.isBefore(start);
+
+		// 시간 단위로 받아야 한다.
+		if (start.getMinute() != 0 || end.getMinute() != 0 || start.getSecond() != 0 || end.getSecond() != 0) {
+			return false;
+		}
+
+		// end 시간이 start 시간보다 같거나 앞에 있으면 안된다.
+		if (end.isEqual(start) || end.isBefore(start)) {
+			return false;
+		}
+
+		return true;
 	}
 }
