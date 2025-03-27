@@ -1,4 +1,5 @@
 package com.dajava.backend.domain.solution;
+import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.global.common.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -6,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import lombok.Getter;
@@ -25,10 +28,11 @@ public class SolutionEntity extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(columnDefinition = "TEXT",name = "text", nullable = false)
+
+	@Column(columnDefinition = "TEXT", name = "text", nullable = false)
 	private String text;
-	// @Column(name = "sessionId", nullable = false)
-	// private String sessionId;
-	// @Column(name = "registerId", nullable = false)
-	// private String registerId;
+
+	@OneToOne
+	@JoinColumn(name = "register_id", nullable = false)
+	private Register register;
 }
