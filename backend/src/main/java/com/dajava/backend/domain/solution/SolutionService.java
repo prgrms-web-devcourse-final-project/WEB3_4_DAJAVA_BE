@@ -1,18 +1,18 @@
 package com.dajava.backend.domain.solution;
 
+import static com.dajava.backend.domain.solution.SolutionUtils.*;
+import static com.dajava.backend.global.exception.ErrorCode.*;
+
 import java.io.IOException;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,15 +41,7 @@ public class SolutionService {
 	@Autowired
 	private final RegisterRepository registerRepository;
 
-	// 텍스트에서 serialNumber 추출하는 함수
-	private String extractSerialNumber(String text) {
-		int startIdx = text.indexOf("serialNumber=") + "serialNumber=".length();
-		int endIdx = text.indexOf(",", startIdx);
-		if (endIdx == -1) {
-			endIdx = text.length();
-		}
-		return text.substring(startIdx, endIdx).trim();
-	}
+
 
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
@@ -76,7 +68,7 @@ public class SolutionService {
 					String serialNumber = extractSerialNumber(refineData);
 					Register register = registerRepository.findBySerialNumber(serialNumber);
 					if (register == null) {
-						return Mono.error(new IllegalArgumentException("해당 serialNumber에 대한 Register를 찾을 수 없습니다."));
+						return Mono.error(new RegisterException(SERIAL_NUMBER_NOT_FOUND));
 					}
 					if (text != null) {
 						SolutionEntity solutionEntity = new SolutionEntity();
@@ -88,31 +80,29 @@ public class SolutionService {
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
 						return Mono.just(solutionResponseDto);
 					} else {
-						log.error("Gemini AI 응답에 'contents' 필드가 없습니다.");
-						return Mono.error(new RuntimeException("Gemini AI 응답에 'contents' 필드가 없습니다."));
+						return Mono.error(new RegisterException(SOLUTION_TEXT_EMPTY));
 					}
 				} catch (IOException e) {
-					log.error("Gemini AI 응답 JSON 파싱 오류: " + e.getMessage());
-					return Mono.error(new RuntimeException("Gemini AI 응답 JSON 파싱 오류: " + e.getMessage()));
+					return Mono.error(new RegisterException(SOLUTION_PARSING_ERROR));
 				} catch (Exception e) {
-					log.error("Gemini AI 응답 처리 중 오류 발생: " + e.getMessage());
-					return Mono.error(new RuntimeException("Gemini AI 응답 처리 중 오류 발생: " + e.getMessage()));
+					return Mono.error(new RegisterException(SOLUTION_RESPONSE_ERROR));
 				}
 			});
 	}
 
-
+	/**
+	 * 특정 시리얼 넘버(serialNumber)와 비밀번호(password)에 해당하는 솔루션 정보를 조회하는 메서드입니다.
+	 *
+	 * @param serialNumber 조회할 시리얼 넘버
+	 * @param password 인증을 위한 비밀번호 (현재 사용되지 않음)
+	 * @return SolutionInfoResponse 솔루션 정보 응답 객체
+	 * @throws RegisterException 시리얼 넘버를 찾을 수 없거나 솔루션 정보가 없을 경우 발생
+	 */
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
-		Register findRegister = registerRepository.findBySerialNumber(serialNumber);
-		if(findRegister == null) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"시리얼 넘버가 없습니다.");
-		}
-		Optional<SolutionEntity> opSolutionEntity = solutionRepository.findByRegister(findRegister);
-		if (opSolutionEntity.isEmpty()) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "솔루션을 찾을 수 없습니다.");
-		} else {
-			SolutionEntity solutionEntity = opSolutionEntity.get();
-			return new SolutionInfoResponse(solutionEntity.getText());
-		}
+		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
+			.orElseThrow(() -> new RegisterException(SERIAL_NUMBER_NOT_FOUND));
+		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
+			.orElseThrow(() -> new RegisterException(SOLUTION_NOT_FOUND));
+		return new SolutionInfoResponse(solutionEntity.getText());
 	}
 }
