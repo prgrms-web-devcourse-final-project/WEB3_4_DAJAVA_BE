@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.domain.event.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
+import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.event.scheduler.vaildation.ClickEventAnalyzer;
 import com.dajava.backend.domain.event.scheduler.vaildation.MoveEventAnalyzer;
 import com.dajava.backend.domain.event.scheduler.vaildation.ScrollEventAnalyzer;
@@ -30,6 +31,7 @@ public class EventVaildateSchedulerTest {
 	private ClickEventAnalyzer clickEventAnalyzer;
 	private MoveEventAnalyzer moveEventAnalyzer;
 	private ScrollEventAnalyzer scrollEventAnalyzer;
+	private SolutionDataRepository solutionDataRepository;
 
 	@BeforeEach
 	void setUp() {
@@ -37,9 +39,10 @@ public class EventVaildateSchedulerTest {
 		clickEventAnalyzer = mock(ClickEventAnalyzer.class);
 		moveEventAnalyzer = mock(MoveEventAnalyzer.class);
 		scrollEventAnalyzer = mock(ScrollEventAnalyzer.class);
-
+		solutionDataRepository = mock(SolutionDataRepository.class);
 		scheduler = new EventValidateScheduler(
 			sessionDataRepository,
+			solutionDataRepository,
 			clickEventAnalyzer,
 			moveEventAnalyzer,
 			scrollEventAnalyzer
