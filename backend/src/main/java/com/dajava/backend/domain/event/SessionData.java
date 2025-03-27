@@ -115,5 +115,13 @@ public class SessionData extends BaseTimeEntity {
 		}
 		this.isOutlier = true;
 	}
+
+	// 세션 검증 후 호출 메서드
+	public void setVerified() {
+		if (this.isVerified) {
+			throw new IllegalStateException("이미 검증이 완료된 세션 데이터 입니다.");
+		}
+		this.isVerified = true;
+	}
 }
 
