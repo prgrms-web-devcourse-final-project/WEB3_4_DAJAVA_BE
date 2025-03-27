@@ -40,7 +40,7 @@ public class SchedulerInitializer implements ServletContextListener {
 		scheduler = Executors.newSingleThreadScheduledExecutor();
 
 		LocalDateTime now = LocalDateTime.now();
-		LocalDateTime nextHour = now.plusHours(1).withMinute(0).withSecond(0).withNano(0);
+		LocalDateTime nextHour = now.plusHours(1).withMinute(0).withSecond(1).withNano(0);
 		long initialDelay = Duration.between(now, nextHour).getSeconds();
 		log.info("다음 Register 캐시 초기화까지 남은 시간: {} 초", initialDelay);
 
