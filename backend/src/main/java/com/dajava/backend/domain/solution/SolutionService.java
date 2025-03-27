@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
@@ -27,7 +26,6 @@ import reactor.core.publisher.Mono;
  * @since 2025-03-24
  */
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class SolutionService {
 	@Value("${DAJAVA_AI_API_KEY}")
@@ -40,8 +38,6 @@ public class SolutionService {
 
 	@Autowired
 	private final RegisterRepository registerRepository;
-
-
 
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
@@ -92,15 +88,17 @@ public class SolutionService {
 
 	/**
 	 * 특정 시리얼 넘버(serialNumber)와 비밀번호(password)에 해당하는 솔루션 정보를 조회하는 메서드입니다.
-	 *
 	 * @param serialNumber 조회할 시리얼 넘버
 	 * @param password 인증을 위한 비밀번호 (현재 사용되지 않음)
 	 * @return SolutionInfoResponse 솔루션 정보 응답 객체
-	 * @throws RegisterException 시리얼 넘버를 찾을 수 없거나 솔루션 정보가 없을 경우 발생
+	 * @throws RegisterException 시리얼 넘버를 찾을 수 없거나, 비밀번호가 일치하지 않거나, 솔루션 정보가 없을 경우 발생
 	 */
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
-			.orElseThrow(() -> new RegisterException(SERIAL_NUMBER_NOT_FOUND));
+			.orElseThrow(() -> new RegisterException(INVALID_SERIAL_NUMBER));
+		if (!findRegister.getPassword().equals(password)) {
+			throw new RegisterException(INVALID_PASSWORD);
+		}
 		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
 			.orElseThrow(() -> new RegisterException(SOLUTION_NOT_FOUND));
 		return new SolutionInfoResponse(solutionEntity.getText());

@@ -19,7 +19,9 @@ public enum ErrorCode {
 	SOLUTION_NOT_FOUND(HttpStatus.NOT_FOUND, "솔루션을 찾을 수 없습니다."),
 	SOLUTION_TEXT_EMPTY(HttpStatus.BAD_REQUEST, "솔루션 요청할 데이터가 없습니다."),
 	SOLUTION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "JSON 파싱에 오류가 발생했습니다."),
-	SOLUTION_RESPONSE_ERROR(HttpStatus.BAD_REQUEST, " 응답 처리 중 오류가 발생했습니다."),
+	SOLUTION_RESPONSE_ERROR(HttpStatus.BAD_REQUEST, "응답 처리 중 오류가 발생했습니다."),
+	INVALID_SERIAL_NUMBER(HttpStatus.UNAUTHORIZED, "시리얼 넘버가 일치하지 않습니다."),
+	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
 
 	// Sample
 	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");
