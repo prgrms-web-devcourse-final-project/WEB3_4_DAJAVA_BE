@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,11 +24,6 @@ public class RegisterCacheService {
 
 	public RegisterCacheService(RegisterRepository registerRepository) {
 		this.registerRepository = registerRepository;
-	}
-
-	@PostConstruct
-	public void initCache() {
-		refreshCache();
 	}
 
 	public void refreshCache() {
