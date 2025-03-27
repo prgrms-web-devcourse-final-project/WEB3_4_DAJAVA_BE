@@ -42,8 +42,9 @@ public class MoveEventAnalyzer implements Analyzer {
 	 * @author NohDongHui
 	 */
 	public boolean detectZigzagMovementByAngle(List<PointerMoveEvent> events) {
-		if (events == null || events.size() < 3)
+		if (events == null || events.size() < 3) {
 			return false;
+		}
 
 		// db에서 시간 오름차순 정렬해 가져옴
 
@@ -123,8 +124,9 @@ public class MoveEventAnalyzer implements Analyzer {
 			double mag1 = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
 			double mag2 = Math.sqrt(other.dx * other.dx + other.dy * other.dy);
 
-			if (mag1 == 0 || mag2 == 0)
+			if (mag1 == 0 || mag2 == 0) {
 				return 0; // 움직임이 없으면 각도 없음
+			}
 
 			double cosTheta = dot / (mag1 * mag2);
 			cosTheta = Math.max(-1, Math.min(1, cosTheta)); // 안전하게 clamp 부동 소수점 계산 문제

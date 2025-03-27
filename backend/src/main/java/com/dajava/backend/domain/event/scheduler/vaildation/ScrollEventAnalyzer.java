@@ -91,16 +91,16 @@ public class ScrollEventAnalyzer implements Analyzer {
 	 */
 	private int countRageScrolls(List<PointerScrollEvent> window, List<PointerScrollEvent> outliers) {
 		int count = 0;
-		int i = 0;
+		int index = 0;
 
-		while (i < window.size()) {
+		while (index < window.size()) {
 			List<PointerScrollEvent> subList = new ArrayList<>();
-			PointerScrollEvent base = window.get(i);
+			PointerScrollEvent base = window.get(index);
 			subList.add(base);
 
 			boolean matched = false;
 
-			for (int j = i + 1; j < window.size(); j++) {
+			for (int j = index + 1; j < window.size(); j++) {
 				PointerScrollEvent next = window.get(j);
 
 				subList.add(next);
@@ -108,14 +108,14 @@ public class ScrollEventAnalyzer implements Analyzer {
 				if (subList.size() >= MIN_EVENT_COUNT && scrollDelta(subList) >= MIN_SCROLL_DELTA) {
 					count++;
 					outliers.addAll(subList);
-					i = j; // 여기서 i 점프! 다음 루프는 j부터 시작
+					index = j; // 여기서 i 점프! 다음 루프는 j부터 시작
 					matched = true;
 					break;
 				}
 			}
 
 			if (!matched) {
-				i++; // 조건 안 맞았으면 그냥 다음으로
+				index++; // 조건 안 맞았으면 그냥 다음으로
 			}
 		}
 

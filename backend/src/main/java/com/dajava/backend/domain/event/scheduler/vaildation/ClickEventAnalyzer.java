@@ -132,8 +132,9 @@ public class ClickEventAnalyzer implements Analyzer {
 
 	private boolean isSuspiciousClick(PointerClickEvent event) {
 		String tag = "div"; //event.getClickTag(); 현재 이벤트 객체에 태그 필드 없음
-		if (tag == null || tag.isBlank())
+		if (tag == null || tag.isBlank()) {
 			return false;
+		}
 
 		String lowerTag = tag.toLowerCase();
 
