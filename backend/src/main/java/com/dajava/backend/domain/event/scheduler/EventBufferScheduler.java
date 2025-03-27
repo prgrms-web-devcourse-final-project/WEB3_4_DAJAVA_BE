@@ -9,7 +9,7 @@ import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.service.EventBatchService;
 import com.dajava.backend.domain.event.service.EventLogService;
 import com.dajava.backend.global.component.buffer.EventBuffer;
-import com.dajava.backend.global.util.SessionDataKeyUtils;
+import com.dajava.backend.global.utils.SessionDataKeyUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

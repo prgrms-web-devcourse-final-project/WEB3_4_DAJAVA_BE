@@ -1,6 +1,6 @@
 package com.dajava.backend.global.component.buffer;
 
-import static com.dajava.backend.global.util.SessionDataKeyUtils.*;
+import static com.dajava.backend.global.utils.SessionDataKeyUtils.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.global.util.SessionDataKeyUtils;
+import com.dajava.backend.global.utils.SessionDataKeyUtils;
 
 import lombok.Getter;
 

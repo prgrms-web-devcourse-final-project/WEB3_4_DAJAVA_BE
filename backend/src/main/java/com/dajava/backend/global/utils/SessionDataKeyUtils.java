@@ -1,4 +1,4 @@
-package com.dajava.backend.global.util;
+package com.dajava.backend.global.utils;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 
