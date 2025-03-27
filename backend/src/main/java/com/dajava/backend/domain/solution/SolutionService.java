@@ -2,6 +2,8 @@ package com.dajava.backend.domain.solution;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +41,16 @@ public class SolutionService {
 	@Autowired
 	private final RegisterRepository registerRepository;
 
+	// 텍스트에서 serialNumber 추출하는 함수
+	private String extractSerialNumber(String text) {
+		int startIdx = text.indexOf("serialNumber=") + "serialNumber=".length();
+		int endIdx = text.indexOf(",", startIdx);
+		if (endIdx == -1) {
+			endIdx = text.length();
+		}
+		return text.substring(startIdx, endIdx).trim();
+	}
+
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
 	 * @param refineData
@@ -57,19 +69,24 @@ public class SolutionService {
 			.retrieve()
 			.bodyToMono(String.class)
 			.flatMap(result -> {
-				// JSON 파싱 및 DB 저장
 				ObjectMapper objectMapper = new ObjectMapper();
 				try {
 					JsonNode rootNode = objectMapper.readTree(result);
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
+					String serialNumber = extractSerialNumber(refineData);
+					Register register = registerRepository.findBySerialNumber(serialNumber);
+					if (register == null) {
+						return Mono.error(new IllegalArgumentException("해당 serialNumber에 대한 Register를 찾을 수 없습니다."));
+					}
 					if (text != null) {
-						String contents = text.toString();
 						SolutionEntity solutionEntity = new SolutionEntity();
-						solutionEntity.setText(contents);
+						solutionEntity.setText(text);
+						solutionEntity.setRegister(register);
 						solutionRepository.save(solutionEntity);
 						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
-						solutionResponseDto.setText(contents);
-						return Mono.just(solutionResponseDto); // Dto에 엔티티 값 담아 Mono로 반환
+						solutionResponseDto.setText(text);
+						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
+						return Mono.just(solutionResponseDto);
 					} else {
 						log.error("Gemini AI 응답에 'contents' 필드가 없습니다.");
 						return Mono.error(new RuntimeException("Gemini AI 응답에 'contents' 필드가 없습니다."));

@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class SolutionResponseDto {
+	private String registerSerialNumber;
 	private String text;
 }
