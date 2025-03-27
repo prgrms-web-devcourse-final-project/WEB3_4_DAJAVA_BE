@@ -26,13 +26,13 @@ public class PointerScrollEvent extends BaseTimeEntity {
 	private long id;
 
 	@Column(nullable = false)
-	int scrollY;
+	Integer scrollY;
 
 	@Column(nullable = false)
 	String pageUrl;
 
 	@Column(nullable = false)
-	int browserWidth;
+	Integer browserWidth;
 
 	@Column(nullable = false)
 	String sessionId;

@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.register.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,6 +40,16 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	boolean checkUrlAvailability(
 		@Param("url") String url,
 		@Param("pastDate") LocalDateTime pastDate);
+
+	/**
+	 * 현재 시각을 기준으로 서비스가 진행중인지 판단후 가져옵니다.
+	 * @param currentTime1 startDate와 비교할 현재 시각입니다.
+	 * @param currentTime2 endDate와 비교할 현재 시각입니다.
+	 * @return List<Register> startDate <= now <= endDate 인 Register 데이터의 리스트입니다.
+	 */
+	List<Register> findByStartDateLessThanEqualAndEndDateGreaterThanEqual(
+		LocalDateTime currentTime1,
+		LocalDateTime currentTime2);
 }
 
 

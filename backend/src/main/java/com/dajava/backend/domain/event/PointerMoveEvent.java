@@ -26,16 +26,16 @@ public class PointerMoveEvent extends BaseTimeEntity {
 	private long id;
 
 	@Column(nullable = false)
-	int clientX;
+	Integer clientX;
 
 	@Column(nullable = false)
-	int clientY;
+	Integer clientY;
 
 	@Column(nullable = false)
 	String pageUrl;
 
 	@Column(nullable = false)
-	int browserWidth;
+	Integer browserWidth;
 
 	@Column(nullable = false)
 	String sessionId;
