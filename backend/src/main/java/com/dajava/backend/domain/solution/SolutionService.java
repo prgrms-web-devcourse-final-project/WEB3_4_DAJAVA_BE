@@ -42,7 +42,7 @@ public class SolutionService {
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
 	 * @param refineData
-	 * @return result(response.block())
+	 * @return result(response)
 	 * @author jhon S, sungkibum
 	 * @since 2025-03-24
 	 */
@@ -84,16 +84,18 @@ public class SolutionService {
 			});
 	}
 
+
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = registerRepository.findBySerialNumber(serialNumber);
-		Long id = findRegister.getId();
-		Optional<SolutionEntity> opSolutionEntity = solutionRepository.findById(id);
+		if(findRegister == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"시리얼 넘버가 없습니다.");
+		}
+		Optional<SolutionEntity> opSolutionEntity = solutionRepository.findByRegister(findRegister);
 		if (opSolutionEntity.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "솔루션을 찾을 수 없습니다.");
 		} else {
 			SolutionEntity solutionEntity = opSolutionEntity.get();
 			return new SolutionInfoResponse(solutionEntity.getText());
 		}
-
 	}
 }
