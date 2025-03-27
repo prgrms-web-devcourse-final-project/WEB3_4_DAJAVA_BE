@@ -16,10 +16,10 @@ import com.dajava.backend.domain.event.service.EventLogService;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 
 /*
- * 스케줄러 통합테스트 입니다.
+ * 버퍼에서 리포지드로 저장하는 스케줄러 통합테스트 입니다.
  *
  * @author NohDongHui
- * @since 2025-03-24
+ * @since 2025-03-26
  */
 public class EventBufferSchedulerTest {
 
@@ -84,3 +84,4 @@ public class EventBufferSchedulerTest {
 		assertThat(remaining).containsExactly(activeEvent);
 	}
 }
+
