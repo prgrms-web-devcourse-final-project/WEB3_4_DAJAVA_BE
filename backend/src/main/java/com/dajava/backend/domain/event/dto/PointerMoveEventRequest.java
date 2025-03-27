@@ -16,3 +16,4 @@ public record PointerMoveEventRequest(
 	@NotNull Integer clientY
 ) {
 }
+

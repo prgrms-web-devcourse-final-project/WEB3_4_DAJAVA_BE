@@ -11,11 +11,14 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.PointerClickEvent;
 import com.dajava.backend.domain.event.SessionData;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 클릭 이벤트를 분석합니다.
  * 이상 데이터인 경우 true를 반환합니다.
  * @author NohDongHui
  */
+@Slf4j
 @Component
 public class ClickEventAnalyzer implements Analyzer {
 
@@ -93,6 +96,8 @@ public class ClickEventAnalyzer implements Analyzer {
 		rageGroups.stream()
 			.flatMap(List::stream)
 			.forEach(PointerClickEvent::setOutlier);
+
+		log.info("클릭 이벤트 로깅: {}", rageGroups);
 
 		// rage 그룹이 존재하면 true 반환 아니면 false
 		return !rageGroups.isEmpty();

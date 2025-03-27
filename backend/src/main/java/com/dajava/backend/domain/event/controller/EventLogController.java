@@ -81,4 +81,3 @@ public class EventLogController {
 		eventLogService.expireSession(sessionId);
 	}
 }
-
