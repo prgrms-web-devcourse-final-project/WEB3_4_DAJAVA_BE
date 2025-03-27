@@ -1,22 +1,28 @@
 package com.dajava.backend.global.filter;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import com.dajava.backend.domain.register.service.RegisterCacheService;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,13 +52,16 @@ public class LogRequestFilter implements Filter {
 		String path = httpRequest.getRequestURI();
 
 		// 클릭, 이동, 스크롤 관련 로그 요청에 대해서만 필터 적용
-		if (path.startsWith("/log/click") || path.startsWith("/log/movement") || path.startsWith("/log/scroll")) {
+		if (path.endsWith("/click")
+			|| path.endsWith("/movement")
+			|| path.endsWith("/scroll")
+		) {
 			try {
-				// 요청 바디를 읽기 위해 래핑함
-				ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(httpRequest);
+				// 재사용 가능한 요청 바디를 위한 래퍼 생성
+				CachedBodyHttpServletRequest cachedBodyRequest = new CachedBodyHttpServletRequest(httpRequest);
 
 				// 요청 본문 읽어오기
-				String requestBody = getRequestBody(requestWrapper);
+				String requestBody = cachedBodyRequest.getBody();
 
 				// JSON 파싱
 				JSONObject jsonObject = new JSONObject(requestBody);
@@ -77,7 +86,8 @@ public class LogRequestFilter implements Filter {
 					return;
 				}
 
-				chain.doFilter(requestWrapper, response);
+				// 캐시된 요청 바디를 사용하는 래퍼를 체인에 전달
+				chain.doFilter(cachedBodyRequest, response);
 			} catch (Exception e) {
 				log.error("로그 요청 처리 중 오류 발생", e);
 				httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -88,18 +98,81 @@ public class LogRequestFilter implements Filter {
 			chain.doFilter(request, response);
 		}
 	}
+}
 
-	private String getRequestBody(ContentCachingRequestWrapper request) throws IOException {
-		String payload = null;
-		ContentCachingRequestWrapper wrapper = request;
+/**
+ * 요청 바디를 캐시하여 여러 번 읽을 수 있게 하는 HttpServletRequest 래퍼 클래스
+ */
+class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
 
-		// 첫 번째 읽기 시 내용이 캐시되지 않았을 수 있으므로 한 번 읽어둠
-		IOUtils.toString(wrapper.getInputStream(), wrapper.getCharacterEncoding());
+	private final byte[] cachedBody;
+	private final String cachedBodyString;
 
-		if (wrapper.getContentAsByteArray() != null && wrapper.getContentAsByteArray().length > 0) {
-			payload = new String(wrapper.getContentAsByteArray(), wrapper.getCharacterEncoding());
+	public CachedBodyHttpServletRequest(HttpServletRequest request) throws IOException {
+		super(request);
+
+		// 요청 바디를 바이트 배열로 읽어옴
+		InputStream requestInputStream = request.getInputStream();
+		this.cachedBody = IOUtils.toByteArray(requestInputStream);
+
+		// 인코딩이 null인 경우 기본값 사용
+		String encoding = request.getCharacterEncoding();
+		if (encoding == null) {
+			encoding = "UTF-8"; // 기본 인코딩으로 UTF-8 사용
 		}
 
-		return payload != null ? payload : "";
+		this.cachedBodyString = new String(this.cachedBody, encoding);
+	}
+
+	@Override
+	public ServletInputStream getInputStream() throws IOException {
+		// 캐시된 바디를 기반으로 새 InputStream 반환
+		return new CachedServletInputStream(this.cachedBody);
+	}
+
+	@Override
+	public BufferedReader getReader() throws IOException {
+		// 캐시된 바디를 기반으로 새 Reader 반환
+		String encoding = getCharacterEncoding();
+		if (encoding == null) {
+			encoding = "UTF-8";
+		}
+		return new BufferedReader(new InputStreamReader(getInputStream(), encoding));
+	}
+
+	public String getBody() {
+		return this.cachedBodyString;
+	}
+
+	/**
+	 * 바이트 배열을 기반으로 하는 ServletInputStream 구현
+	 */
+	private static class CachedServletInputStream extends ServletInputStream {
+
+		private final ByteArrayInputStream buffer;
+
+		public CachedServletInputStream(byte[] contents) {
+			this.buffer = new ByteArrayInputStream(contents);
+		}
+
+		@Override
+		public int read() throws IOException {
+			return buffer.read();
+		}
+
+		@Override
+		public boolean isFinished() {
+			return buffer.available() == 0;
+		}
+
+		@Override
+		public boolean isReady() {
+			return true;
+		}
+
+		@Override
+		public void setReadListener(ReadListener listener) {
+			throw new UnsupportedOperationException("ReadListener not supported");
+		}
 	}
 }

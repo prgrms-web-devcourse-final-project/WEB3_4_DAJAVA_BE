@@ -43,6 +43,9 @@ public class RegisterCacheService {
 			newCache.add(register.getSerialNumber());
 		}
 
+		// 로그 요청 테스트용 memberSerialNumber
+		newCache.add("5_team_testSerial");
+
 		this.serialNumberCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
 		this.serialNumberCache.addAll(newCache);
 
