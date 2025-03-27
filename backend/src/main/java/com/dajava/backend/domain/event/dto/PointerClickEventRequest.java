@@ -16,3 +16,4 @@ public record PointerClickEventRequest(
 	@NotNull Integer clientY
 ) {
 }
+

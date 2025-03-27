@@ -79,5 +79,19 @@ public class PointerClickEvent extends BaseTimeEntity {
 		}
 		this.isOutlier = true;
 	}
+
+	@Override
+	public String toString() {
+		return "PointerClickEvent{" +
+			"id=" + id +
+			", clientX=" + clientX +
+			", clientY=" + clientY +
+			", pageUrl='" + pageUrl + '\'' +
+			", browserWidth=" + browserWidth +
+			", sessionId='" + sessionId + '\'' +
+			", memberSerialNumber='" + memberSerialNumber + '\'' +
+			", isOutlier=" + isOutlier +
+			'}';
+	}
 }
 
