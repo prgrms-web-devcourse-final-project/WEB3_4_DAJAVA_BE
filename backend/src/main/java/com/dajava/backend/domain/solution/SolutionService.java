@@ -47,7 +47,7 @@ public class SolutionService {
 	 * @author jhon S, sungkibum
 	 * @since 2025-03-24
 	 */
-	public Mono<SolutionResponseDto> getAISolution(String refineData) {
+	public Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber) {
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
 			.defaultHeader("Content-Type", "application/json")
@@ -62,7 +62,6 @@ public class SolutionService {
 				try {
 					JsonNode rootNode = objectMapper.readTree(result);
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
-					String serialNumber = extractSerialNumber(refineData);
 					Register register = registerRepository.findBySerialNumber(serialNumber);
 					if (register == null) {
 						return Mono.error(new RegisterException(SERIAL_NUMBER_NOT_FOUND));
