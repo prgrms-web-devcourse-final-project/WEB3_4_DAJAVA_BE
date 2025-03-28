@@ -62,7 +62,7 @@ class RegisterControllerTest {
 			"test@example.com",
 			"password123",
 			"localhost:3000/test",
-			now.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0),
 			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
