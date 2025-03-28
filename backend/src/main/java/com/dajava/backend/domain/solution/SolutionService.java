@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.global.utils.PasswordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -96,7 +97,9 @@ public class SolutionService {
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
 			.orElseThrow(() -> new RegisterException(INVALID_SERIAL_NUMBER));
-		if (!findRegister.getPassword().equals(password)) {
+		PasswordUtils passwordUtils = new PasswordUtils();
+		//해시화된 password 검증로직
+		if (!passwordUtils.verifyPassword(password, findRegister.getPassword())) {
 			throw new RegisterException(INVALID_PASSWORD);
 		}
 		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
