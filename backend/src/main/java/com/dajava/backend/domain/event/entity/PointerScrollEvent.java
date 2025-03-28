@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.event;
+package com.dajava.backend.domain.event.entity;
 
 import com.dajava.backend.global.common.BaseTimeEntity;
 
@@ -40,7 +40,6 @@ public class PointerScrollEvent extends BaseTimeEntity {
 	@Column(nullable = false)
 	String memberSerialNumber;
 
-
 	@ManyToOne
 	@JoinColumn(name = "session_data_id")
 	private SessionData sessionData;
@@ -64,6 +63,5 @@ public class PointerScrollEvent extends BaseTimeEntity {
 		sessionData.addScrollEvent(event); // 양방향 연관관계 설정
 		return event;
 	}
-
 
 }

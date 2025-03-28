@@ -1,21 +1,18 @@
 package com.dajava.backend.domain.event.scheduler.vaildation;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.dajava.backend.domain.event.PointerClickEvent;
-import com.dajava.backend.domain.event.PointerScrollEvent;
+import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.global.common.BaseTimeEntity;
 
 /*
@@ -63,8 +60,8 @@ public class ScrollEventAnalyzerTest {
 		Instant now = Instant.now();
 		List<PointerScrollEvent> events = List.of(
 			testScrollEvent(now, 100),
-			testScrollEvent(now.plusMillis(100),  101),
-			testScrollEvent(now.plusMillis(100),  500),
+			testScrollEvent(now.plusMillis(100), 101),
+			testScrollEvent(now.plusMillis(100), 500),
 			testScrollEvent(now.plusMillis(100), 600),
 			testScrollEvent(now.plusMillis(100), 610),
 			testScrollEvent(now.plusMillis(100), 1200),
@@ -72,7 +69,6 @@ public class ScrollEventAnalyzerTest {
 			testScrollEvent(now.plusMillis(100), 1220),
 			testScrollEvent(now.plusMillis(100), 1800)
 		);
-
 
 		// when
 		List<PointerScrollEvent> result = analyzer.countRageScrollBursts(events);
@@ -89,18 +85,15 @@ public class ScrollEventAnalyzerTest {
 		Instant now = Instant.now();
 		List<PointerScrollEvent> events = List.of(
 			testScrollEvent(now, 100),
-			testScrollEvent(now.plusMillis(100),  101)
+			testScrollEvent(now.plusMillis(100), 101)
 		);
 
-
 		// when
-		List<PointerScrollEvent> result =  analyzer.countRageScrollBursts(events);
+		List<PointerScrollEvent> result = analyzer.countRageScrollBursts(events);
 
 		// then
 		assertThat(result).isEmpty();
 	}
-
-
 
 	@Test
 	@DisplayName("방향 전환 감지 테스트 참인 경우")
@@ -109,12 +102,12 @@ public class ScrollEventAnalyzerTest {
 		Instant now = Instant.now();
 		List<PointerScrollEvent> events = List.of(
 			testScrollEvent(now, 100),
-			testScrollEvent(now.plusMillis(100),  101),
-			testScrollEvent(now.plusMillis(100),  90),
-			testScrollEvent(now.plusMillis(100),  100),
-			testScrollEvent(now.plusMillis(100),  90),
-			testScrollEvent(now.plusMillis(100),  80),
-			testScrollEvent(now.plusMillis(100),  100)
+			testScrollEvent(now.plusMillis(100), 101),
+			testScrollEvent(now.plusMillis(100), 90),
+			testScrollEvent(now.plusMillis(100), 100),
+			testScrollEvent(now.plusMillis(100), 90),
+			testScrollEvent(now.plusMillis(100), 80),
+			testScrollEvent(now.plusMillis(100), 100)
 		);
 
 		List<PointerScrollEvent> result = analyzer.getBackAndForthScrollOutliers(events);
@@ -130,9 +123,9 @@ public class ScrollEventAnalyzerTest {
 		Instant now = Instant.now();
 		List<PointerScrollEvent> events = List.of(
 			testScrollEvent(now, 100),
-			testScrollEvent(now.plusMillis(100),  101),
-			testScrollEvent(now.plusMillis(100),  102),
-			testScrollEvent(now.plusMillis(100),  103)
+			testScrollEvent(now.plusMillis(100), 101),
+			testScrollEvent(now.plusMillis(100), 102),
+			testScrollEvent(now.plusMillis(100), 103)
 
 		);
 
@@ -149,9 +142,9 @@ public class ScrollEventAnalyzerTest {
 		Instant now = Instant.now();
 		List<PointerScrollEvent> events = List.of(
 			testScrollEvent(now, 100),
-			testScrollEvent(now.plusMillis(100),  500),
-			testScrollEvent(now.plusMillis(100),  1000),
-			testScrollEvent(now.plusMillis(100),  1500)
+			testScrollEvent(now.plusMillis(100), 500),
+			testScrollEvent(now.plusMillis(100), 1000),
+			testScrollEvent(now.plusMillis(100), 1500)
 
 		);
 

@@ -2,7 +2,7 @@ package com.dajava.backend.domain.event.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.dajava.backend.domain.event.PointerMoveEvent;
+import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 
 /**
  * PointerMoveEventRepository
@@ -11,5 +11,5 @@ import com.dajava.backend.domain.event.PointerMoveEvent;
  * @author NohDongHui
  * @since 2025-03-24
  */
-public interface PointerMoveEventRepository extends JpaRepository<PointerMoveEvent, Long>  {
+public interface PointerMoveEventRepository extends JpaRepository<PointerMoveEvent, Long> {
 }

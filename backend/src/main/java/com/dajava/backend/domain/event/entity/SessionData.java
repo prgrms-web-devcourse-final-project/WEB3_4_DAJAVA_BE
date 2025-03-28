@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.event;
+package com.dajava.backend.domain.event.entity;
 
 import java.util.ArrayList;
 import java.util.List;

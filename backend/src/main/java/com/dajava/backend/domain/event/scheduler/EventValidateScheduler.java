@@ -1,18 +1,17 @@
 package com.dajava.backend.domain.event.scheduler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.event.PointerClickEvent;
-import com.dajava.backend.domain.event.PointerEvent;
-import com.dajava.backend.domain.event.PointerMoveEvent;
-import com.dajava.backend.domain.event.PointerScrollEvent;
-import com.dajava.backend.domain.event.SessionData;
-import com.dajava.backend.domain.event.SolutionData;
 import com.dajava.backend.domain.event.converter.PointerEventConverter;
+import com.dajava.backend.domain.event.entity.PointerClickEvent;
+import com.dajava.backend.domain.event.entity.PointerMoveEvent;
+import com.dajava.backend.domain.event.entity.PointerScrollEvent;
+import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.domain.event.entity.SolutionData;
+import com.dajava.backend.domain.event.entity.SolutionEvent;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.event.scheduler.vaildation.ClickEventAnalyzer;
@@ -50,7 +49,7 @@ public class EventValidateScheduler {
 		// 2. 가져온 세션을 반복문으로 처리
 		for (SessionData sessionData : sessionDataList) {
 			String serialNumber = sessionData.getMemberSerialNumber();
-			SolutionData solutionData=SolutionData.create(serialNumber);
+			SolutionData solutionData = SolutionData.create(serialNumber);
 
 			List<PointerClickEvent> clickResult = clickEventAnalyzer.analyze(sessionData);
 			List<PointerMoveEvent> moveResult = moveEventAnalyzer.analyze(sessionData);
@@ -58,13 +57,13 @@ public class EventValidateScheduler {
 
 			sessionData.setVerified();
 
-			List<PointerEvent> pointerEvents = PointerEventConverter.toPointerEvents(clickResult, moveResult, scrollResult, solutionData);
+			List<SolutionEvent> solutionEvents = PointerEventConverter.toPointerEvents(clickResult, moveResult,
+				scrollResult, solutionData);
 
-			solutionData.addPointerEvents(pointerEvents);
+			solutionData.addPointerEvents(solutionEvents);
 
 			solutionDataRepository.save(solutionData);
 		}
 	}
-
 
 }

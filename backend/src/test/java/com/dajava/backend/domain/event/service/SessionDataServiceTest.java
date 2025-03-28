@@ -14,8 +14,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.dajava.backend.domain.event.SessionData;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 
 @ExtendWith(MockitoExtension.class)

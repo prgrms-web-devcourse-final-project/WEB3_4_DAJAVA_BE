@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.event;
+package com.dajava.backend.domain.event.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,14 +6,11 @@ import java.util.List;
 import com.dajava.backend.global.common.BaseTimeEntity;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,8 +34,7 @@ public class SolutionData extends BaseTimeEntity {
 
 	@OneToMany(mappedBy = "solutionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	private List<PointerEvent> pointerEvents = new ArrayList<>();
-
+	private List<SolutionEvent> solutionEvents = new ArrayList<>();
 
 	// 정적 팩토리 메서드
 	public static SolutionData create(String serialNumber) {
@@ -49,11 +45,12 @@ public class SolutionData extends BaseTimeEntity {
 
 	}
 
-	public void addPointerEvents(List<PointerEvent> events) {
-		if (events == null) return;
+	public void addPointerEvents(List<SolutionEvent> events) {
+		if (events == null)
+			return;
 
-		for (PointerEvent event : events) {
-			this.pointerEvents.add(event);
+		for (SolutionEvent event : events) {
+			this.solutionEvents.add(event);
 		}
 	}
 }

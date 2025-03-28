@@ -3,18 +3,15 @@ package com.dajava.backend.domain.event.scheduler.vaildation;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.event.PointerMoveEvent;
-import com.dajava.backend.domain.event.PointerScrollEvent;
-import com.dajava.backend.domain.event.SessionData;
+import com.dajava.backend.domain.event.entity.PointerScrollEvent;
+import com.dajava.backend.domain.event.entity.SessionData;
 
 /**
  * 스크롤 이벤트를 분석합니다.
@@ -206,6 +203,5 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 
 		return Collections.emptyList();
 	}
-
 
 }

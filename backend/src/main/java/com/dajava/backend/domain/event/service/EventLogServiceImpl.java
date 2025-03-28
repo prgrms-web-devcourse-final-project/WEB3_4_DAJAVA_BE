@@ -6,14 +6,14 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.event.PointerClickEvent;
-import com.dajava.backend.domain.event.PointerMoveEvent;
-import com.dajava.backend.domain.event.PointerScrollEvent;
-import com.dajava.backend.domain.event.SessionData;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.entity.PointerClickEvent;
+import com.dajava.backend.domain.event.entity.PointerMoveEvent;
+import com.dajava.backend.domain.event.entity.PointerScrollEvent;
+import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 

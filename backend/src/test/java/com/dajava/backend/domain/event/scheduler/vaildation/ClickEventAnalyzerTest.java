@@ -1,6 +1,6 @@
 package com.dajava.backend.domain.event.scheduler.vaildation;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.dajava.backend.domain.event.PointerClickEvent;
+import com.dajava.backend.domain.event.entity.PointerClickEvent;
 import com.dajava.backend.global.common.BaseTimeEntity;
 
 /*

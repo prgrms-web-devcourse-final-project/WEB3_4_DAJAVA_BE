@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.dajava.backend.domain.event.SessionData;
+import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.event.scheduler.vaildation.ClickEventAnalyzer;
@@ -23,7 +23,6 @@ import com.dajava.backend.domain.event.scheduler.vaildation.ScrollEventAnalyzer;
  * @since 2025-03-26
  */
 public class EventVaildateSchedulerTest {
-
 
 	private EventValidateScheduler scheduler;
 

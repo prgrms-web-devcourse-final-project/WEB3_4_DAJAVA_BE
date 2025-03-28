@@ -11,9 +11,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.event.PointerClickEvent;
-import com.dajava.backend.domain.event.PointerMoveEvent;
-import com.dajava.backend.domain.event.SessionData;
+import com.dajava.backend.domain.event.entity.PointerClickEvent;
+import com.dajava.backend.domain.event.entity.SessionData;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -91,7 +90,6 @@ public class ClickEventAnalyzer implements Analyzer<PointerClickEvent> {
 				window.clear(); // 중복 감지 방지
 			}
 		}
-
 
 		log.info("감지된 rage click 이벤트 수: {}", rageClicks.size());
 

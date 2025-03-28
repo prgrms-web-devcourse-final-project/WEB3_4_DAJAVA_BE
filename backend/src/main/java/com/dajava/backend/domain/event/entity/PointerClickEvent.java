@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.event;
+package com.dajava.backend.domain.event.entity;
 
 import com.dajava.backend.global.common.BaseTimeEntity;
 
@@ -47,7 +47,6 @@ public class PointerClickEvent extends BaseTimeEntity {
 	@JoinColumn(name = "session_data_id")
 	private SessionData sessionData;
 
-
 	public static PointerClickEvent create(
 		int clientX,
 		int clientY,
@@ -69,8 +68,6 @@ public class PointerClickEvent extends BaseTimeEntity {
 		sessionData.addClickEvent(event); // 양방향 연관관계 설정
 		return event;
 	}
-
-
 
 	@Override
 	public String toString() {

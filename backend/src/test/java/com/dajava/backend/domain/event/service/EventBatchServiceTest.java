@@ -13,11 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.dajava.backend.domain.event.SessionData;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
 import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
 import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;

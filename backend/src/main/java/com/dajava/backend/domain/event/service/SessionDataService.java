@@ -6,8 +6,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.event.SessionData;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 
 import lombok.RequiredArgsConstructor;

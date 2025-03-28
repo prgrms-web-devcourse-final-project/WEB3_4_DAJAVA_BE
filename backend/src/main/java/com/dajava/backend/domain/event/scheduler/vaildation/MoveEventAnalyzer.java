@@ -9,12 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.event.PointerClickEvent;
-import com.dajava.backend.domain.event.PointerMoveEvent;
-import com.dajava.backend.domain.event.PointerScrollEvent;
-import com.dajava.backend.domain.event.SessionData;
+import com.dajava.backend.domain.event.entity.PointerMoveEvent;
+import com.dajava.backend.domain.event.entity.SessionData;
 
 /**
  * 무브 이벤트를 분석합니다.
@@ -32,7 +29,7 @@ public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 	public List<PointerMoveEvent> analyze(SessionData sessionData) {
 		List<PointerMoveEvent> events = sessionData.getPointerMoveEvents();
 
-		List<PointerMoveEvent> zigzags=detectZigzagMovementByAngle(events);
+		List<PointerMoveEvent> zigzags = detectZigzagMovementByAngle(events);
 		Set<PointerMoveEvent> resultSet = new HashSet<>();
 		resultSet.addAll(zigzags);
 		return new ArrayList<>(resultSet);
@@ -101,12 +98,9 @@ public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 		return new ArrayList<>(outliers);
 	}
 
-
 	private boolean isOutOfTimeRange(PointerMoveEvent first, PointerMoveEvent current) {
 		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > TIME_WINDOW_MS;
 	}
-
-
 
 	// 내부 벡터 클래스 (2D)
 	public static class Vector {
