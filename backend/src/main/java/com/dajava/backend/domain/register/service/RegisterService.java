@@ -39,32 +39,32 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RegisterService {
 
-	private final RegisterRepository solutionRepository;
+	private final RegisterRepository registerRepository;
 	private final OrderRepository orderRepository;
-	private final RegisterValidator solutionValidator;
+	private final RegisterValidator registerValidator;
 
 	/**
-	 * 솔루션 생성 메서드
+	 * 서비스 Register 생성 메서드
 	 *
 	 * @param request RegisterCreateRequest (DTO)
 	 * @return RegisterCreateResponse (DTO)
 	 */
 	@Transactional
-	public RegisterCreateResponse createSolution(final RegisterCreateRequest request) {
-		solutionValidator.validateCreateRequest(request);
+	public RegisterCreateResponse createRegister(final RegisterCreateRequest request) {
+		registerValidator.validateCreateRequest(request);
 
-		Register newSolution = solutionRepository.save(Register.create(request));
+		Register newRegister = registerRepository.save(Register.create(request));
 		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
 
-		log.info("Solution 엔티티 생성 : {} ", newSolution);
+		log.info("Register 엔티티 생성 : {} ", newRegister);
 		log.info("Order 엔티티 생성 : {} ", newOrder);
 
-		return toSolutionCreateResponse(newSolution);
+		return toRegisterCreateResponse(newRegister);
 	}
 
 	/**
-	 * 솔루션 수정 메서드
-	 * 솔루션 수정 가능 여부를 파악한 후, 수정한다.
+	 * Register 수정 메서드
+	 * Register 수정 가능 여부를 파악한 후, 수정한다.
 	 *
 	 * @param request RegisterModifyRequest (DTO)
 	 * @param solutionId 대상 솔루션 ID
@@ -73,7 +73,7 @@ public class RegisterService {
 	@Transactional
 	public RegisterModifyResponse modifySolution(RegisterModifyRequest request, Long solutionId) {
 
-		Register targetSolution = solutionValidator.validateModifyRequest(request, solutionId);
+		Register targetSolution = registerValidator.validateModifyRequest(request, solutionId);
 		targetSolution.updateEndDate(request.solutionCompleteDate());
 
 		log.info("Solution endDate 수정 성공, Target Solution : {}, New endDate : {}",
@@ -82,7 +82,7 @@ public class RegisterService {
 	}
 
 	/**
-	 * 솔루션 삭제 메서드 (TODO)
+	 * Register 삭제 메서드 (TODO)
 	 * **** 현재 스프린트 상 껍데기만 존재 *****
 	 *
 	 * @param solutionId 대상 솔루션 ID
@@ -90,24 +90,24 @@ public class RegisterService {
 	 */
 	@Transactional
 	public RegisterDeleteResponse deleteSolution(Long solutionId) {
-		Register targetSolution = solutionValidator.validateDeleteRequest(solutionId);
+		Register targetSolution = registerValidator.validateDeleteRequest(solutionId);
 
 		log.info("Solution endDate 삭제 성공, Target Solution : {} ", solutionId);
 		return RegisterDeleteResponse.create();
 	}
 
 	/**
-	 * 솔루션 리스트 조회 메서드
+	 * Register 리스트 조회 메서드
 	 *
 	 * @param request RegisterInfoRequest (DTO)
 	 * @return RegistersInfoResponse (DTO)
 	 */
 	@Transactional(readOnly = true)
 	public RegistersInfoResponse getRegisterList(RegistersInfoRequest request) {
-		solutionValidator.validateInfoRequest(request);
+		registerValidator.validateInfoRequest(request);
 
 		Pageable pageable = PageRequest.of(request.pageNum(), request.pageSize());
-		List<RegisterInfo> registerInfos = solutionRepository.findAll(pageable).stream()
+		List<RegisterInfo> registerInfos = registerRepository.findAll(pageable).stream()
 			.map(RegisterConverter::toRegisterInfo)
 			.toList();
 

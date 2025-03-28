@@ -36,14 +36,23 @@ dependencies {
 
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
+    // webclient 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 
     // json 처리
     implementation("org.json:json:20250107")
 
     // IO 유틸
     implementation("commons-io:commons-io:2.18.0")
+
+    // env
+    implementation 'me.paulschwarz:spring-dotenv:3.0.0'
 }
 
+test {
+    useJUnitPlatform()
+}
 tasks.named('test') {
     useJUnitPlatform()
 }

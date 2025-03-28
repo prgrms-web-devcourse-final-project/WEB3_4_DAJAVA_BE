@@ -15,7 +15,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-      dialect: org.hibernate.dialect.H2Dialect # 데이터베이스 엔진 종류 설정
+      dialect: org.hibernate.dialect.H2Dialect
     properties:
       hibernate:
         default_batch_fetch_size: 100
@@ -23,8 +23,10 @@ spring:
         highlight_sql: true
         use_sql_comments: true
 
-springdoc:
-  default-produces-media-type: application/json;charset=UTF-8
+gemini:
+  api:
+    key: ${DAJAVA_AI_API_KEY}
+    url: ${DAJAVA_AI_API_URL}
 
 logging:
   level:

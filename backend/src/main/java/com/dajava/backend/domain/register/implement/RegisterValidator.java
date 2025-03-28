@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RegisterValidator {
 
-	private final RegisterRepository solutionRepository;
+	private final RegisterRepository registerRepository;
 
 	/**
 	 * 솔루션 등록 요청 검증 메서드
@@ -42,7 +42,7 @@ public class RegisterValidator {
 		}
 
 		// 2. Url 등록 가능 여부 체크
-		if (!solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
+		if (!registerRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
 			throw new RegisterException(ALREADY_REGISTER_URL);
 		}
 	}
@@ -60,7 +60,7 @@ public class RegisterValidator {
 			throw new RegisterException(INVALID_REGISTER_REQUEST);
 		}
 
-		return solutionRepository.findById(solutionId).orElseThrow(
+		return registerRepository.findById(solutionId).orElseThrow(
 			() -> new RegisterException(SOLUTION_NOT_FOUND)
 		);
 	}
@@ -72,7 +72,7 @@ public class RegisterValidator {
 	 * @return 조회된 솔루션
 	 */
 	public Register validateDeleteRequest(Long solutionId) {
-		return solutionRepository.findById(solutionId).orElseThrow(
+		return registerRepository.findById(solutionId).orElseThrow(
 			() -> new RegisterException(SOLUTION_NOT_FOUND)
 		);
 	}
@@ -122,3 +122,4 @@ public class RegisterValidator {
 		return true;
 	}
 }
+

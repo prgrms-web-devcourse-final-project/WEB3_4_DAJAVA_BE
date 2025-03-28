@@ -8,15 +8,18 @@ import java.util.UUID;
 
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
+import com.dajava.backend.domain.solution.SolutionEntity;
 import com.dajava.backend.global.common.BaseTimeEntity;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,6 +63,9 @@ public class Register extends BaseTimeEntity {
 
 	@Column(nullable = false)
 	private boolean isSolutionComplete;
+
+	@OneToOne(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true)
+	private SolutionEntity solution;
 
 	public static Register create(
 		final RegisterCreateRequest request

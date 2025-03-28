@@ -25,7 +25,7 @@ public class RegisterConverter {
 			.build();
 	}
 
-	public static RegisterCreateResponse toSolutionCreateResponse(final Register solution) {
+	public static RegisterCreateResponse toRegisterCreateResponse(final Register solution) {
 		return RegisterCreateResponse.builder()
 			.serialNumber(solution.getSerialNumber())
 			.build();

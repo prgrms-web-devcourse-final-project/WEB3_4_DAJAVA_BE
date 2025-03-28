@@ -7,5 +7,5 @@ package com.dajava.backend.domain.register.constant;
  * @since 2025-03-24
  */
 public class RegisterConstant {
-	public static final int DEFAULT_MODIFY_MAX_DATE = 7;
+	public static final int DEFAULT_REGISTER_DURATION = 7;
 }
