@@ -1,7 +1,7 @@
 package com.dajava.backend.domain.register.converter;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
-import com.dajava.backend.domain.register.entity.Solution;
+import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
+import com.dajava.backend.domain.register.entity.Register;
 
 /**
  * RegisterConstant
@@ -12,9 +12,9 @@ import com.dajava.backend.domain.register.entity.Solution;
  */
 public class RegisterConverter {
 
-	public static SolutionCreateResponse toSolutionCreateResponse(final Solution solution) {
-		return SolutionCreateResponse.builder()
-			.serialNumber(solution.getSerialNumber())
+	public static RegisterCreateResponse toRegisterCreateResponse(final Register register) {
+		return RegisterCreateResponse.builder()
+			.serialNumber(register.getSerialNumber())
 			.build();
 	}
 }

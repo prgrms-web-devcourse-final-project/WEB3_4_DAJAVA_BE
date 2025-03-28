@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 
 import { constant } from '../../../libs/constant';
-import { CodeContext } from '../../../providers/CodeContextProvider';
 import { getImageSrc, getItemTitle } from './cardUtil';
 
 import styles from './card.module.css';
@@ -13,10 +12,8 @@ import { CardProps, ItemData } from './card.types';
 
 const Card: React.FC<CardProps> = ({ category = 'PRODUCT', data, fullWidth = false }) => {
   const param = useParams();
-  const context = useContext(CodeContext);
   const { id = '', images = [], title = '-', type = '-' } = data;
   const locale = Array.isArray(param?.locale) ? param?.locale[0] : param?.locale || constant.DEFAULT_LOCALE;
-  const matchingItem = context?.code?.[0]?.items?.[0]?.items?.find((item: ItemData) => item?.id === type);
   const imageSrc = images[0]?.url || getImageSrc(category);
 
 
@@ -36,7 +33,7 @@ const Card: React.FC<CardProps> = ({ category = 'PRODUCT', data, fullWidth = fal
         </figure>
         <ul className={styles.description}>
         <li className={styles[category.toLowerCase()]}>
-            {getItemTitle(matchingItem, locale)}
+            상품
           </li>
           <li className={styles.title}><h2>{title}</h2></li>
         </ul>

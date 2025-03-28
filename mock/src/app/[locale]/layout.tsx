@@ -5,6 +5,7 @@ import { RootLayoutProps } from "../types/layout";
 import ProgressBar from "../components/common/progressBar/ProgressBar";
 import SkipNavigation from "../components/layout/skipNavigation/SkipNavigation";
 import "./styles/globals.css";
+import LogContextProvider from "../providers/LogContextProvider";
 
 
 async function RootLayout({ children, params }: RootLayoutProps) {
@@ -15,13 +16,13 @@ async function RootLayout({ children, params }: RootLayoutProps) {
 
   return (
       <html lang={locale}>
-        {/* <CodeContextProvider> */}
+        <LogContextProvider>
           <body>
           <SkipNavigation locale={locale} />
           <ProgressBar />
               {children}
           </body>
-        {/* </CodeContextProvider> */}
+        </LogContextProvider>
       </html>
   );
 }

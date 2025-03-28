@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
 import com.dajava.backend.domain.register.service.RegisterService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,22 +32,22 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RegisterController {
 
-	private final RegisterService solutionService;
+	private final RegisterService registerService;
 
 	/**
 	 * 솔루션 신청 폼 접수 API
-	 * @param request 신청 데이터 (SolutionCreateRequest)
-	 * @return 신청 결과 (SolutionCreateResponse)
+	 * @param request 신청 데이터 (RegisterCreateRequest)
+	 * @return 신청 결과 (RegisterCreateResponse)
 	 */
 	@Operation(
 		summary = "솔루션 요청",
 		description = "솔루션 폼 정보를 기반으로 등록 후 일련 번호 등 등록 정보를 반환합니다.")
 	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
-	public SolutionCreateResponse create(
-		@RequestBody SolutionCreateRequest request
+	public RegisterCreateResponse create(
+		@RequestBody RegisterCreateRequest request
 	) {
 		log.info(request.toString());
-		return solutionService.createSolution(request);
+		return registerService.createRegister(request);
 	}
 }

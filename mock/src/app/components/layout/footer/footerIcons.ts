@@ -1,4 +1,3 @@
-// footerIcons.ts
 export const FOOTER_ICONS = [
     {
       id: 0,

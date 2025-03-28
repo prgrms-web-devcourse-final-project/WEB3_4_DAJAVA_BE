@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.register.exception.SolutionException;
-import com.dajava.backend.domain.register.repository.SolutionRepository;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.exception.RegisterException;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,18 +25,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RegisterValidator {
 
-	private final SolutionRepository solutionRepository;
+	private final RegisterRepository registerRepository;
 
-	public void validate(final SolutionCreateRequest request) {
+	public void validate(final RegisterCreateRequest request) {
 
 		// Request Data 유효성 검증
 		if (!isValidEmail(request.email()) || !isValidDate(request.startDate(), request.endDate())) {
-			throw new SolutionException(INVALID_SOLUTION_REQUEST);
+			throw new RegisterException(INVALID_REGISTER_REQUEST);
 		}
 
 		// 2. Url 등록 가능 여부 체크
-		if (!solutionRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
-			throw new SolutionException(ALREADY_REGISTER_URL);
+		if (!registerRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
+			throw new RegisterException(ALREADY_REGISTER_URL);
 		}
 	}
 

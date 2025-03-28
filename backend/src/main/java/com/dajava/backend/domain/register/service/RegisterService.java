@@ -6,13 +6,13 @@ import static com.dajava.backend.domain.register.converter.RegisterConverter.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.register.dto.SolutionCreateRequest;
-import com.dajava.backend.domain.register.dto.SolutionCreateResponse;
+import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
 import com.dajava.backend.domain.register.entity.Order;
-import com.dajava.backend.domain.register.entity.Solution;
+import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
 import com.dajava.backend.domain.register.repository.OrderRepository;
-import com.dajava.backend.domain.register.repository.SolutionRepository;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,21 +29,21 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RegisterService {
 
-	private final SolutionRepository solutionRepository;
+	private final RegisterRepository registerRepository;
 	private final OrderRepository orderRepository;
-	private final RegisterValidator solutionValidator;
+	private final RegisterValidator registerValidator;
 
 	@Transactional
-	public SolutionCreateResponse createSolution(final SolutionCreateRequest request) {
+	public RegisterCreateResponse createRegister(final RegisterCreateRequest request) {
 
-		solutionValidator.validate(request);
+		registerValidator.validate(request);
 
-		Solution newSolution = solutionRepository.save(Solution.create(request, DEFAULT_SOLUTION_DURATION));
+		Register newRegister= registerRepository.save(Register.create(request, DEFAULT_REGISTER_DURATION));
 		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
 
-		log.info("Solution 엔티티 생성 : {} ", newSolution);
+		log.info("Register 엔티티 생성 : {} ", newRegister);
 		log.info("Order 엔티티 생성 : {} ", newOrder);
 
-		return toSolutionCreateResponse(newSolution);
+		return toRegisterCreateResponse(newRegister);
 	}
 }

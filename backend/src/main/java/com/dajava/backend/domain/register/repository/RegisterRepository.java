@@ -1,23 +1,24 @@
 package com.dajava.backend.domain.register.repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.dajava.backend.domain.register.entity.Solution;
+import com.dajava.backend.domain.register.entity.Register;
 
 /**
- * SolutionRepository
- * Solution Entity 에 대한 Spring Data Jpa 인터페이스
+ * RegisterRepository
+ * Register Entity 에 대한 Spring Data Jpa 인터페이스
  *
  * @author ChoiHyunSan
  * @since 2025-03-24
  */
 @Repository
-public interface SolutionRepository extends JpaRepository<Solution, Long> {
+public interface RegisterRepository extends JpaRepository<Register, Long> {
 
 	/**
 	 * Url 경로를 통해 이미 존재하는지 체크
@@ -26,16 +27,21 @@ public interface SolutionRepository extends JpaRepository<Solution, Long> {
 	 * @return 존재 여부
 	 */
 	@Query("""
-		      select count(s) = 0 or 
-		             (select s2.endDate from Solution s2 
-		              where s2.url = :url 
-		              order by s2.createDate desc limit 1) < :pastDate
-		      from Solution s
-		      where s.url = :url
-		""")
+      SELECT CASE 
+             WHEN COUNT(s) = 0 THEN true
+             WHEN (SELECT s2.endDate FROM Register s2 
+                  WHERE s2.url = :url 
+                  ORDER BY s2.createDate DESC LIMIT 1) < :pastDate THEN true
+             ELSE false
+             END
+      FROM Register s
+      WHERE s.url = :url
+    """)
 	boolean checkUrlAvailability(
 		@Param("url") String url,
 		@Param("pastDate") LocalDateTime pastDate);
+
+	Register findBySerialNumber(String serialNumber);
 }
 
 
