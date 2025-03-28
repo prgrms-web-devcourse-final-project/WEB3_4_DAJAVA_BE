@@ -4,7 +4,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
+import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -35,6 +39,14 @@ class RegisterControllerTest {
 	@Autowired
 	private RegisterService registerService;
 
+	@Autowired
+	private RegisterRepository registerRepository;
+
+	@BeforeEach
+	void setUp() throws Exception {
+		registerRepository.deleteAll();
+	}
+
 	@Test
 	@DisplayName("솔루션 신청 : 성공")
 	void t1() throws Exception {
@@ -44,8 +56,8 @@ class RegisterControllerTest {
 			"test@example.com",
 			"password123",
 			"localhost:3000/test",
-			now,
-			now.plusDays(7)
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0),
+			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
 		// when & then
@@ -65,8 +77,8 @@ class RegisterControllerTest {
 			"invalid-email", // 잘못된 이메일
 			"password123",
 			"localhost:3000/test",
-			now,
-			now.plusDays(7)
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0),
+			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
 		// when & then
@@ -86,8 +98,8 @@ class RegisterControllerTest {
 			"chsan626@gmail.com",
 			"password123!",
 			"localhost:3000/test123",
-			now,
-			now.plusDays(7)
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0),
+			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
 		// when & then
@@ -108,10 +120,14 @@ class RegisterControllerTest {
 	@DisplayName("솔루션 수정 : 성공")
 	void t4() throws Exception {
 		t1();
-		mockMvc.perform(patch("/v1/register/1")
+		List<Register> all = registerRepository.findAll();
+		Register register = all.get(0);
+
+		mockMvc.perform(patch("/v1/register/" + register.getId())
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
-				.content(objectMapper.writeValueAsString(new RegisterModifyRequest(LocalDateTime.now().plusDays(3L)))))
+				.content(objectMapper.writeValueAsString(new RegisterModifyRequest(
+					LocalDateTime.now().plusDays(3L).withHour(0).withMinute(0).withSecond(0).withNano(0)))))
 			.andExpect(status().isOk());
 	}
 
