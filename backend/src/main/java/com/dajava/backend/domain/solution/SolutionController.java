@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dajava.backend.domain.event.entity.SolutionData;
+
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -28,7 +30,7 @@ public class SolutionController {
 
 	@PostMapping
 	@Operation(summary = "사용자 로그 기반 UX 개선 솔루션 요청", description = "사용자의 이벤트 로그 데이터를 AI 모델에 보내 UI/UX 개선 솔루션을 받아옵니다.")
-	public Mono<SolutionResponseDto> getUXSolution(@RequestBody List<SolutionRequestDto> sessionDatas) {
+	public Mono<SolutionResponseDto> getUXSolution(@RequestBody SolutionData sessionDatas) {
 		String prompt = SolutionUtils.refinePrompt(sessionDatas);
 		String constructedRefineData = SolutionUtils.buildRefineData(prompt);
 		String serialNumber = extractSerialNumber(constructedRefineData);

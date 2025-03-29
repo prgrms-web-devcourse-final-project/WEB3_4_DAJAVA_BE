@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.register.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,6 +53,8 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 		LocalDateTime currentTime2);
 
 	Register findBySerialNumber(String serialNumber);
+
+	List<Register> findByEndDateLessThanEqual(LocalDateTime endDate);
 }
 
 

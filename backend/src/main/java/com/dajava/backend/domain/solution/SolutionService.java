@@ -4,6 +4,7 @@ import static com.dajava.backend.domain.solution.SolutionUtils.*;
 import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.dajava.backend.domain.event.entity.SolutionData;
+import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -19,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
@@ -28,6 +32,7 @@ import reactor.core.publisher.Mono;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SolutionService {
 	@Value("${DAJAVA_AI_API_KEY}")
 	private String apiKey;
@@ -39,6 +44,9 @@ public class SolutionService {
 
 	@Autowired
 	private final RegisterRepository registerRepository;
+
+	@Autowired
+	private final SolutionDataRepository solutionDataRepository;
 
 	/**
 	 * 컨트롤러에서 제공받은 파라미터를 활용해 Gemini에 답변을 요청하는 메서드
@@ -104,5 +112,9 @@ public class SolutionService {
 		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
 			.orElseThrow(() -> new RegisterException(SOLUTION_NOT_FOUND));
 		return new SolutionInfoResponse(solutionEntity.getText());
+	}
+
+	public SolutionData getSolutionData(String serialNumber) {
+		return solutionDataRepository.findBySerialNumber(serialNumber);
 	}
 }
