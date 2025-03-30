@@ -15,8 +15,10 @@ public class RegisterInfo {
 	private String serialNumber;
 	private String email;
 	private String url;
-	private boolean isCompleted;
 	private LocalDateTime solutionDate;
-	private LocalDateTime solutionCompleteDate;
+	private LocalDateTime solutionStartDate;
+	private LocalDateTime solutionEndDate;
+	private boolean isCompleted;
+	private String eventState;
 }
 

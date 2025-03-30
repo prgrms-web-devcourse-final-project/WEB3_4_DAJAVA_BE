@@ -21,7 +21,8 @@ public class RegisterConverter {
 			.url(solution.getUrl())
 			.isCompleted(solution.isSolutionComplete())
 			.solutionDate(solution.getCreateDate())
-			.solutionCompleteDate(solution.getEndDate())
+			.solutionStartDate(solution.getStartDate())
+			.solutionEndDate(solution.getEndDate())
 			.build();
 	}
 
