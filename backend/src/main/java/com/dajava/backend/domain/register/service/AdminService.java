@@ -41,7 +41,7 @@ public class AdminService {
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if ("admin_auth".equals(cookie.getName()) &&
-					PasswordUtils.verifyPassword(cookie.getValue(), adminCode)) {
+					PasswordUtils.verifyPassword(adminCode, cookie.getValue())) {
 					isAuthenticated = true;
 					break;
 				}
