@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.hibernate.annotations.BatchSize;
 
+import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.common.BaseTimeEntity;
+import com.dajava.backend.global.exception.ErrorCode;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -103,15 +105,16 @@ public class SessionData extends BaseTimeEntity {
 	// 세션 종료시 (데이터 받기 중단) 호출 메서드
 	public void endSession() {
 		if (this.isSessionEnded) {
-			throw new IllegalStateException("세션이 이미 종료되었습니다.");
+			throw new PointerEventException(ErrorCode.ALREADY_ENDED_SESSION);
 		}
 		this.isSessionEnded = true;
 	}
 
 	// 세션 검증시 (이상치 여부 판단) 호출 메서드
+	// 추후 어뷰저 검증시 해당 메서드 사용 예정
 	public void setOutlier() {
 		if (this.isOutlier) {
-			throw new IllegalStateException("이미 이상치 여부 값이 참입니다.");
+			throw new PointerEventException(ErrorCode.ALREADY_OUTLIER_SESSION);
 		}
 		this.isOutlier = true;
 	}
@@ -119,7 +122,7 @@ public class SessionData extends BaseTimeEntity {
 	// 세션 검증 후 호출 메서드
 	public void setVerified() {
 		if (this.isVerified) {
-			throw new IllegalStateException("이미 검증이 완료된 세션 데이터 입니다.");
+			throw new PointerEventException(ErrorCode.ALREADY_VERIFIED_SESSION);
 		}
 		this.isVerified = true;
 	}
