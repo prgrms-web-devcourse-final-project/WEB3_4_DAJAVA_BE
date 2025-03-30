@@ -115,7 +115,7 @@ public class RegisterValidator {
 		}
 
 		// end 시간이 start 시간보다 같거나 앞에 있으면 안된다.
-		if (end.isEqual(start) || end.isBefore(start)) {
+		if (start.isAfter(LocalDateTime.now()) || end.isEqual(start) || end.isBefore(start)) {
 			return false;
 		}
 
