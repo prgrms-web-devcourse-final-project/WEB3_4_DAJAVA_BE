@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
-import com.dajava.backend.domain.solution.service.SolutionService;
+import com.dajava.backend.domain.solution.service.SolutionServiceImpl;
 import com.dajava.backend.domain.solution.controller.SolutionController;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class SolutionScheduler {
 
 	private final RegisterRepository registerRepository;
 	private final SolutionController solutionController;
-	private final SolutionService solutionService;
+	private final SolutionServiceImpl solutionServiceImpl;
 
 	@Scheduled(cron = "0 0 0 * * *")	//매일 자정(00:00)에 실행
 	public void processExpiredRegisters() {
@@ -31,7 +31,7 @@ public class SolutionScheduler {
 
 		for (Register register : expiredRegisters) {
 			try {
-				SolutionData solutionData = solutionService.getSolutionData(register.getSerialNumber());
+				SolutionData solutionData = solutionServiceImpl.getSolutionData(register.getSerialNumber());
 				if (solutionData != null) {
 					solutionController.getUXSolution(solutionData);
 					log.info("Processed expired register: {}", register.getSerialNumber());

@@ -5,7 +5,7 @@ import com.dajava.backend.domain.event.entity.SolutionData;
 public class SolutionUtils {
 	/**
 	 * 사용자 세션 데이터를 기반으로 UI/UX 개선점을 제안하는 프롬프트를 생성합니다.
-	 * @param sessionDatas 사용자 세션 데이터
+	 * @param sessionData 사용자 세션 데이터
 	 * @return 생성된 프롬프트 문자열
 	 */
 	public static String refinePrompt(SolutionData sessionData) {
