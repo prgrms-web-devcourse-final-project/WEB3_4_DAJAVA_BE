@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.admin;
+package com.dajava.backend.domain.register.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
