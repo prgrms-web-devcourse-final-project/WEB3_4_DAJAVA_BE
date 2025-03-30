@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.entity.PointerClickEvent;
+import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.global.utils.EventsUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,9 +29,14 @@ import lombok.extern.slf4j.Slf4j;
 public class ClickEventAnalyzer implements Analyzer<PointerClickEvent> {
 
 	//5초 내 클릭 한지 감지
-	private static final int TIME_THRESHOLD_MS = 5000;
-	private static final int POSITION_THRESHOLD_PX = 10;
-	private static final int MIN_CLICK_COUNT = 3;
+	@Value("${CLICK_ANALYZER_TIME_THRESHOLD_MS:5000}")
+	private int timeThresholdMs;
+
+	@Value("${CLICK_ANALYZER_POSITION_THRESHOLD_PX:10}")
+	private int positionThresholdPx;
+
+	@Value("${CLICK_ANALYZER_MIN_CLICK_COUNT:3}")
+	private int minClickCount;
 
 	// 비정상 클릭으로 판단되는 태그 목록
 	private static final Set<String> SUSPICIOUS_TAGS = Set.of(
@@ -47,8 +55,10 @@ public class ClickEventAnalyzer implements Analyzer<PointerClickEvent> {
 	 */
 	@Override
 	public List<PointerClickEvent> analyze(SessionData sessionData) {
-		List<PointerClickEvent> rageClicks = getRageClicks(sessionData.getPointerClickEvents());
-		List<PointerClickEvent> suspiciousClicks = getSuspiciousClicks(sessionData.getPointerClickEvents());
+		List<PointerClickEvent> events = sessionData.getPointerClickEvents();
+		EventsUtils.sortByCreateDateAsc(events);
+		List<PointerClickEvent> rageClicks = getRageClicks(events);
+		List<PointerClickEvent> suspiciousClicks = getSuspiciousClicks(events);
 
 		// 중복 제거를 위해 Set 사용
 		Set<PointerClickEvent> resultSet = new HashSet<>();
@@ -65,29 +75,36 @@ public class ClickEventAnalyzer implements Analyzer<PointerClickEvent> {
 	 * @return Rage Click으로 판단된 클릭 그룹 리스트
 	 */
 	public List<PointerClickEvent> getRageClicks(List<PointerClickEvent> clickEvents) {
-		if (clickEvents == null || clickEvents.size() < MIN_CLICK_COUNT) {
+
+		if (clickEvents == null || clickEvents.size() < minClickCount) {
 			return Collections.emptyList();
 		}
 
-		// 1. 시간순 정렬 db 에서 정렬해 가져옴
-
 		Set<PointerClickEvent> rageClicks = new HashSet<>();
-		LinkedList<PointerClickEvent> window = new LinkedList<>();
+		PointerClickEvent[] window = new PointerClickEvent[clickEvents.size()];
+		int start = 0, end = 0;
 
 		for (PointerClickEvent current : clickEvents) {
-			window.addLast(current);
+			window[end++] = current;
 
-			while (!window.isEmpty() && isOutOfTimeRange(window.getFirst(), current)) {
-				window.removeFirst();
+			while (start < end && isOutOfTimeRange(window[start], current)) {
+				start++;
 			}
 
-			List<PointerClickEvent> inRange = window.stream()
-				.filter(e -> isInProximity(e, current))
-				.toList();
+			int count = 0;
+			for (int i = start; i < end; i++) {
+				if (isInProximity(window[i], current)) {
+					count++;
+				}
+			}
 
-			if (inRange.size() >= MIN_CLICK_COUNT) {
-				rageClicks.addAll(inRange);
-				window.clear(); // 중복 감지 방지
+			if (count >= minClickCount) {
+				for (int i = start; i < end; i++) {
+					if (isInProximity(window[i], current)) {
+						rageClicks.add(window[i]);
+					}
+				}
+				start = end; // 중복 방지
 			}
 		}
 
@@ -97,12 +114,12 @@ public class ClickEventAnalyzer implements Analyzer<PointerClickEvent> {
 	}
 
 	private boolean isOutOfTimeRange(PointerClickEvent first, PointerClickEvent current) {
-		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > TIME_THRESHOLD_MS;
+		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > timeThresholdMs;
 	}
 
 	private boolean isInProximity(PointerClickEvent clickEvent1, PointerClickEvent clickEvent2) {
-		return (Math.abs(clickEvent1.getClientX() - clickEvent2.getClientX()) <= POSITION_THRESHOLD_PX)
-			&& (Math.abs(clickEvent1.getClientY() - clickEvent2.getClientY()) <= POSITION_THRESHOLD_PX);
+		return (Math.abs(clickEvent1.getClientX() - clickEvent2.getClientX()) <= positionThresholdPx)
+			&& (Math.abs(clickEvent1.getClientY() - clickEvent2.getClientY()) <= positionThresholdPx);
 	}
 
 	/**

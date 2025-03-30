@@ -56,19 +56,16 @@ public class SessionData extends BaseTimeEntity {
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	@OrderBy("createDate ASC")
 	@BatchSize(size = 100)
 	private List<PointerClickEvent> pointerClickEvents = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	@OrderBy("createDate ASC")
 	@BatchSize(size = 1000)
 	private List<PointerMoveEvent> pointerMoveEvents = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	@OrderBy("createDate ASC")
 	@BatchSize(size = 100)
 	private List<PointerScrollEvent> pointerScrollEvents = new ArrayList<>();
 
@@ -108,13 +105,6 @@ public class SessionData extends BaseTimeEntity {
 		this.isSessionEnded = true;
 	}
 
-	// 세션 검증시 (이상치 여부 판단) 호출 메서드
-	public void setOutlier() {
-		if (this.isOutlier) {
-			throw new IllegalStateException("이미 이상치 여부 값이 참입니다.");
-		}
-		this.isOutlier = true;
-	}
 
 	// 세션 검증 후 호출 메서드
 	public void setVerified() {

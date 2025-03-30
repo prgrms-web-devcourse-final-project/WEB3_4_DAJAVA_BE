@@ -8,10 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.global.utils.EventsUtils;
 
 /**
  * 무브 이벤트를 분석합니다.
@@ -21,14 +23,19 @@ import com.dajava.backend.domain.event.entity.SessionData;
 @Component
 public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 
-	private static final long TIME_WINDOW_MS = 3000;
-	private static final int TURN_THRESHOLD = 4;
-	private static final double ANGLE_THRESHOLD_DEGREES = 90.0;
+	@Value("${MOVE_ANALYZER_TIME_WINDOW_MS:3000}")
+	private long timeWindowMs;
+
+	@Value("${MOVE_ANALYZER_TURN_THRESHOLD:4}")
+	private int turnThreshold;
+
+	@Value("${MOVE_ANALYZER_ANGLE_THRESHOLD_DEGREES:90.0}")
+	private double angleThresholdDegrees;
 
 	@Override
 	public List<PointerMoveEvent> analyze(SessionData sessionData) {
 		List<PointerMoveEvent> events = sessionData.getPointerMoveEvents();
-
+		EventsUtils.sortByCreateDateAsc(events);
 		List<PointerMoveEvent> zigzags = detectZigzagMovementByAngle(events);
 		Set<PointerMoveEvent> resultSet = new HashSet<>();
 		resultSet.addAll(zigzags);
@@ -78,7 +85,7 @@ public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 					Vector v2 = vectors.get(i);
 					double angle = v1.angleWith(v2);
 
-					if (angle >= ANGLE_THRESHOLD_DEGREES) {
+					if (angle >= angleThresholdDegrees) {
 						turnCount++;
 					}
 
@@ -89,7 +96,7 @@ public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 					tempOutliers.add(e2);
 				}
 
-				if (turnCount >= TURN_THRESHOLD) {
+				if (turnCount >= turnThreshold) {
 					outliers.addAll(tempOutliers);
 				}
 			}
@@ -99,7 +106,7 @@ public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 	}
 
 	private boolean isOutOfTimeRange(PointerMoveEvent first, PointerMoveEvent current) {
-		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > TIME_WINDOW_MS;
+		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > timeWindowMs;
 	}
 
 	// 내부 벡터 클래스 (2D)

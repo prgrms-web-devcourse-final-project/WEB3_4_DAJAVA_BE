@@ -23,7 +23,6 @@ import com.dajava.backend.global.component.buffer.EventBuffer;
  */
 public class EventBufferSchedulerTest {
 
-	private EventLogService eventLogService;
 	private EventBuffer eventBuffer;
 	private EventBatchService eventBatchService;
 	private EventBufferScheduler scheduler;
@@ -32,10 +31,9 @@ public class EventBufferSchedulerTest {
 
 	@BeforeEach
 	void setUp() {
-		eventLogService = mock(EventLogService.class);
 		eventBatchService = mock(EventBatchService.class);  // EventBatchService mock 추가
 		eventBuffer = new EventBuffer();
-		scheduler = new EventBufferScheduler(eventLogService, eventBatchService, eventBuffer);
+		scheduler = new EventBufferScheduler(eventBatchService, eventBuffer);
 	}
 
 	@Test

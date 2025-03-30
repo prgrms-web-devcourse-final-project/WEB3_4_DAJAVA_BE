@@ -15,14 +15,6 @@ import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
  */
 public interface EventLogService {
 
-	public <T> void saveAll(List<T> events);
-
-	public void saveClickEvents(List<PointerClickEventRequest> events);
-
-	public void saveMoveEvents(List<PointerMoveEventRequest> events);
-
-	public void saveScrollEvents(List<PointerScrollEventRequest> events);
-
 	void createClickEvent(PointerClickEventRequest clickEventRequest);
 
 	void createMoveEvent(PointerMoveEventRequest moveEventRequest);

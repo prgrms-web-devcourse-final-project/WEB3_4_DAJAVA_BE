@@ -27,12 +27,11 @@ import lombok.extern.slf4j.Slf4j;
 public class EventBufferScheduler {
 
 	// 비활성 상태 간주 시간 (10분)
-	private static final long INACTIVITY_THRESHOLD_MS = 10 * 60 * 1000;
+	private static final long INACTIVITY_THRESHOLD_MS = 10L * 60 * 1000;
 
 	// 활성 상태 세션 주기적 저장 주기 (5분)
-	private static final long ACTIVE_SESSION_FLUSH_INTERVAL_MS = 5 * 60 * 1000;
+	private static final long ACTIVE_SESSION_FLUSH_INTERVAL_MS = 5L * 60 * 1000;
 
-	private final EventLogService eventLogService;
 	private final EventBatchService eventBatchService;
 	private final EventBuffer eventBuffer;
 
@@ -79,7 +78,7 @@ public class EventBufferScheduler {
 	 * 처리하여 데이터 손실 위험을 줄입니다.
 	 */
 	@Scheduled(fixedRate = ACTIVE_SESSION_FLUSH_INTERVAL_MS) // 5분마다 실행
-	public <T> void flushAllEventBuffers() {
+	public void flushAllEventBuffers() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 
 		Set<SessionDataKey> activeKeys = eventBuffer.getAllActiveSessionKeys();
@@ -112,3 +111,4 @@ public class EventBufferScheduler {
 		return latest;
 	}
 }
+

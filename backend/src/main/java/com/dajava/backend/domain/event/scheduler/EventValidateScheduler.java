@@ -35,7 +35,8 @@ public class EventValidateScheduler {
 	private final ScrollEventAnalyzer scrollEventAnalyzer;
 
 	// 비활성 상태 간주 시간 (10분)
-	private static final long VALIDATE_END_SESSION_MS = 10 * 60 * 1000;
+	private static final long VALIDATE_END_SESSION_MS = 10L * 60 * 1000;
+
 
 	@Transactional
 	@Scheduled(fixedRate = VALIDATE_END_SESSION_MS)
@@ -57,7 +58,7 @@ public class EventValidateScheduler {
 
 			sessionData.setVerified();
 
-			List<SolutionEvent> solutionEvents = PointerEventConverter.toPointerEvents(clickResult, moveResult,
+			List<SolutionEvent> solutionEvents = PointerEventConverter.toSolutionEvents(clickResult, moveResult,
 				scrollResult, solutionData);
 
 			solutionData.addPointerEvents(solutionEvents);
