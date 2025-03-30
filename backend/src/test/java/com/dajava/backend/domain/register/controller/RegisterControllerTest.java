@@ -25,6 +25,8 @@ import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.servlet.http.Cookie;
+
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,6 +49,10 @@ class RegisterControllerTest {
 		registerRepository.deleteAll();
 	}
 
+	private static String cookieKey = "admin_auth";
+	private static String cookieValue = "true";
+
+	@SuppressWarnings("checkstyle:RegexpMultiline")
 	@Test
 	@DisplayName("솔루션 신청 : 성공")
 	void t1() throws Exception {
@@ -56,7 +62,7 @@ class RegisterControllerTest {
 			"test@example.com",
 			"password123",
 			"localhost:3000/test",
-			now.withHour(0).withMinute(0).withSecond(0).withNano(0),
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
 			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
@@ -98,7 +104,7 @@ class RegisterControllerTest {
 			"chsan626@gmail.com",
 			"password123!",
 			"localhost:3000/test123",
-			now.withHour(0).withMinute(0).withSecond(0).withNano(0),
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
 			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
@@ -125,6 +131,7 @@ class RegisterControllerTest {
 
 		mockMvc.perform(patch("/v1/register/" + register.getId())
 				.contentType(MediaType.APPLICATION_JSON)
+				.cookie(new Cookie(cookieKey, cookieValue))
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
 				.content(objectMapper.writeValueAsString(new RegisterModifyRequest(
 					LocalDateTime.now().plusDays(3L).withHour(0).withMinute(0).withSecond(0).withNano(0)))))
@@ -142,6 +149,7 @@ class RegisterControllerTest {
 
 		ResultActions resultActions = mockMvc.perform(get("/v1/registers")
 				.contentType(MediaType.APPLICATION_JSON)
+				.cookie(new Cookie(cookieKey, cookieValue))
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isOk());

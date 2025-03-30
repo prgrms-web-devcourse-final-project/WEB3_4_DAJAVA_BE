@@ -39,7 +39,7 @@ class RegisterServiceTest {
 			"chsan626@gmail.com",
 			"password123!",
 			"localhost:3000/test123",
-			LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0),
+			LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
 			LocalDateTime.now().plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
@@ -73,7 +73,7 @@ class RegisterServiceTest {
 				"chsan626@gmail.com",
 				"password123!",
 				"localhost:3000/test123" + i,
-				LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0),
+				LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
 				LocalDateTime.now().plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 			);
 			service.createRegister(request);

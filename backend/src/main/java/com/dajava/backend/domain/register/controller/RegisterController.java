@@ -118,6 +118,13 @@ public class RegisterController {
 		return registerService.getRegisterList(request);
 	}
 
+	/**
+	 * 관리자 코드 입력 API
+	 * 접속에 성공하면 인증 토큰을 쿠키에 담아서 전달
+	 */
+	@Operation(
+		summary = "솔루션 관리자 코드 입력",
+		description = "관리자 페이지에 접속하기 위해 관리코드를 입력합니다.")
 	@PostMapping("/v1/register/admin")
 	@ResponseStatus(HttpStatus.OK)
 	public void admin(
