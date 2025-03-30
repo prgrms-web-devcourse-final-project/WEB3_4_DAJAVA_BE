@@ -1,8 +1,11 @@
-package com.dajava.backend.domain.solution.util;
+package com.dajava.backend.global.utils;
+
+import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
+import com.dajava.backend.domain.solution.exception.SolutionException;
 
-public class SolutionUtils {
+public final class SolutionUtils {
 	/**
 	 * 사용자 세션 데이터를 기반으로 UI/UX 개선점을 제안하는 프롬프트를 생성합니다.
 	 * @param sessionData 사용자 세션 데이터

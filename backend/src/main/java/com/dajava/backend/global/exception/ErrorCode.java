@@ -24,6 +24,8 @@ public enum ErrorCode {
 	SOLUTION_RESPONSE_ERROR(HttpStatus.BAD_REQUEST, "응답 처리 중 오류가 발생했습니다."),
 	INVALID_SERIAL_NUMBER(HttpStatus.UNAUTHORIZED, "시리얼 넘버가 일치하지 않습니다."),
 	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+	SERIAL_NUMBER_DATA_NULL(HttpStatus.BAD_REQUEST, "시리얼 넘버가 존재하지 않습니다."),
+
 
 	// Sample
 	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");
