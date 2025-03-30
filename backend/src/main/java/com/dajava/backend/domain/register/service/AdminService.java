@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.dajava.backend.domain.register.exception.AdminException;
 import com.dajava.backend.global.exception.ErrorCode;
+import com.dajava.backend.global.utils.PasswordUtils;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class AdminService {
 		}
 
 		// 관리자 코드 대신 "true" 등의 값 사용
-		Cookie authCookie = new Cookie("admin_auth", "true");
+		Cookie authCookie = new Cookie("admin_auth", PasswordUtils.hashPassword(adminCode));
 		authCookie.setMaxAge(30 * 60);
 		authCookie.setHttpOnly(true);
 		authCookie.setPath("/");
@@ -40,7 +41,7 @@ public class AdminService {
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
 				if ("admin_auth".equals(cookie.getName()) &&
-					"true".equals(cookie.getValue())) {
+					PasswordUtils.verifyPassword(cookie.getValue(), adminCode)) {
 					isAuthenticated = true;
 					break;
 				}
