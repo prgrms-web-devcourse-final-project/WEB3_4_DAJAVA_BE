@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.solution.SolutionEntity;
 import com.dajava.backend.global.common.BaseTimeEntity;

@@ -1,7 +1,7 @@
 package com.dajava.backend.domain.register.converter;
 
 import com.dajava.backend.domain.register.RegisterInfo;
-import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.entity.Register;
 
 /**

@@ -14,9 +14,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 

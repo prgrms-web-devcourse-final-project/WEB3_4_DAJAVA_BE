@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
-import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 

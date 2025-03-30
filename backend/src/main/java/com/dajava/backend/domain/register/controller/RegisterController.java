@@ -12,17 +12,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
-import com.dajava.backend.domain.register.dto.RegisterDeleteResponse;
-import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.RegisterModifyResponse;
-import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
+import com.dajava.backend.domain.register.dto.admin.AdminLoginRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyResponse;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.service.RegisterService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -105,5 +107,14 @@ public class RegisterController {
 		@RequestBody RegistersInfoRequest request
 	) {
 		return registerService.getRegisterList(request);
+	}
+
+	@PostMapping("/v1/register/admin")
+	@ResponseStatus(HttpStatus.OK)
+	public void admin(
+		@RequestBody AdminLoginRequest request,
+		HttpServletResponse response
+	) {
+
 	}
 }
