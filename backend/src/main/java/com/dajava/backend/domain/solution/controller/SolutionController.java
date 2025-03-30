@@ -1,8 +1,6 @@
-package com.dajava.backend.domain.solution;
+package com.dajava.backend.domain.solution.controller;
 
-import static com.dajava.backend.domain.solution.SolutionUtils.*;
-
-import java.util.List;
+import static com.dajava.backend.domain.solution.util.SolutionUtils.*;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
+import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
+import com.dajava.backend.domain.solution.service.SolutionService;
+import com.dajava.backend.domain.solution.util.SolutionUtils;
+import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

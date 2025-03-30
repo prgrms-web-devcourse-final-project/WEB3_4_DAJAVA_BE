@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
-import com.dajava.backend.domain.solution.SolutionEntity;
+import com.dajava.backend.domain.solution.entity.SolutionEntity;
 import com.dajava.backend.global.common.BaseTimeEntity;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;

@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.solution;
+package com.dajava.backend.domain.solution.dto;
 
 import lombok.Data;
 

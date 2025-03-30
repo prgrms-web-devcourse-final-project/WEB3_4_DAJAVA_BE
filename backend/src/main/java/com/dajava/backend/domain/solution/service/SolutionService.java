@@ -1,10 +1,8 @@
-package com.dajava.backend.domain.solution;
+package com.dajava.backend.domain.solution.service;
 
-import static com.dajava.backend.domain.solution.SolutionUtils.*;
 import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,10 @@ import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
+import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
+import com.dajava.backend.domain.solution.entity.SolutionEntity;
+import com.dajava.backend.domain.solution.repository.SolutionRepository;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

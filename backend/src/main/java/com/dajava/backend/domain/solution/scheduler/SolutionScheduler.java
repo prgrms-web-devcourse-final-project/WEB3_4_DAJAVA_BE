@@ -1,16 +1,16 @@
-package com.dajava.backend.domain.solution;
+package com.dajava.backend.domain.solution.scheduler;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.solution.service.SolutionService;
+import com.dajava.backend.domain.solution.controller.SolutionController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

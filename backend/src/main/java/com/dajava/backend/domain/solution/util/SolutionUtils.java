@@ -1,6 +1,4 @@
-package com.dajava.backend.domain.solution;
-
-import java.util.List;
+package com.dajava.backend.domain.solution.util;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 
