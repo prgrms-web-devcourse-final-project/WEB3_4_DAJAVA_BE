@@ -102,7 +102,7 @@ class SolutionServiceImplTest {
 			() -> solutionService.getSolutionInfo(serialNumber, inCorrectPassword));
 
 		//then
-		assertEquals(ErrorCode.INVALID_PASSWORD, exception.errorCode);
+		assertEquals(ErrorCode.SOLUTION_PASSWORD_INVALID, exception.errorCode);
 	}
 
 	@Test
