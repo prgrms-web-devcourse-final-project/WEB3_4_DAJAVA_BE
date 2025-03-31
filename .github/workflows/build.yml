@@ -3,9 +3,9 @@ name: Build Test
 on:
   pull_request:
     paths:
-      - 'backend/src/**'
-      - 'backend/build.gradle'
-      - 'backend/build.gradle.kts'
+      - "backend/src/**"
+      - "backend/build.gradle"
+      - "backend/build.gradle.kts"
     # branches:
     #   - dev
 
@@ -14,6 +14,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 0. 시크릿 필드 가져오기
+      - name: application-secret.yml 생성
+        env:
+          APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET_YML }}
+        run: echo "$APPLICATION_SECRET" > backend/src/main/resources/application-secret.yml
+
       # 1. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v2.3.4
@@ -22,15 +28,15 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: "21"
+          distribution: "temurin"
 
       # 3. Gradle 의존성 캐시
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/build.gradle*') }}  # 캐시 키 설정
+          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/build.gradle*') }} # 캐시 키 설정
           restore-keys: |
             ${{ runner.os }}-gradle-
 
