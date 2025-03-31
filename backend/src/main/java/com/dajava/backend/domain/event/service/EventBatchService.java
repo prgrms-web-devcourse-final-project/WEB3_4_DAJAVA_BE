@@ -1,9 +1,7 @@
 package com.dajava.backend.domain.event.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,14 +83,6 @@ public class EventBatchService {
 			sessionData.endSession();
 		}
 		sessionDataRepository.save(sessionData);
-	}
-
-	/**
-	 * eventBuffer 에서 활성 상태인 Session Set 을 가져오기 위한 메서드입니다.
-	 * @return Set 현재 활성 상태인 Session 의 키 Set 입니다.
-	 */
-	public Set<SessionDataKey> collectActiveSessionKeys() {
-		return new HashSet<>(eventBuffer.getAllActiveSessionKeys());
 	}
 
 	/**

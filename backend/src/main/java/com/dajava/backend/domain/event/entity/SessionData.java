@@ -15,7 +15,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -106,7 +105,6 @@ public class SessionData extends BaseTimeEntity {
 		}
 		this.isSessionEnded = true;
 	}
-
 
 	// 세션 검증 후 호출 메서드
 	public void setVerified() {
