@@ -35,3 +35,6 @@ logging:
     org.hibernate.orm.jdbc.bind: INFO
     org.hibernate.orm.jdbc.extract: INFO
     org.springframework.transaction.interceptor: INFO
+
+custom:
+  DAJAVA_ADMIN_CODE: abcdefg12345
