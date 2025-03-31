@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static reactor.core.publisher.Mono.*;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,35 +15,81 @@ import org.mockito.MockitoAnnotations;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
+import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
+import com.dajava.backend.domain.solution.entity.SolutionEntity;
+import com.dajava.backend.domain.solution.repository.SolutionRepository;
+import com.dajava.backend.global.utils.PasswordUtils;
 
 class SolutionServiceImplTest {
 
 	@Mock
 	private SolutionDataRepository solutionDataRepository;
 
+	@Mock
+	private RegisterRepository registerRepository;
+
+	@Mock
+	private SolutionRepository solutionRepository;
+
 	@InjectMocks
 	private SolutionServiceImpl solutionService;
 
 	private SolutionData solutionData;
+	private Register register;
+	private SolutionEntity solutionEntity;
+
+
 	private String serialNumber;
+	private String correctPassword;
 
 	@BeforeEach
 	void beforeEach() {
-		MockitoAnnotations.openMocks(this);	//NPE 방(mock객체 필드 초기화)
+		MockitoAnnotations.openMocks(this);	//NPE 방지(mock객체 필드 초기화)
+
 		serialNumber = "11db0706-4879-463a-a4d7-f7c347668cc6";
 		solutionData = SolutionData.create(serialNumber);
+		register = Register.builder()
+			.serialNumber(serialNumber)
+			.email("test@example.com")
+			.password(PasswordUtils.hashPassword("password"))
+			.url("http://example.com")
+			.startDate(LocalDateTime.now())
+			.endDate(LocalDateTime.now().plusMonths(1))
+			.duration(30)
+			.isServiceExpired(false)
+			.isSolutionComplete(false)
+			.build();
+		solutionEntity = new SolutionEntity();
+		solutionEntity.setText("test");
+		solutionEntity.setRegister(register);
+
 	}
 	@Test
 	void getAISolution() {
 	}
 
 	@Test
-	void getSolutionInfo() {
+	void getSolutionInfo_correctSerialNumberAndPassword() {
+		//given
+		String pwd = "password";
+		when(registerRepository.findBySerialNumber(serialNumber)).thenReturn(register);
+		when(solutionRepository.findByRegister(register)).thenReturn(Optional.of(solutionEntity));
+
+		// when
+		SolutionInfoResponse result = solutionService.getSolutionInfo(serialNumber, pwd);
+
+		//then
+		assertNotNull(result);
+		assertEquals(result.text(), solutionEntity.getText());
+		verify(registerRepository, times(1)).findBySerialNumber(serialNumber);
+		verify(solutionRepository, times(1)).findByRegister(register);
 	}
 
 	@Test
 	void getSolutionData_success() {
-
+		//given
 		when(solutionDataRepository.findBySerialNumber(serialNumber)).thenReturn(solutionData);
 
 		// when
@@ -54,6 +103,7 @@ class SolutionServiceImplTest {
 
 	@Test
 	void getSolutionData_fail() {
+		//given
 		String wrongSerialNumber = "aaaa";
 		when(solutionDataRepository.findBySerialNumber(wrongSerialNumber)).thenReturn(null);
 
