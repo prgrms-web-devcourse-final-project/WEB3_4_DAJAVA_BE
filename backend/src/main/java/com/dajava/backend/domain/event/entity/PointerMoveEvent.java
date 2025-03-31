@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointerMoveEvent extends BaseTimeEntity {
+public class PointerMoveEvent extends BaseTimeEntity implements PointerEvent{
 
 	@Id
 	@GeneratedValue

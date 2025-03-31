@@ -2,6 +2,7 @@ package com.dajava.backend.domain.event.scheduler;
 
 import static org.mockito.Mockito.*;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -9,6 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.dajava.backend.domain.event.entity.PointerClickEvent;
+import com.dajava.backend.domain.event.entity.PointerMoveEvent;
+import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
@@ -82,6 +86,79 @@ public class EventVaildateSchedulerTest {
 		// then
 		verify(sessionDataRepository).findEndedSession();
 		verifyNoInteractions(clickEventAnalyzer, moveEventAnalyzer, scrollEventAnalyzer);
+	}
+
+	@Test
+	@DisplayName("분석된 이벤트가 SolutionData에 저장되어야 함")
+	void shouldSaveAnalyzedEventsToSolutionData() {
+		// given
+		SessionData session = mock(SessionData.class);
+		when(session.getMemberSerialNumber()).thenReturn("user123");
+
+		List<PointerClickEvent> clickEvents = List.of(mock(PointerClickEvent.class));
+		List<PointerMoveEvent> moveEvents = List.of(mock(PointerMoveEvent.class));
+		List<PointerScrollEvent> scrollEvents = List.of(mock(PointerScrollEvent.class));
+
+		when(sessionDataRepository.findEndedSession()).thenReturn(List.of(session));
+		when(clickEventAnalyzer.analyze(session)).thenReturn(clickEvents);
+		when(moveEventAnalyzer.analyze(session)).thenReturn(moveEvents);
+		when(scrollEventAnalyzer.analyze(session)).thenReturn(scrollEvents);
+
+		// when
+		scheduler.endedSessionValidate();
+
+		// then
+		verify(solutionDataRepository, times(1)).save(argThat(solutionData ->
+			solutionData.getSerialNumber().equals("user123") &&
+				!solutionData.getSolutionEvents().isEmpty()
+		));
+	}
+
+	@Test
+	@DisplayName("분석 후 세션은 검증 완료 상태로 변경되어야 함")
+	void shouldSetSessionAsVerifiedAfterAnalysis() {
+		// given
+		SessionData session = mock(SessionData.class);
+		when(session.getMemberSerialNumber()).thenReturn("user123");
+
+		when(sessionDataRepository.findEndedSession()).thenReturn(List.of(session));
+		when(clickEventAnalyzer.analyze(session)).thenReturn(Collections.emptyList());
+		when(moveEventAnalyzer.analyze(session)).thenReturn(Collections.emptyList());
+		when(scrollEventAnalyzer.analyze(session)).thenReturn(Collections.emptyList());
+
+		// when
+		scheduler.endedSessionValidate();
+
+		// then
+		verify(session, times(1)).setVerified();
+	}
+
+	@Test
+	@DisplayName("이벤트 개수만큼 SolutionEvent가 생성되어야 함")
+	void shouldConvertAllEventsToSolutionEvents() {
+		// given
+		SessionData session = mock(SessionData.class);
+		when(session.getMemberSerialNumber()).thenReturn("user123");
+
+		PointerClickEvent click = mock(PointerClickEvent.class);
+		when(click.getSessionId()).thenReturn("s");
+		when(click.getPageUrl()).thenReturn("p");
+		when(click.getCreateDate()).thenReturn(LocalDateTime.now());
+		when(click.getBrowserWidth()).thenReturn(1080);
+
+		when(sessionDataRepository.findEndedSession()).thenReturn(List.of(session));
+		when(clickEventAnalyzer.analyze(session)).thenReturn(List.of(click));
+		when(moveEventAnalyzer.analyze(session)).thenReturn(Collections.emptyList());
+		when(scrollEventAnalyzer.analyze(session)).thenReturn(Collections.emptyList());
+
+		// when
+		scheduler.endedSessionValidate();
+
+		// then
+		verify(solutionDataRepository).save(argThat(solutionData ->
+			solutionData.getSolutionEvents().size() == 1 &&
+				solutionData.getSolutionEvents().get(0).getType().equals("click")
+		));
 	}
 
 }

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.global.common.BaseTimeEntity;
+import com.dajava.backend.global.component.analyzer.ScrollAnalyzerProperties;
 
 /*
  * 스크롤 이벤트 분석 단위 테스트 입니다.
@@ -27,7 +28,15 @@ public class ScrollEventAnalyzerTest {
 
 	@BeforeEach
 	void setUp() {
-		analyzer = new ScrollEventAnalyzer();
+		ScrollAnalyzerProperties props = new ScrollAnalyzerProperties();
+		props.setTimeWindowMs(3000L); // long
+		props.setMinScrollDelta(300);
+		props.setMinEventCount(3);
+		props.setRageThresholdPerWindow(3);
+		props.setMinDirectionChanges(3);
+		props.setScrollBottomThreshold(2000);
+
+		analyzer = new ScrollEventAnalyzer(props);
 	}
 
 	private PointerScrollEvent testScrollEvent(Instant createDate, int scrollY) {

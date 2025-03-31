@@ -8,10 +8,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.global.component.analyzer.ScrollAnalyzerProperties;
+import com.dajava.backend.global.utils.EventsUtils;
 
 /**
  * 스크롤 이벤트를 분석합니다.
@@ -21,18 +24,26 @@ import com.dajava.backend.domain.event.entity.SessionData;
 @Component
 public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 
-	private static final long TIME_WINDOW_MS = 3000;
-	private static final int MIN_SCROLL_DELTA = 300; // 변경됨
-	private static final int MIN_EVENT_COUNT = 3;
-	private static final int RAGE_THRESHOLD_PER_WINDOW = 3; // 윈도우 안에서 3번 이상 rage scroll
+	private final long timeWindowMs;
+	private final int minScrollDelta;
+	private final int minEventCount;
+	private final int rageThresholdPerWindow;
+	private final int minDirectionChanges;
+	private final int scrollBottomThreshold;
 
-	private static final int MIN_DIRECTION_CHANGES = 3; //방향 전환 횟수
-
-	private static final int SCROLL_BOTTOM_THRESHOLD = 2000; // 컨텐츠 소모 정도 감지하는 기준
+	public ScrollEventAnalyzer(ScrollAnalyzerProperties props) {
+		this.timeWindowMs = props.getTimeWindowMs();
+		this.minScrollDelta = props.getMinScrollDelta();
+		this.minEventCount = props.getMinEventCount();
+		this.rageThresholdPerWindow = props.getRageThresholdPerWindow();
+		this.minDirectionChanges = props.getMinDirectionChanges();
+		this.scrollBottomThreshold = props.getScrollBottomThreshold();
+	}
 
 	@Override
 	public List<PointerScrollEvent> analyze(SessionData sessionData) {
 		List<PointerScrollEvent> events = sessionData.getPointerScrollEvents();
+		EventsUtils.sortByCreateDateAsc(events);
 
 		List<PointerScrollEvent> rageScrolls = countRageScrollBursts(events);
 		List<PointerScrollEvent> backAndForthScrolls = getBackAndForthScrollOutliers(events);
@@ -54,38 +65,41 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 	 * @return rage scroll 에 해당하는 이벤트 반환
 	 */
 	public List<PointerScrollEvent> countRageScrollBursts(List<PointerScrollEvent> events) {
-		if (events == null || events.size() < MIN_EVENT_COUNT) {
+		if (events == null || events.size() < minEventCount) {
 			return Collections.emptyList();
 		}
 
-		//db에서 오름차순 정렬해 가져옴
+		PointerScrollEvent[] window = new PointerScrollEvent[events.size()];
+		int start = 0, end = 0;
 
-		LinkedList<PointerScrollEvent> window = new LinkedList<>();
 		int rageBurstCount = 0;
 		Set<PointerScrollEvent> detectedOutliers = new HashSet<>();
 
 		for (PointerScrollEvent current : events) {
-			window.addLast(current);
+			window[end++] = current;
 
-			// 오래된 이벤트 제거 (3초 넘은 것)
-			while (!window.isEmpty() && isOutOfTimeRange(window.getFirst(), current)) {
-				window.removeFirst();
+			// 오래된 이벤트 제거
+			while (start < end && isOutOfTimeRange(window[start], current)) {
+				start++;
+			}
+
+			// 슬라이딩 윈도우를 배열의 start~end 범위로 자르기
+			List<PointerScrollEvent> windowList = new ArrayList<>(end - start);
+			for (int i = start; i < end; i++) {
+				windowList.add(window[i]);
 			}
 
 			List<PointerScrollEvent> windowOutliers = new ArrayList<>();
+			int rageWithinWindow = countRageScrolls(windowList, windowOutliers);
 
-			// 윈도우 안에서 Rage Scroll이 3번 이상 발생했는지 검사
-			int rageWithinWindow = countRageScrolls(window, windowOutliers);
-			if (rageWithinWindow >= RAGE_THRESHOLD_PER_WINDOW) {
+			if (rageWithinWindow >= rageThresholdPerWindow) {
 				rageBurstCount++;
-				detectedOutliers.addAll(windowOutliers); // 전체 결과에 추가
-				window.clear(); // 윈도우 초기화
+				detectedOutliers.addAll(windowOutliers);
+				start = end; // 윈도우 초기화 (중복 감지 방지)
 			}
 		}
 
-		List<PointerScrollEvent> result = new ArrayList<>(detectedOutliers);
-
-		return result;
+		return new ArrayList<>(detectedOutliers);
 	}
 
 	/**
@@ -110,10 +124,10 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 
 				subList.add(next);
 
-				if (subList.size() >= MIN_EVENT_COUNT && scrollDelta(subList) >= MIN_SCROLL_DELTA) {
+				if (subList.size() >= minEventCount && scrollDelta(subList) >= minScrollDelta) {
 					count++;
 					outliers.addAll(subList);
-					index = j; // 여기서 i 점프! 다음 루프는 j부터 시작
+					index = j; // 여기서 i 점프 점프 하지 않는 경우 이미 rage_scroll로 판별된 이벤트 데이터를 중복 검사함
 					matched = true;
 					break;
 				}
@@ -128,7 +142,7 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 	}
 
 	private boolean isOutOfTimeRange(PointerScrollEvent first, PointerScrollEvent current) {
-		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > TIME_WINDOW_MS;
+		return Duration.between(first.getCreateDate(), current.getCreateDate()).toMillis() > timeWindowMs;
 	}
 
 	private int scrollDelta(List<PointerScrollEvent> events) {
@@ -174,7 +188,7 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 			prevY = currentY;
 		}
 
-		if (directionChanges >= MIN_DIRECTION_CHANGES) {
+		if (directionChanges >= minDirectionChanges) {
 			return new ArrayList<>(outliers);
 		}
 
@@ -194,7 +208,7 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 		}
 
 		boolean allUnderThreshold = events.stream()
-			.allMatch(e -> e.getScrollY() <= SCROLL_BOTTOM_THRESHOLD);
+			.allMatch(e -> e.getScrollY() <= scrollBottomThreshold);
 
 		if (allUnderThreshold) {
 			// 이상치 판단: 상단 근처에서만 스크롤이 반복됨

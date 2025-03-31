@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointerClickEvent extends BaseTimeEntity {
+public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 
 	@Id
 	@GeneratedValue
@@ -66,20 +66,22 @@ public class PointerClickEvent extends BaseTimeEntity {
 			.sessionData(sessionData)
 			.build();
 		sessionData.addClickEvent(event); // 양방향 연관관계 설정
+
 		return event;
 	}
 
 	@Override
 	public String toString() {
-		return "PointerClickEvent{" +
-			"id=" + id +
-			", clientX=" + clientX +
-			", clientY=" + clientY +
-			", pageUrl='" + pageUrl + '\'' +
-			", browserWidth=" + browserWidth +
-			", sessionId='" + sessionId + '\'' +
-			", memberSerialNumber='" + memberSerialNumber + '\'' +
-			'}';
+		return "PointerClickEvent{"
+			+ "id=" + id
+			+ ", clientX=" + clientX
+			+ ", clientY=" + clientY
+			+ ", pageUrl='" + pageUrl + '\''
+			+ ", browserWidth=" + browserWidth
+			+ ", sessionId='" + sessionId + '\''
+			+ ", memberSerialNumber='" + memberSerialNumber + '\''
+			+ '}';
 	}
 }
+
 

@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.hibernate.annotations.BatchSize;
 
+import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.common.BaseTimeEntity;
+import com.dajava.backend.global.exception.ErrorCode;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -13,7 +15,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,19 +57,16 @@ public class SessionData extends BaseTimeEntity {
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	@OrderBy("createDate ASC")
 	@BatchSize(size = 100)
 	private List<PointerClickEvent> pointerClickEvents = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	@OrderBy("createDate ASC")
 	@BatchSize(size = 1000)
 	private List<PointerMoveEvent> pointerMoveEvents = new ArrayList<>();
 
 	@OneToMany(mappedBy = "sessionData", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
-	@OrderBy("createDate ASC")
 	@BatchSize(size = 100)
 	private List<PointerScrollEvent> pointerScrollEvents = new ArrayList<>();
 
@@ -103,23 +101,15 @@ public class SessionData extends BaseTimeEntity {
 	// 세션 종료시 (데이터 받기 중단) 호출 메서드
 	public void endSession() {
 		if (this.isSessionEnded) {
-			throw new IllegalStateException("세션이 이미 종료되었습니다.");
+			throw new PointerEventException(ErrorCode.ALREADY_ENDED_SESSION);
 		}
 		this.isSessionEnded = true;
-	}
-
-	// 세션 검증시 (이상치 여부 판단) 호출 메서드
-	public void setOutlier() {
-		if (this.isOutlier) {
-			throw new IllegalStateException("이미 이상치 여부 값이 참입니다.");
-		}
-		this.isOutlier = true;
 	}
 
 	// 세션 검증 후 호출 메서드
 	public void setVerified() {
 		if (this.isVerified) {
-			throw new IllegalStateException("이미 검증이 완료된 세션 데이터 입니다.");
+			throw new PointerEventException(ErrorCode.ALREADY_VERIFIED_SESSION);
 		}
 		this.isVerified = true;
 	}

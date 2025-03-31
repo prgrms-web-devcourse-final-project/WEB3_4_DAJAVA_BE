@@ -10,6 +10,11 @@ import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.entity.SolutionEvent;
 
 public class PointerEventConverter {
+
+	//utiltiy class에서 생성자 호출되는 경우 막음
+	private PointerEventConverter() {
+	}
+
 	public static SolutionEvent fromClick(PointerClickEvent event, SolutionData solutionData) {
 		return SolutionEvent.builder()
 			.sessionId(event.getSessionId())
@@ -58,7 +63,7 @@ public class PointerEventConverter {
 			.build();
 	}
 
-	public static List<SolutionEvent> toPointerEvents(
+	public static List<SolutionEvent> toSolutionEvents(
 		List<PointerClickEvent> clicks,
 		List<PointerMoveEvent> moves,
 		List<PointerScrollEvent> scrolls,

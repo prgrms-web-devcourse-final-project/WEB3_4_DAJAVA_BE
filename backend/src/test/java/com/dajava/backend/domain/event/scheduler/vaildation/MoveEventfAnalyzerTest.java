@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.global.common.BaseTimeEntity;
+import com.dajava.backend.global.component.analyzer.MoveAnalyzerProperties;
 
 public class MoveEventfAnalyzerTest {
 
@@ -21,7 +22,12 @@ public class MoveEventfAnalyzerTest {
 
 	@BeforeEach
 	void setUp() {
-		analyzer = new MoveEventAnalyzer();
+		MoveAnalyzerProperties props = new MoveAnalyzerProperties();
+		props.setTimeWindowMs(3000L);
+		props.setTurnThreshold(4);
+		props.setAngleThresholdDegrees(90.0);
+
+		analyzer = new MoveEventAnalyzer(props);
 	}
 
 	private PointerMoveEvent testMoveEvent(Instant createDate, int clientX, int clientY) {

@@ -1,9 +1,7 @@
 package com.dajava.backend.domain.event.service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,24 +40,6 @@ public class EventBatchService {
 	private final SessionDataRepository sessionDataRepository;
 
 	/**
-	 * 활성 세션 배치 처리 메서드
-	 * isInactive 값이 false 로, 캐시가 제거되지 않습니다.
-	 */
-	@Transactional
-	public void processActiveBatchForSession(SessionDataKey key) {
-		processBatchForSession(key, false);
-	}
-
-	/**
-	 * 비활성 세선 배치 처리 메서드
-	 * isInactive 값이 true 로, 캐시가 제거됩니다.
-	 */
-	@Transactional
-	public void processInactiveBatchForSession(SessionDataKey key) {
-		processBatchForSession(key, true);
-	}
-
-	/**
 	 * 각 이벤트 타입의 저장 로직을 배치화한 로직입니다.
 	 * @param sessionDataKey sessionData 객체 생성 및 캐싱을 위해 주입합니다.
 	 */
@@ -85,14 +65,6 @@ public class EventBatchService {
 			sessionData.endSession();
 		}
 		sessionDataRepository.save(sessionData);
-	}
-
-	/**
-	 * eventBuffer 에서 활성 상태인 Session Set 을 가져오기 위한 메서드입니다.
-	 * @return Set 현재 활성 상태인 Session 의 키 Set 입니다.
-	 */
-	public Set<SessionDataKey> collectActiveSessionKeys() {
-		return new HashSet<>(eventBuffer.getAllActiveSessionKeys());
 	}
 
 	/**
@@ -189,3 +161,4 @@ public class EventBatchService {
 		}
 	}
 }
+

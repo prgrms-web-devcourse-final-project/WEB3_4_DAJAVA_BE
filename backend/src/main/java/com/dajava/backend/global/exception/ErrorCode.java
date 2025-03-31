@@ -29,6 +29,10 @@ public enum ErrorCode {
 	INVALID_ADMIN_CODE(HttpStatus.UNAUTHORIZED, "관리자 코드가 올바르지 않습니다."),
 	AUTHORIZE_ERROR(HttpStatus.FORBIDDEN, "인증이 필요합니다."),
 
+	// Event
+	ALREADY_ENDED_SESSION(HttpStatus.BAD_REQUEST, "세션이 이미 종료되었습니다."),
+	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다."),
+
 	// Sample
 	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");
 
