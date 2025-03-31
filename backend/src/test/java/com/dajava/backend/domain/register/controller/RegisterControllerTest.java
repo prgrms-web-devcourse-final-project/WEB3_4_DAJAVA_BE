@@ -10,12 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
@@ -23,6 +25,7 @@ import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.RegisterService;
+import com.dajava.backend.global.utils.PasswordUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.Cookie;
@@ -30,6 +33,7 @@ import jakarta.servlet.http.Cookie;
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 class RegisterControllerTest {
 
 	@Autowired
@@ -44,15 +48,19 @@ class RegisterControllerTest {
 	@Autowired
 	private RegisterRepository registerRepository;
 
+	@Value("${custom.DAJAVA_ADMIN_CODE}")
+	private String adminCode;
+
+	private String cookieKey = "admin_auth";
+	private String cookieValue; // 초기화하지 않음
+
 	@BeforeEach
 	void setUp() throws Exception {
 		registerRepository.deleteAll();
+		// 테스트 실행 전에 cookieValue 초기화
+		cookieValue = PasswordUtils.hashPassword(adminCode);
 	}
 
-	private static String cookieKey = "admin_auth";
-	private static String cookieValue = "true";
-
-	@SuppressWarnings("checkstyle:RegexpMultiline")
 	@Test
 	@DisplayName("솔루션 신청 : 성공")
 	void t1() throws Exception {
@@ -134,7 +142,8 @@ class RegisterControllerTest {
 				.cookie(new Cookie(cookieKey, cookieValue))
 				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
 				.content(objectMapper.writeValueAsString(new RegisterModifyRequest(
-					LocalDateTime.now().plusDays(3L).withHour(0).withMinute(0).withSecond(0).withNano(0)))))
+					LocalDateTime.now().plusDays(3L).withHour(0).withMinute(0).withSecond(0).withNano(0),
+					"abcde"))))
 			.andExpect(status().isOk());
 	}
 

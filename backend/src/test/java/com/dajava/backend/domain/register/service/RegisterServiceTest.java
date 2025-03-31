@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
@@ -18,7 +18,7 @@ import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
-@ActiveProfiles("test")
+@TestPropertySource(locations = "classpath:application-test.yml")
 @SpringBootTest
 class RegisterServiceTest {
 
@@ -30,6 +30,7 @@ class RegisterServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
+		repository.deleteAll();
 	}
 
 	@Test
@@ -51,10 +52,12 @@ class RegisterServiceTest {
 	@Test
 	@DisplayName("솔루션 수정")
 	public void t2() {
+		t1();
+
 		Register solution = repository.findAll().get(0);
 		Long solutionId = solution.getId();
 		RegisterModifyRequest request = new RegisterModifyRequest(
-			solution.getEndDate().plusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0)
+			solution.getEndDate().plusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0), "abcd"
 		);
 		int curDuration = solution.getDuration();
 

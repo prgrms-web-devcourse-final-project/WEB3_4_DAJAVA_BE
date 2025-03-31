@@ -78,7 +78,7 @@ class RegisterValidatorTest {
 	@DisplayName("RegisterModifyRequest-실패 : 존재하지 않는 솔루션 요청")
 	void t3() {
 		RegisterModifyRequest request = new RegisterModifyRequest(
-			LocalDateTime.now().plusDays(7)
+			LocalDateTime.now().plusDays(7), "abcd"
 		);
 		Long solutionId = 1000L;
 
