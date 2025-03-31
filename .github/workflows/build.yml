@@ -27,7 +27,7 @@ jobs:
 
       # 3. Gradle 의존성 캐시
       - name: Cache Gradle dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/build.gradle*') }}  # 캐시 키 설정
@@ -50,11 +50,11 @@ jobs:
         run: ./gradlew test
 
       # 7. 빌드 아티팩트 저장 (옵션)
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: backend-build
-          path: ./backend/build/libs/*.jar
+      # - name: Archive build artifacts
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: backend-build
+      #     path: ./backend/build/libs/*.jar
 
       # 8. 배포 (옵션: AWS, Docker, Heroku 등)
       # 추후 배포 작업 시
