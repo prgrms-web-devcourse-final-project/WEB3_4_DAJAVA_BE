@@ -26,6 +26,7 @@ import com.dajava.backend.global.component.buffer.EventBuffer;
 
 @ExtendWith(MockitoExtension.class)
 public class EventBatchServiceTest {
+	private static final String TEST_MEMBER_SERIAL_NUMBER = "5_team_testSerial";
 
 	@Mock
 	private EventBuffer eventBuffer;
@@ -59,17 +60,19 @@ public class EventBatchServiceTest {
 			scrollRepository,
 			sessionDataRepository
 		);
+
+		activityHandleService = new ActivityHandleService(eventBatchService);
 	}
 
 	@Test
 	@DisplayName("1. 세션이 활성 상태인지 처리 테스트")
 	void t001() {
 		// given
-		SessionDataKey key = new SessionDataKey("session1", "https://example.com", "user001");
-		SessionData sessionData = SessionData.create("session1", "https://example.com", "user001");
+		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
+		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
-			new PointerClickEventRequest("session1", "https://example.com", "user001",
+			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 100, 200)
 		);
 
@@ -90,15 +93,15 @@ public class EventBatchServiceTest {
 	}
 
 	@Test
-	@DisplayName("세션을 비활성 상태 처리시 캐시에서 제거 테스트")
+	@DisplayName("2. 세션을 비활성 상태 처리시 캐시에서 제거 테스트")
 	void t002() {
 		// given
-		SessionDataKey key = new SessionDataKey("session1", "https://example.com", "user001");
-		SessionData sessionData = SessionData.create("session1", "https://example.com", "user001");
+		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
+		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 
 		List<PointerClickEventRequest> clickEvents = Collections.emptyList();
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
-			new PointerMoveEventRequest("session1", "https://example.com", "user001",
+			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 300, 400)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.emptyList();
@@ -125,7 +128,7 @@ public class EventBatchServiceTest {
 	@DisplayName("3. 이벤트가 없을 경우 처리되지 않는지 테스트")
 	void t003() {
 		// given
-		SessionDataKey key = new SessionDataKey("session1", "https://example.com", "user001");
+		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 
 		when(eventBuffer.getClickEvents(key)).thenReturn(Collections.emptyList());
 		when(eventBuffer.getMoveEvents(key)).thenReturn(Collections.emptyList());
@@ -146,19 +149,19 @@ public class EventBatchServiceTest {
 	@DisplayName("4. 모든 타입의 이벤트를 처리하는지 테스트")
 	void t004() {
 		// given
-		SessionDataKey key = new SessionDataKey("session1", "https://example.com", "user001");
-		SessionData sessionData = SessionData.create("session1", "https://example.com", "user001");
+		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
+		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
-			new PointerClickEventRequest("session1", "https://example.com", "user001",
+			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 100, 200)
 		);
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
-			new PointerMoveEventRequest("session1", "https://example.com", "user001",
+			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 300, 400)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.singletonList(
-			new PointerScrollEventRequest("session1", "https://example.com", "user001",
+			new PointerScrollEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 0, 500)
 		);
 
