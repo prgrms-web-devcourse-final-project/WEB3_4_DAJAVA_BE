@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -115,7 +115,7 @@ public class RegisterValidator {
 		}
 
 		// end 시간이 start 시간보다 같거나 앞에 있으면 안된다.
-		if (end.isEqual(start) || end.isBefore(start)) {
+		if (start.isBefore(LocalDateTime.now()) || end.isEqual(start) || end.isBefore(start)) {
 			return false;
 		}
 

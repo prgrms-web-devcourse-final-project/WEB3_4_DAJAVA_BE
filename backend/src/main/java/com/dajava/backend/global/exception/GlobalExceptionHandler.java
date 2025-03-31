@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.domain.home.exception.SampleException;
+import com.dajava.backend.domain.register.exception.AdminException;
 import com.dajava.backend.domain.register.exception.RegisterException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,4 +36,11 @@ public class GlobalExceptionHandler {
 			.body(ErrorData.create(e.getMessage()));
 	}
 
+
+	@ExceptionHandler(AdminException.class)
+	public ResponseEntity<ErrorData> handleAdminException(AdminException e) {
+		log.error("Admin Error, message : {}", e.getMessage());
+		return ResponseEntity.status(e.errorCode.getHttpStatus())
+			.body(ErrorData.create(e.getMessage()));
+	}
 }
