@@ -25,6 +25,11 @@ public enum ErrorCode {
 	INVALID_SERIAL_NUMBER(HttpStatus.UNAUTHORIZED, "시리얼 넘버가 일치하지 않습니다."),
 	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
 
+	// Event
+	ALREADY_ENDED_SESSION(HttpStatus.BAD_REQUEST, "세션이 이미 종료되었습니다."),
+	ALREADY_OUTLIER_SESSION(HttpStatus.BAD_REQUEST, "이미 이상치 여부 값이 참입니다."),
+	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다."),
+
 	// Sample
 	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");
 

@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.domain.home.exception.SampleException;
 import com.dajava.backend.domain.register.exception.RegisterException;
 
@@ -26,4 +27,12 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(e.errorCode.getHttpStatus())
 			.body(ErrorData.create(e.getMessage()));
 	}
+
+	@ExceptionHandler(PointerEventException.class)
+	public ResponseEntity<ErrorData> handlePointerEventException(PointerEventException e) {
+		log.error("Pointer Event Error, message : {}", e.getMessage());
+		return ResponseEntity.status(e.errorCode.getHttpStatus())
+			.body(ErrorData.create(e.getMessage()));
+	}
+
 }
