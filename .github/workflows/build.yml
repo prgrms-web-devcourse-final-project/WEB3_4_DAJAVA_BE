@@ -15,17 +15,15 @@ jobs:
 
     steps:
 
-      - name: 디렉토리 구조 확인
-        run: ls -la
-      # 0. 시크릿 필드 가져오기
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v2.3.4
+
+      # 1-1. 시크릿 필드 가져오기
       - name: application-secret.yml 생성
         env:
           APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET_YML }}
         run: echo "$APPLICATION_SECRET" > backend/src/main/resources/application-secret.yml
-
-      # 1. 코드 체크아웃
-      - name: Checkout code
-        uses: actions/checkout@v2.3.4
 
       # 2. JDK 설정
       - name: Set up JDK
