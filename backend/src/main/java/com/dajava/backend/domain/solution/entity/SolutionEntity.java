@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.solution;
+package com.dajava.backend.domain.solution.entity;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.global.common.BaseTimeEntity;
 

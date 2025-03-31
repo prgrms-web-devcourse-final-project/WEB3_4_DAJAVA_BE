@@ -1,20 +1,23 @@
-package com.dajava.backend.domain.solution;
-
-import static com.dajava.backend.domain.solution.SolutionUtils.*;
+package com.dajava.backend.domain.solution.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
+import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
+import com.dajava.backend.domain.solution.service.SolutionService;
+import com.dajava.backend.global.utils.SolutionUtils;
+import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
@@ -25,15 +28,22 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/solution")
 @RequiredArgsConstructor
+@Slf4j
 public class SolutionController {
 	private final SolutionService solutionService;
 
 	@PostMapping
 	@Operation(summary = "사용자 로그 기반 UX 개선 솔루션 요청", description = "사용자의 이벤트 로그 데이터를 AI 모델에 보내 UI/UX 개선 솔루션을 받아옵니다.")
-	public Mono<SolutionResponseDto> getUXSolution(@RequestBody List<SolutionRequestDto> sessionDatas) {
-		String prompt = SolutionUtils.refinePrompt(sessionDatas);
+	public Mono<SolutionResponseDto> getUXSolution(@RequestBody SolutionRequestDto solutionRequestDto) {
+		// serialNumber 추출
+		String serialNumber = SolutionUtils.extractsSerialNumber(solutionRequestDto);
+		// 이벤트 로그 데이터 추출
+		List<SolutionRequestDto.EventDataDto> eventDataDto = SolutionUtils.extractSolutionEvents(solutionRequestDto);
+		// 이벤트 로그 데이터와 질문을 합쳐 스트링화
+		String prompt = SolutionUtils.refinePrompt(eventDataDto);
+		// AI 요구 구조로 parsing
 		String constructedRefineData = SolutionUtils.buildRefineData(prompt);
-		return solutionService.getAISolution(constructedRefineData);
+		return solutionService.getAISolution(constructedRefineData, serialNumber);
 	}
 
 	@GetMapping("/info/{serialNumber}/{password}")
@@ -41,5 +51,4 @@ public class SolutionController {
 	public SolutionInfoResponse getSolutionInfo(@PathVariable String serialNumber, @PathVariable String password) {
 		return solutionService.getSolutionInfo(serialNumber, password);
 	}
-
 }
