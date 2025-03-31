@@ -35,8 +35,8 @@ public class SolutionScheduler {
 			try {
 				SolutionData solutionData = solutionServiceImpl.getSolutionData(register.getSerialNumber());
 				if (solutionData != null) {
-					SolutionRequestDto solutionRequestDto = new SolutionRequestDto(solutionData.getSerialNumber(), solutionData.getSolutionEvents() );
-					solutionController.getUXSolution(solutionData);
+					SolutionRequestDto solutionRequestDto = SolutionRequestDto.from(solutionData);
+					solutionController.getUXSolution(solutionRequestDto);
 					log.info("Processed expired register: {}", register.getSerialNumber());
 				} else {
 					log.info("No session data for register: {}", register.getSerialNumber());
