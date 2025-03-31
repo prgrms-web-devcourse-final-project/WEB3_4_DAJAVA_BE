@@ -9,20 +9,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
-import com.dajava.backend.domain.register.dto.RegisterDeleteResponse;
-import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.RegisterModifyResponse;
-import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyResponse;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
+import com.dajava.backend.domain.register.service.AdminService;
 import com.dajava.backend.domain.register.service.RegisterService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RegisterController {
 
 	private final RegisterService registerService;
+	private final AdminService adminService;
 
 	/**
 	 * 솔루션 신청 폼 접수 API
@@ -67,13 +72,15 @@ public class RegisterController {
 	 */
 	@Operation(
 		summary = "솔루션 수정 요청",
-		description = "솔루션 요청 정보를 수저합니다.")
+		description = "솔루션 요청 정보를 수정합니다.")
 	@PatchMapping("/v1/register/{solutionId}")
 	@ResponseStatus(HttpStatus.OK)
 	public RegisterModifyResponse modify(
 		@RequestBody RegisterModifyRequest request,
-		@PathVariable Long solutionId
+		@PathVariable Long solutionId,
+		HttpServletRequest httpRequest
 	) {
+		adminService.authorize(httpRequest);
 		return registerService.modifySolution(request, solutionId);
 	}
 
@@ -87,8 +94,10 @@ public class RegisterController {
 	@DeleteMapping("/v1/register/{solutionId}")
 	@ResponseStatus(HttpStatus.OK)
 	public RegisterDeleteResponse modify(
-		@PathVariable Long solutionId
+		@PathVariable Long solutionId,
+		HttpServletRequest httpRequest
 	) {
+		adminService.authorize(httpRequest);
 		return registerService.deleteSolution(solutionId);
 	}
 
@@ -102,8 +111,26 @@ public class RegisterController {
 	@GetMapping("/v1/registers")
 	@ResponseStatus(HttpStatus.OK)
 	public RegistersInfoResponse list(
-		@RequestBody RegistersInfoRequest request
+		@RequestBody RegistersInfoRequest request,
+		HttpServletRequest httpRequest
 	) {
+		adminService.authorize(httpRequest);
 		return registerService.getRegisterList(request);
+	}
+
+	/**
+	 * 관리자 코드 입력 API
+	 * 접속에 성공하면 인증 토큰을 쿠키에 담아서 전달
+	 */
+	@Operation(
+		summary = "솔루션 관리자 코드 입력",
+		description = "관리자 페이지에 접속하기 위해 관리코드를 입력합니다.")
+	@PostMapping("/v1/register/admin")
+	@ResponseStatus(HttpStatus.OK)
+	public void admin(
+		@RequestParam String adminCode,
+		HttpServletResponse response
+	) {
+		adminService.login(adminCode, response);
 	}
 }

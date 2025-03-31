@@ -34,11 +34,12 @@ import reactor.core.publisher.Mono;
  */
 @Service
 @RequiredArgsConstructor
+
 @Slf4j
 public class SolutionServiceImpl implements SolutionService {
-	@Value("${DAJAVA_AI_API_KEY}")
+	@Value("${dajava.apiKey}")
 	private String apiKey;
-	@Value("${DAJAVA_AI_API_URL}")
+	@Value("${dajava.url}")
 	private String apiUrl;
 
 	@Autowired

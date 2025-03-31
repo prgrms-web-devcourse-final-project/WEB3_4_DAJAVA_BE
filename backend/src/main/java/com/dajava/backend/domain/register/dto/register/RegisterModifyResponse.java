@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.register.dto;
+package com.dajava.backend.domain.register.dto.register;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;

@@ -30,6 +30,10 @@ public enum ErrorCode {
 
 
 
+	// Admin
+	INVALID_ADMIN_CODE(HttpStatus.UNAUTHORIZED, "관리자 코드가 올바르지 않습니다."),
+	AUTHORIZE_ERROR(HttpStatus.FORBIDDEN, "인증이 필요합니다."),
+
 	// Sample
 	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");
 

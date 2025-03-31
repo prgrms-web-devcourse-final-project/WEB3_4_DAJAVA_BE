@@ -1,7 +1,8 @@
 package com.dajava.backend.domain.register.converter;
 
+import com.dajava.backend.domain.register.EventState;
 import com.dajava.backend.domain.register.RegisterInfo;
-import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.entity.Register;
 
 /**
@@ -21,7 +22,9 @@ public class RegisterConverter {
 			.url(solution.getUrl())
 			.isCompleted(solution.isSolutionComplete())
 			.solutionDate(solution.getCreateDate())
-			.solutionCompleteDate(solution.getEndDate())
+			.solutionStartDate(solution.getStartDate())
+			.solutionEndDate(solution.getEndDate())
+			.eventState(EventState.IN_PROGRESS.getState()) // 아직 엔티티에 추가하지 않았으므로 기본 값으로 넣어놓음
 			.build();
 	}
 

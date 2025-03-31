@@ -1,12 +1,12 @@
 server:
-  port : 8080
+  port: 8080
 
 spring:
   profiles:
     default: dev
     include: secret
   application:
-    name: davaja_server
+    name: dajava_server
   datasource:
     url: jdbc:h2:./db_dev;MODE=MySQL
     username: sa
