@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.global.component.analyzer.MoveAnalyzerProperties;
 import com.dajava.backend.global.utils.EventsUtils;
 
 /**
@@ -27,14 +28,10 @@ public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 	private final int turnThreshold;
 	private final double angleThresholdDegrees;
 
-	public MoveEventAnalyzer(
-		@Value("${MOVE_ANALYZER_TIME_WINDOW_MS:3000}") long timeWindowMs,
-		@Value("${MOVE_ANALYZER_TURN_THRESHOLD:4}") int turnThreshold,
-		@Value("${MOVE_ANALYZER_ANGLE_THRESHOLD_DEGREES:90.0}") double angleThresholdDegrees
-	) {
-		this.timeWindowMs = timeWindowMs;
-		this.turnThreshold = turnThreshold;
-		this.angleThresholdDegrees = angleThresholdDegrees;
+	public MoveEventAnalyzer(MoveAnalyzerProperties props) {
+		this.timeWindowMs = props.getTimeWindowMs();
+		this.turnThreshold = props.getTurnThreshold();
+		this.angleThresholdDegrees = props.getAngleThresholdDegrees();
 	}
 
 	@Override

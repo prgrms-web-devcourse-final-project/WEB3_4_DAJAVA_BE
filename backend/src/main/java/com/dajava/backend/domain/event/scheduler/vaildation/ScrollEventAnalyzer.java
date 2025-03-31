@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.global.component.analyzer.ScrollAnalyzerProperties;
 import com.dajava.backend.global.utils.EventsUtils;
 
 /**
@@ -30,20 +31,13 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 	private final int minDirectionChanges;
 	private final int scrollBottomThreshold;
 
-	public ScrollEventAnalyzer(
-		@Value("${SCROLL_ANALYZER_TIME_WINDOW_MS:3000}") long timeWindowMs,
-		@Value("${SCROLL_ANALYZER_MIN_SCROLL_DELTA:300}") int minScrollDelta,
-		@Value("${SCROLL_ANALYZER_MIN_EVENT_COUNT:3}") int minEventCount,
-		@Value("${SCROLL_ANALYZER_RAGE_THRESHOLD_PER_WINDOW:3}") int rageThresholdPerWindow,
-		@Value("${SCROLL_ANALYZER_MIN_DIRECTION_CHANGES:3}") int minDirectionChanges,
-		@Value("${SCROLL_ANALYZER_SCROLL_BOTTOM_THRESHOLD:2000}") int scrollBottomThreshold
-	) {
-		this.timeWindowMs = timeWindowMs;
-		this.minScrollDelta = minScrollDelta;
-		this.minEventCount = minEventCount;
-		this.rageThresholdPerWindow = rageThresholdPerWindow;
-		this.minDirectionChanges = minDirectionChanges;
-		this.scrollBottomThreshold = scrollBottomThreshold;
+	public ScrollEventAnalyzer(ScrollAnalyzerProperties props) {
+		this.timeWindowMs = props.getTimeWindowMs();
+		this.minScrollDelta = props.getMinScrollDelta();
+		this.minEventCount = props.getMinEventCount();
+		this.rageThresholdPerWindow = props.getRageThresholdPerWindow();
+		this.minDirectionChanges = props.getMinDirectionChanges();
+		this.scrollBottomThreshold = props.getScrollBottomThreshold();
 	}
 
 	@Override

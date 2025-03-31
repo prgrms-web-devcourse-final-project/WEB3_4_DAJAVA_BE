@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.domain.event.entity.PointerClickEvent;
 import com.dajava.backend.global.common.BaseTimeEntity;
+import com.dajava.backend.global.component.analyzer.ClickAnalyzerProperties;
 
 /*
  * 클릭 이벤트 분석 단위 테스트 입니다.
@@ -27,10 +28,12 @@ public class ClickEventAnalyzerTest {
 
 	@BeforeEach
 	void setUp() {
-		analyzer = new ClickEventAnalyzer(
-			5000,
-			10,
-			3);
+		ClickAnalyzerProperties props = new ClickAnalyzerProperties();
+		props.setTimeThresholdMs(5000);
+		props.setPositionThresholdPx(10);
+		props.setMinClickCount(3);
+
+		analyzer = new ClickEventAnalyzer(props);
 	}
 
 	private PointerClickEvent testClickEvent(Instant createDate, int clientX, int clientY) {

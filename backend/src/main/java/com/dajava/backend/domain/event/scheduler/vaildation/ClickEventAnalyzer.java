@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.entity.PointerClickEvent;
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.global.component.analyzer.ClickAnalyzerProperties;
 import com.dajava.backend.global.utils.EventsUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,16 +34,11 @@ public class ClickEventAnalyzer implements Analyzer<PointerClickEvent> {
 	private final int positionThresholdPx;
 	private final int minClickCount;
 
-	public ClickEventAnalyzer(
-		@Value("${CLICK_ANALYZER_TIME_THRESHOLD_MS:5000}") int timeThresholdMs,
-		@Value("${CLICK_ANALYZER_POSITION_THRESHOLD_PX:10}") int positionThresholdPx,
-		@Value("${CLICK_ANALYZER_MIN_CLICK_COUNT:3}") int minClickCount
-	) {
-		this.timeThresholdMs = timeThresholdMs;
-		this.positionThresholdPx = positionThresholdPx;
-		this.minClickCount = minClickCount;
+	public ClickEventAnalyzer(ClickAnalyzerProperties props) {
+		this.timeThresholdMs = props.getTimeThresholdMs();
+		this.positionThresholdPx = props.getPositionThresholdPx();
+		this.minClickCount = props.getMinClickCount();
 	}
-
 
 
 	// 비정상 클릭으로 판단되는 태그 목록
