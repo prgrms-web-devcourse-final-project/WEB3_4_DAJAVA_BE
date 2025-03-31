@@ -68,7 +68,7 @@ public class SolutionServiceImpl implements SolutionService {
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
 					Register register = registerRepository.findBySerialNumber(serialNumber);
 					if (register == null) {
-						return Mono.error(new SolutionException(SERIAL_NUMBER_NOT_FOUND));
+						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					}
 					if (text != null) {
 						SolutionEntity solutionEntity = new SolutionEntity();
@@ -79,14 +79,14 @@ public class SolutionServiceImpl implements SolutionService {
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
 						if(!register.isServiceExpired()){
-							return Mono.error(new SolutionException(SOLUTION_TEXT_EMPTY));
+							return Mono.error(new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND));
 						}else{
 							register.setSolutionComplete(true);
 					}
 
 						return Mono.just(solutionResponseDto);
 					} else {
-						return Mono.error(new SolutionException(SOLUTION_TEXT_EMPTY));
+						return Mono.error(new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND));
 					}
 				} catch (IOException e) {
 					return Mono.error(new SolutionException(SOLUTION_PARSING_ERROR));
@@ -99,11 +99,11 @@ public class SolutionServiceImpl implements SolutionService {
 	@Override
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
-			.orElseThrow(() -> new SolutionException(INVALID_SERIAL_NUMBER));
+			.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_INVALID));
 		PasswordUtils passwordUtils = new PasswordUtils();
 		//해시화된 password 검증로직
 		if (!passwordUtils.verifyPassword(password, findRegister.getPassword())) {
-			throw new SolutionException(INVALID_PASSWORD);
+			throw new SolutionException(SOLUTION_PASSWORD_INVALID);
 		}
 		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
 			.orElseThrow(() -> new SolutionException(SOLUTION_NOT_FOUND));

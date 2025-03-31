@@ -1,7 +1,6 @@
 package com.dajava.backend.domain.solution.controller;
 
-import static com.dajava.backend.global.utils.SolutionUtils.*;
-
+import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,12 +35,14 @@ public class SolutionController {
 	@PostMapping
 	@Operation(summary = "사용자 로그 기반 UX 개선 솔루션 요청", description = "사용자의 이벤트 로그 데이터를 AI 모델에 보내 UI/UX 개선 솔루션을 받아옵니다.")
 	public Mono<SolutionResponseDto> getUXSolution(@RequestBody SolutionRequestDto solutionRequestDto) {
-		// SolutionData를 바탕으로 프롬프트 생성
-		String prompt = SolutionUtils.refinePrompt(solutionRequestDto);
+		// serialNumber 추출
+		String serialNumber = SolutionUtils.extractsSerialNumber(solutionRequestDto);
+		// 이벤트 로그 데이터 추출
+		List<SolutionRequestDto.EventDataDto> eventDataDto = SolutionUtils.extractSolutionEvents(solutionRequestDto);
+		// 이벤트 로그 데이터와 질문을 합쳐 스트링화
+		String prompt = SolutionUtils.refinePrompt(eventDataDto);
+		// AI 요구 구조로 parsing
 		String constructedRefineData = SolutionUtils.buildRefineData(prompt);
-		// sessionDatas에서 serialNumber를 추출하는 부분
-		String serialNumber = extractSerialNumber(constructedRefineData);
-		// 솔루션 요청
 		return solutionService.getAISolution(constructedRefineData, serialNumber);
 	}
 
