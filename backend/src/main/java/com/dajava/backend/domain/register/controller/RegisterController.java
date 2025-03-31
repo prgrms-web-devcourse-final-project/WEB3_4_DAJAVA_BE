@@ -72,7 +72,7 @@ public class RegisterController {
 	 */
 	@Operation(
 		summary = "솔루션 수정 요청",
-		description = "솔루션 요청 정보를 수저합니다.")
+		description = "솔루션 요청 정보를 수정합니다.")
 	@PatchMapping("/v1/register/{solutionId}")
 	@ResponseStatus(HttpStatus.OK)
 	public RegisterModifyResponse modify(

@@ -9,6 +9,10 @@ import lombok.NonNull;
 public record RegisterModifyRequest(
 	@Schema(description = "새로 갱신되는 솔루션 종료 일시", example = "2025-03-28T12:00:00", required = true)
 	@NonNull
-	LocalDateTime solutionCompleteDate
+	LocalDateTime solutionCompleteDate,
+
+	@Schema(description = "수정하려는 현재 값", example = "2025-03-28T12:00:00", required = true)
+	@NonNull
+	String newEventState
 ) {
 }
