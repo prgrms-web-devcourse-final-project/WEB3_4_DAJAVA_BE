@@ -2,6 +2,7 @@ package com.dajava.backend.domain.solution.controller;
 
 import static com.dajava.backend.global.utils.SolutionUtils.*;
 
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,15 +10,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
+import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
 import com.dajava.backend.domain.solution.service.SolutionService;
-import com.dajava.backend.domain.solution.service.SolutionServiceImpl;
 import com.dajava.backend.global.utils.SolutionUtils;
 import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 /**
@@ -28,15 +29,19 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/v1/solution")
 @RequiredArgsConstructor
+@Slf4j
 public class SolutionController {
 	private final SolutionService solutionService;
 
 	@PostMapping
 	@Operation(summary = "사용자 로그 기반 UX 개선 솔루션 요청", description = "사용자의 이벤트 로그 데이터를 AI 모델에 보내 UI/UX 개선 솔루션을 받아옵니다.")
-	public Mono<SolutionResponseDto> getUXSolution(@RequestBody SolutionData sessionDatas) {
-		String prompt = SolutionUtils.refinePrompt(sessionDatas);
+	public Mono<SolutionResponseDto> getUXSolution(@RequestBody SolutionRequestDto solutionRequestDto) {
+		// SolutionData를 바탕으로 프롬프트 생성
+		String prompt = SolutionUtils.refinePrompt(solutionRequestDto);
 		String constructedRefineData = SolutionUtils.buildRefineData(prompt);
+		// sessionDatas에서 serialNumber를 추출하는 부분
 		String serialNumber = extractSerialNumber(constructedRefineData);
+		// 솔루션 요청
 		return solutionService.getAISolution(constructedRefineData, serialNumber);
 	}
 
@@ -45,5 +50,4 @@ public class SolutionController {
 	public SolutionInfoResponse getSolutionInfo(@PathVariable String serialNumber, @PathVariable String password) {
 		return solutionService.getSolutionInfo(serialNumber, password);
 	}
-
 }

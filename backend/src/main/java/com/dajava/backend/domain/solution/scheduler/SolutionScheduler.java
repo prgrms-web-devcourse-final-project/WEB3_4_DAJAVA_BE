@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+
+import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
 import com.dajava.backend.domain.solution.service.SolutionServiceImpl;
 import com.dajava.backend.domain.solution.controller.SolutionController;
 
@@ -33,6 +35,7 @@ public class SolutionScheduler {
 			try {
 				SolutionData solutionData = solutionServiceImpl.getSolutionData(register.getSerialNumber());
 				if (solutionData != null) {
+					SolutionRequestDto solutionRequestDto = new SolutionRequestDto(solutionData.getSerialNumber(), solutionData.getSolutionEvents() );
 					solutionController.getUXSolution(solutionData);
 					log.info("Processed expired register: {}", register.getSerialNumber());
 				} else {

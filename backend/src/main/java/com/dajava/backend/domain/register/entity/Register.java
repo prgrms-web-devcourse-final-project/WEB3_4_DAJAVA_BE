@@ -83,6 +83,10 @@ public class Register extends BaseTimeEntity {
 			.build();
 	}
 
+	public void setSolutionComplete(boolean solutionComplete) {
+		isSolutionComplete = solutionComplete;
+	}
+
 	private static String createSerialNumber() {
 		return UUID.randomUUID().toString();
 	}

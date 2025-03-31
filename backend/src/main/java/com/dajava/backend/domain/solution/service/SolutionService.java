@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.solution.service;
 
+import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
 import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
@@ -23,4 +24,6 @@ public interface SolutionService {
 	 * @throws RegisterException 시리얼 넘버를 찾을 수 없거나, 비밀번호가 일치하지 않거나, 솔루션 정보가 없을 경우 발생
 	 */
 	SolutionInfoResponse getSolutionInfo(String serialNumber, String password);
+
+	SolutionData getSolutionData(String serialNumber);
 }

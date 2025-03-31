@@ -78,6 +78,12 @@ public class SolutionServiceImpl implements SolutionService {
 						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
+						if(!register.isServiceExpired()){
+							return Mono.error(new SolutionException(SOLUTION_TEXT_EMPTY));
+						}else{
+							register.setSolutionComplete(true);
+					}
+
 						return Mono.just(solutionResponseDto);
 					} else {
 						return Mono.error(new SolutionException(SOLUTION_TEXT_EMPTY));
@@ -102,8 +108,10 @@ public class SolutionServiceImpl implements SolutionService {
 		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
 			.orElseThrow(() -> new SolutionException(SOLUTION_NOT_FOUND));
 		return new SolutionInfoResponse(solutionEntity.getText());
+
 	}
 
+	@Override
 	public SolutionData getSolutionData(String serialNumber) {
 		return solutionDataRepository.findBySerialNumber(serialNumber);
 	}

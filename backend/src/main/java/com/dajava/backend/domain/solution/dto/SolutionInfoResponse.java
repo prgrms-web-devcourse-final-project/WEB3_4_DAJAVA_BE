@@ -1,6 +1,8 @@
 package com.dajava.backend.domain.solution.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public record SolutionInfoResponse(
-	String text
-) {
+	@NotNull String text
+	) {
 }

@@ -28,7 +28,7 @@ public interface SessionDataRepository extends JpaRepository<SessionData, Long> 
 	 * @return List<SessionData>
 	 */
 	@Query("""
-		SELECT s FROM SessionData s 
+		SELECT s FROM SessionData s
 			WHERE s.isSessionEnded = true 
 				ORDER BY s.modifiedDate ASC
 		""")
