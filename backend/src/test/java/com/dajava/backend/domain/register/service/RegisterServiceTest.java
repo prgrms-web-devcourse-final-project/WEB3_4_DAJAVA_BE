@@ -8,17 +8,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.RegisterCreateResponse;
-import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
-@ActiveProfiles("test")
 @SpringBootTest
 class RegisterServiceTest {
 
@@ -30,7 +28,6 @@ class RegisterServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		// 혹시 테스트 중에 생성되어있던 것이 있다면 삭제
 		repository.deleteAll();
 	}
 
@@ -41,8 +38,8 @@ class RegisterServiceTest {
 			"chsan626@gmail.com",
 			"password123!",
 			"localhost:3000/test123",
-			LocalDateTime.now(),
-			LocalDateTime.now().plusDays(7)
+			LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
+			LocalDateTime.now().plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
 		RegisterCreateResponse response = service.createRegister(request);
@@ -53,14 +50,12 @@ class RegisterServiceTest {
 	@Test
 	@DisplayName("솔루션 수정")
 	public void t2() {
-
-		// 솔루션 하나를 미리 생성
 		t1();
 
 		Register solution = repository.findAll().get(0);
 		Long solutionId = solution.getId();
 		RegisterModifyRequest request = new RegisterModifyRequest(
-			solution.getEndDate().plusDays(3)
+			solution.getEndDate().plusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0), "abcd"
 		);
 		int curDuration = solution.getDuration();
 
@@ -79,8 +74,8 @@ class RegisterServiceTest {
 				"chsan626@gmail.com",
 				"password123!",
 				"localhost:3000/test123" + i,
-				LocalDateTime.now(),
-				LocalDateTime.now().plusDays(7)
+				LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
+				LocalDateTime.now().plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 			);
 			service.createRegister(request);
 		}

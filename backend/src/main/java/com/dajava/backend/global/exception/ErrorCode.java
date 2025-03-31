@@ -25,6 +25,10 @@ public enum ErrorCode {
 	INVALID_SERIAL_NUMBER(HttpStatus.UNAUTHORIZED, "시리얼 넘버가 일치하지 않습니다."),
 	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
 
+	// Admin
+	INVALID_ADMIN_CODE(HttpStatus.UNAUTHORIZED, "관리자 코드가 올바르지 않습니다."),
+	AUTHORIZE_ERROR(HttpStatus.FORBIDDEN, "인증이 필요합니다."),
+
 	// Sample
 	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");
 

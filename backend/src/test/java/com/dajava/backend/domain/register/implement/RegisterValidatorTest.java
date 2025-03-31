@@ -14,9 +14,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.dajava.backend.domain.register.dto.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.RegistersInfoRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
+import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
@@ -78,7 +78,7 @@ class RegisterValidatorTest {
 	@DisplayName("RegisterModifyRequest-실패 : 존재하지 않는 솔루션 요청")
 	void t3() {
 		RegisterModifyRequest request = new RegisterModifyRequest(
-			LocalDateTime.now().plusDays(7)
+			LocalDateTime.now().plusDays(7), "abcd"
 		);
 		Long solutionId = 1000L;
 
