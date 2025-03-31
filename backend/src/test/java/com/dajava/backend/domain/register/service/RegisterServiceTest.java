@@ -8,7 +8,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
@@ -18,7 +17,6 @@ import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
-@TestPropertySource(locations = "classpath:application-test.yml")
 @SpringBootTest(properties = {"DAJAVA_ADMIN_CODE=abcdefg12345"})
 class RegisterServiceTest {
 
