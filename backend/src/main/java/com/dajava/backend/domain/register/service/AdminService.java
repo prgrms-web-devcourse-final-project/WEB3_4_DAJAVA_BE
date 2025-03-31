@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AdminService {
 
-	@Value("${DAJAVA_ADMIN_CODE}")
+	@Value("${custom.adminCode}")
 	private String adminCode;
 
 	public void login(final String adminCode, HttpServletResponse response) {

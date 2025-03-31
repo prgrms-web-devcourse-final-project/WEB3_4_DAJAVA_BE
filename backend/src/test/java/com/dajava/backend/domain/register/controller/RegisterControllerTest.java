@@ -48,7 +48,7 @@ class RegisterControllerTest {
 	@Autowired
 	private RegisterRepository registerRepository;
 
-	@Value("${custom.DAJAVA_ADMIN_CODE}")
+	@Value("${custom.adminCode}")
 	private String adminCode;
 
 	private String cookieKey = "admin_auth";

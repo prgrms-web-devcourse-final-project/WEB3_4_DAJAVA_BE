@@ -17,7 +17,7 @@ import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
-@SpringBootTest(properties = {"DAJAVA_ADMIN_CODE=abcdefg12345"})
+@SpringBootTest
 class RegisterServiceTest {
 
 	@Autowired
