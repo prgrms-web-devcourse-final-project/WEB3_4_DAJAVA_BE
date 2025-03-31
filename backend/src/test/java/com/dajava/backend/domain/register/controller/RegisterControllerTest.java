@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 
 @ActiveProfiles("test")
-@SpringBootTest
+@SpringBootTest(properties = {"DAJAVA_ADMIN_CODE=abcdefg12345"})
 @AutoConfigureMockMvc
 @Transactional
 class RegisterControllerTest {
@@ -48,7 +48,7 @@ class RegisterControllerTest {
 	@Autowired
 	private RegisterRepository registerRepository;
 
-	@Value("${custom.DAJAVA_ADMIN_CODE}")
+	@Value("${DAJAVA_ADMIN_CODE}")
 	private String adminCode;
 
 	private String cookieKey = "admin_auth";

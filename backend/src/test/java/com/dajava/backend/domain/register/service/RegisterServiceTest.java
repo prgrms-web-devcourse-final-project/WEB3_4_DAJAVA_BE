@@ -19,7 +19,7 @@ import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
 @TestPropertySource(locations = "classpath:application-test.yml")
-@SpringBootTest
+@SpringBootTest(properties = {"DAJAVA_ADMIN_CODE=abcdefg12345"})
 class RegisterServiceTest {
 
 	@Autowired
