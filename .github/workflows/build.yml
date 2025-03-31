@@ -51,7 +51,7 @@ jobs:
 
       # 7. 빌드 아티팩트 저장 (옵션)
       - name: Archive build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: backend-build
           path: ./backend/build/libs/*.jar
