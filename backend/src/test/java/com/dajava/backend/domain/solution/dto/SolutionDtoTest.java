@@ -1,11 +1,12 @@
 package com.dajava.backend.domain.solution.dto;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.List;
 import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.entity.SolutionEvent;
@@ -18,17 +19,17 @@ import com.dajava.backend.domain.event.entity.SolutionEvent;
  */
 public class SolutionDtoTest {
 
-	/** 테스트 객체 SolutionData, SolutionEvent */
+	/** 테스트 객체 SolutionData */
 	private SolutionData mockSolutionData;
-	private SolutionEvent mockSolutionEvent;
 
 	/** 독립적 실행을 위해 테스트 실행 전, mockSolutionEvent mockSolutionData 초기화 메서드 */
 	@BeforeEach
+	@DisplayName("테스트 실행 전, mockSolutionEvent mockSolutionData 초기화")
 	void setUp() {
 		// SolutionEvent 객체 생성
-		mockSolutionEvent = SolutionEvent.builder()
+		SolutionEvent mockSolutionEvent = SolutionEvent.builder()
 			.sessionId("session1")
-			.pageUrl("http://example.com")
+			.pageUrl("https://example.com")
 			.type("click")
 			.clientX(100)
 			.clientY(200)
@@ -49,6 +50,7 @@ public class SolutionDtoTest {
 	 * serialNumber와 eventData의 값이 정확히 매핑되는지 확인합니다.
 	 */
 	@Test
+	@DisplayName("SolutionData 객체를 SolutionRequestDto로 변환")
 	void testFromSolutionData() {
 		SolutionRequestDto solutionRequestDto = SolutionRequestDto.from(mockSolutionData);
 

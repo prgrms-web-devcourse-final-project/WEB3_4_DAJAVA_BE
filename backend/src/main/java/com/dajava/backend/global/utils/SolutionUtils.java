@@ -10,7 +10,7 @@ import com.dajava.backend.domain.solution.exception.SolutionException;
 public final class SolutionUtils {
 	/**
 	 * 사용자 세션 데이터를 기반으로 UI/UX 개선점을 제안하는 프롬프트를 생성합니다.
-	 * @param eventData // 사용자 로그 데이터만 담은 객체
+	 * @param eventData 사용자 로그 데이터만 담은 객체
 	 * @return 생성된 프롬프트 문자열
 	 */
 	public static String refinePrompt(List<SolutionRequestDto.EventDataDto> eventData) {
@@ -26,9 +26,9 @@ public final class SolutionUtils {
 	}
 	/**
 	 * SolutionData 객체에서 serialNumber를 추출합니다.
-	 * @param solutionRequestDto // solutionRequestDto 객체
-	 * @return solutionRequestDto.serialNumber() // serialNumber
-	 * @throws IllegalArgumentException // solutionRequestDto가 null인 경우
+	 * @param solutionRequestDto solutionRequestDto 객체
+	 * @return solutionRequestDto.serialNumber() serialNumber
+	 * @throws IllegalArgumentException solutionRequestDto가 null인 경우
 	 */
 	public static String extractsSerialNumber(SolutionRequestDto solutionRequestDto) {
 		if (solutionRequestDto.serialNumber() == null) {
@@ -37,10 +37,10 @@ public final class SolutionUtils {
 		return solutionRequestDto.serialNumber();
 	}
 	/**
-	 * SolutionData 객체에서 log data를 추출합니다.
-	 * @param solutionRequestDto // solutionRequestDto 객체
-	 * @return solutionRequestDto.eventData() // log data
-	 * @throws IllegalArgumentException // solutionRequestDto가 null인 경우
+	 * SolutionData 객체에서 event data를 추출합니다.
+	 * @param solutionRequestDto solutionRequestDto 객체
+	 * @return solutionRequestDto.eventData() event data
+	 * @throws IllegalArgumentException solutionRequestDto가 null인 경우
 	 */
 	public static List<SolutionRequestDto.EventDataDto> extractSolutionEvents(SolutionRequestDto solutionRequestDto) {
 		if (solutionRequestDto.eventData() == null) {
