@@ -67,7 +67,7 @@ public class SolutionDtoTest {
 		assertEquals(100, eventData.x(), "x 값이 일치해야 합니다.");
 		assertEquals(200, eventData.y(), "y 값이 일치해야 합니다.");
 		assertEquals("button", eventData.element(), "element 값이 일치해야 합니다.");
-		assertEquals("http://example.com", eventData.pageUrl(), "pageUrl 값이 일치해야 합니다.");
+		assertEquals("https://example.com", eventData.pageUrl(), "pageUrl 값이 일치해야 합니다.");
 		assertEquals(1024, eventData.broswerWidth(), "browserWidth 값이 일치해야 합니다.");
 	}
 }
