@@ -47,6 +47,8 @@ public class EventBatchServiceTest {
 
 	private EventBatchService eventBatchService;
 
+	private ActivityHandleService activityHandleService;
+
 	@BeforeEach
 	void setUp() {
 		eventBatchService = new EventBatchService(
@@ -78,7 +80,7 @@ public class EventBatchServiceTest {
 		when(sessionDataService.createOrFindSessionData(key)).thenReturn(sessionData);
 
 		// when
-		eventBatchService.processActiveBatchForSession(key);
+		activityHandleService.processActiveBatchForSession(key);
 
 		// then
 		verify(sessionDataService, times(1)).createOrFindSessionData(key);
@@ -110,7 +112,7 @@ public class EventBatchServiceTest {
 		when(sessionDataService.createOrFindSessionData(key)).thenReturn(sessionData);
 
 		// when
-		eventBatchService.processInactiveBatchForSession(key);
+		activityHandleService.processInactiveBatchForSession(key);
 
 		// then
 		verify(sessionDataService, times(1)).createOrFindSessionData(key);

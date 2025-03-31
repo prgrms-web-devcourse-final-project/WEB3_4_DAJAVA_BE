@@ -1,8 +1,5 @@
 package com.dajava.backend.domain.event.service;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,9 +7,6 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.domain.event.entity.PointerClickEvent;
-import com.dajava.backend.domain.event.entity.PointerMoveEvent;
-import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.global.component.buffer.EventBuffer;
@@ -35,7 +29,7 @@ public class EventLogServiceImpl implements EventLogService {
 	private final SessionDataRepository sessionDataRepository;
 	private final SessionDataService sessionDataService;
 	private final EventBuffer eventBuffer;
-	private final EventBatchService eventBatchService;
+	private final ActivityHandleService activityHandleService;
 
 	/**
 	 * 클릭 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
@@ -106,7 +100,7 @@ public class EventLogServiceImpl implements EventLogService {
 			data.getSessionId(), data.getPageUrl(), data.getMemberSerialNumber()
 		);
 
-		eventBatchService.processInactiveBatchForSession(sessionDataKey);
+		activityHandleService.processInactiveBatchForSession(sessionDataKey);
 	}
 }
 

@@ -6,8 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.domain.event.service.EventBatchService;
-import com.dajava.backend.domain.event.service.EventLogService;
+import com.dajava.backend.domain.event.service.ActivityHandleService;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
 
@@ -32,7 +31,7 @@ public class EventBufferScheduler {
 	// 활성 상태 세션 주기적 저장 주기 (5분)
 	private static final long ACTIVE_SESSION_FLUSH_INTERVAL_MS = 5L * 60 * 1000;
 
-	private final EventBatchService eventBatchService;
+	private final ActivityHandleService activityHandleService;
 	private final EventBuffer eventBuffer;
 
 	/**
@@ -65,7 +64,7 @@ public class EventBufferScheduler {
 				inactiveCount++;
 
 				// 배치 처리를 통해 데이터 저장 및 캐시 제거
-				eventBatchService.processInactiveBatchForSession(sessionKey);
+				activityHandleService.processInactiveBatchForSession(sessionKey);
 			}
 		}
 
@@ -86,7 +85,7 @@ public class EventBufferScheduler {
 
 		for (SessionDataKey sessionKey : activeKeys) {
 			try {
-				eventBatchService.processActiveBatchForSession(sessionKey);
+				activityHandleService.processActiveBatchForSession(sessionKey);
 			} catch (Exception e) {
 				log.error("세션 {} 처리 중 오류 발생: {}", sessionKey, e.getMessage(), e);
 			}

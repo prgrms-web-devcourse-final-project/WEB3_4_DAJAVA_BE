@@ -1,18 +1,9 @@
 package com.dajava.backend.domain.event.service;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.*;
 import static org.mockito.Mockito.*;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
-import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
-import com.dajava.backend.domain.event.entity.PointerClickEvent;
-import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 
@@ -28,18 +19,17 @@ public class EventLogServiceTest {
 	private SessionDataService sessionDataService;
 	private EventBuffer eventBuffer;
 	private EventLogService eventLogService;
-	private EventBatchService eventBatchService;
+	private ActivityHandleService activityHandleService;
 
 	@BeforeEach
 	void setUp() {
 		sessionDataRepository = mock(SessionDataRepository.class);
 		sessionDataService = mock(SessionDataService.class);
 		eventBuffer = mock(EventBuffer.class);
-		eventBatchService = mock(EventBatchService.class);
+		activityHandleService = mock(ActivityHandleService.class);
 		eventLogService = new EventLogServiceImpl(sessionDataRepository, sessionDataService, eventBuffer,
-			eventBatchService);
+			activityHandleService);
 	}
-
 
 }
 

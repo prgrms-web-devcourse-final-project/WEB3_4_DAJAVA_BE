@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.service.ActivityHandleService;
 import com.dajava.backend.domain.event.service.EventBatchService;
-import com.dajava.backend.domain.event.service.EventLogService;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 
 /*
@@ -26,14 +26,15 @@ public class EventBufferSchedulerTest {
 	private EventBuffer eventBuffer;
 	private EventBatchService eventBatchService;
 	private EventBufferScheduler scheduler;
+	private ActivityHandleService activityHandleService;
 
 	final long inactivityThresholdMs = 10 * 60 * 1000; // 10분
 
 	@BeforeEach
 	void setUp() {
-		eventBatchService = mock(EventBatchService.class);  // EventBatchService mock 추가
+		activityHandleService = mock(ActivityHandleService.class);  // EventBatchService mock 추가
 		eventBuffer = new EventBuffer();
-		scheduler = new EventBufferScheduler(eventBatchService, eventBuffer);
+		scheduler = new EventBufferScheduler(activityHandleService, eventBuffer);
 	}
 
 	@Test
@@ -71,11 +72,11 @@ public class EventBufferSchedulerTest {
 		scheduler.flushInactiveEventBuffers();
 
 		// then
-		// 이제 eventLogService 대신 eventBatchService를 검증
-		verify(eventBatchService, times(1)).processInactiveBatchForSession(eq(oldSessionKey));
+		// 이제 eventLogService 대신 activityHandleService를 검증
+		verify(activityHandleService, times(1)).processInactiveBatchForSession(eq(oldSessionKey));
 
 		// 활성 세션은 처리되지 않았는지 확인
-		verify(eventBatchService, never()).processInactiveBatchForSession(eq(activeSessionKey));
+		verify(activityHandleService, never()).processInactiveBatchForSession(eq(activeSessionKey));
 
 		// 활성 세션 이벤트는 여전히 남아 있음
 		List<PointerClickEventRequest> remaining = eventBuffer.getClickBuffer().getEvents(activeSessionKey);
