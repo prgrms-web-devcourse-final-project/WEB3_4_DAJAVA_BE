@@ -27,7 +27,10 @@ public class ClickEventAnalyzerTest {
 
 	@BeforeEach
 	void setUp() {
-		analyzer = new ClickEventAnalyzer();
+		analyzer = new ClickEventAnalyzer(
+			5000,
+			10,
+			3);
 	}
 
 	private PointerClickEvent testClickEvent(Instant createDate, int clientX, int clientY) {

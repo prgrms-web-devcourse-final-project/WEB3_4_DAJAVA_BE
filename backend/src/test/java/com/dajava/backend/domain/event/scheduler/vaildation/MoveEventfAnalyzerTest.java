@@ -21,7 +21,10 @@ public class MoveEventfAnalyzerTest {
 
 	@BeforeEach
 	void setUp() {
-		analyzer = new MoveEventAnalyzer();
+		analyzer = new MoveEventAnalyzer(
+		3000,
+		4,
+		90.0);
 	}
 
 	private PointerMoveEvent testMoveEvent(Instant createDate, int clientX, int clientY) {

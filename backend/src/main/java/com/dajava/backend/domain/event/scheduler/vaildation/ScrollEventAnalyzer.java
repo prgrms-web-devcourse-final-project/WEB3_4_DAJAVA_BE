@@ -23,23 +23,28 @@ import com.dajava.backend.global.utils.EventsUtils;
 @Component
 public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 
-	@Value("${SCROLL_ANALYZER_TIME_WINDOW_MS:3000}")
-	private long timeWindowMs;
+	private final long timeWindowMs;
+	private final int minScrollDelta;
+	private final int minEventCount;
+	private final int rageThresholdPerWindow;
+	private final int minDirectionChanges;
+	private final int scrollBottomThreshold;
 
-	@Value("${SCROLL_ANALYZER_MIN_SCROLL_DELTA:300}")
-	private int minScrollDelta;
-
-	@Value("${SCROLL_ANALYZER_MIN_EVENT_COUNT:3}")
-	private int minEventCount;
-
-	@Value("${SCROLL_ANALYZER_RAGE_THRESHOLD_PER_WINDOW:3}") // 윈도우 안에서 3번 이상 rage scroll
-	private int rageThresholdPerWindow;
-
-	@Value("${SCROLL_ANALYZER_MIN_DIRECTION_CHANGES:3}") //방향 전환 횟수
-	private int minDirectionChanges;
-
-	@Value("${SCROLL_ANALYZER_SCROLL_BOTTOM_THRESHOLD:2000}") // 컨텐츠 소모 정도 감지하는 기준
-	private int scrollBottomThreshold;
+	public ScrollEventAnalyzer(
+		@Value("${SCROLL_ANALYZER_TIME_WINDOW_MS:3000}") long timeWindowMs,
+		@Value("${SCROLL_ANALYZER_MIN_SCROLL_DELTA:300}") int minScrollDelta,
+		@Value("${SCROLL_ANALYZER_MIN_EVENT_COUNT:3}") int minEventCount,
+		@Value("${SCROLL_ANALYZER_RAGE_THRESHOLD_PER_WINDOW:3}") int rageThresholdPerWindow,
+		@Value("${SCROLL_ANALYZER_MIN_DIRECTION_CHANGES:3}") int minDirectionChanges,
+		@Value("${SCROLL_ANALYZER_SCROLL_BOTTOM_THRESHOLD:2000}") int scrollBottomThreshold
+	) {
+		this.timeWindowMs = timeWindowMs;
+		this.minScrollDelta = minScrollDelta;
+		this.minEventCount = minEventCount;
+		this.rageThresholdPerWindow = rageThresholdPerWindow;
+		this.minDirectionChanges = minDirectionChanges;
+		this.scrollBottomThreshold = scrollBottomThreshold;
+	}
 
 	@Override
 	public List<PointerScrollEvent> analyze(SessionData sessionData) {

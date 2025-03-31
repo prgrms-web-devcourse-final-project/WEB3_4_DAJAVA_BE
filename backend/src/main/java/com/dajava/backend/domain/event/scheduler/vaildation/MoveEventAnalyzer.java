@@ -23,14 +23,19 @@ import com.dajava.backend.global.utils.EventsUtils;
 @Component
 public class MoveEventAnalyzer implements Analyzer<PointerMoveEvent> {
 
-	@Value("${MOVE_ANALYZER_TIME_WINDOW_MS:3000}")
-	private long timeWindowMs;
+	private final long timeWindowMs;
+	private final int turnThreshold;
+	private final double angleThresholdDegrees;
 
-	@Value("${MOVE_ANALYZER_TURN_THRESHOLD:4}")
-	private int turnThreshold;
-
-	@Value("${MOVE_ANALYZER_ANGLE_THRESHOLD_DEGREES:90.0}")
-	private double angleThresholdDegrees;
+	public MoveEventAnalyzer(
+		@Value("${MOVE_ANALYZER_TIME_WINDOW_MS:3000}") long timeWindowMs,
+		@Value("${MOVE_ANALYZER_TURN_THRESHOLD:4}") int turnThreshold,
+		@Value("${MOVE_ANALYZER_ANGLE_THRESHOLD_DEGREES:90.0}") double angleThresholdDegrees
+	) {
+		this.timeWindowMs = timeWindowMs;
+		this.turnThreshold = turnThreshold;
+		this.angleThresholdDegrees = angleThresholdDegrees;
+	}
 
 	@Override
 	public List<PointerMoveEvent> analyze(SessionData sessionData) {

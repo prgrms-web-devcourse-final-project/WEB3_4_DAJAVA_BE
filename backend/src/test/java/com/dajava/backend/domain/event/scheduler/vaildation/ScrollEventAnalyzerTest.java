@@ -27,7 +27,14 @@ public class ScrollEventAnalyzerTest {
 
 	@BeforeEach
 	void setUp() {
-		analyzer = new ScrollEventAnalyzer();
+		analyzer = new ScrollEventAnalyzer(
+			3000,
+			300,
+			3,
+			3,
+			3,
+			2000
+		);
 	}
 
 	private PointerScrollEvent testScrollEvent(Instant createDate, int scrollY) {
