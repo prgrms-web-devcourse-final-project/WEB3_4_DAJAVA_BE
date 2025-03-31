@@ -51,4 +51,17 @@ class SolutionServiceImplTest {
 		assertEquals(serialNumber, result.getSerialNumber());
 		verify(solutionDataRepository, times(1)).findBySerialNumber(serialNumber);
 	}
+
+	@Test
+	void getSolutionData_fail() {
+		String wrongSerialNumber = "aaaa";
+		when(solutionDataRepository.findBySerialNumber(wrongSerialNumber)).thenReturn(null);
+
+		// when
+		SolutionData result = solutionService.getSolutionData(wrongSerialNumber);
+
+		// then
+		assertNull(result);
+		verify(solutionDataRepository, times(1)).findBySerialNumber(wrongSerialNumber);
+	}
 }
