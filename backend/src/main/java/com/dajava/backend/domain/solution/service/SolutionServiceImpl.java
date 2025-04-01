@@ -5,8 +5,6 @@ import static com.dajava.backend.global.exception.ErrorCode.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -19,6 +17,7 @@ import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
 import com.dajava.backend.domain.solution.entity.SolutionEntity;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.domain.solution.repository.SolutionRepository;
+import com.dajava.backend.global.config.GeminiApiConfig;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,10 +36,6 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 public class SolutionServiceImpl implements SolutionService {
-	@Value("${dajava.apiKey}")
-	private String apiKey;
-	@Value("${dajava.url}")
-	private String apiUrl;
 
 	private final SolutionRepository solutionRepository;
 
@@ -48,14 +43,16 @@ public class SolutionServiceImpl implements SolutionService {
 
 	private final SolutionDataRepository solutionDataRepository;
 
+	private final GeminiApiConfig geminiApiConfig;
+
 	@Override
 	public Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber) {
 		WebClient client = WebClient.builder()
-			.baseUrl(apiUrl)
+			.baseUrl(geminiApiConfig.getApiUrl())
 			.defaultHeader("Content-Type", "application/json")
 			.build();
 		return client.post()
-			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
+			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
 			.bodyValue(refineData)
 			.retrieve()
 			.bodyToMono(String.class)
@@ -76,7 +73,7 @@ public class SolutionServiceImpl implements SolutionService {
 						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
-						if(register.isServiceExpired()){	//isServiceExpired 값이 true여야 에러 발생
+						if(register.isServiceExpired()){	//(isServiceExpired == true) => 에러 발생
 							return Mono.error(new SolutionException(SOLUTION_EXPIRED_ERROR));
 						}else{
 							register.setSolutionComplete(true);
