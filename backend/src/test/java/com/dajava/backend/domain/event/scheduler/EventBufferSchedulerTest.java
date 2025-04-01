@@ -46,12 +46,12 @@ public class EventBufferSchedulerTest {
 
 		PointerClickEventRequest oldEvent = new PointerClickEventRequest(
 			"session1", "https://example.com", "user001",
-			System.currentTimeMillis(), 1920, 100, 200,100,1000,100,"div"
+			System.currentTimeMillis(), 1920, 100, 200, 100, 1000, 100, "div"
 		);
 
 		PointerClickEventRequest activeEvent = new PointerClickEventRequest(
 			"session2", "https://example.com", "user002",
-			System.currentTimeMillis(), 1920, 300, 400,100,1000,100,"div"
+			System.currentTimeMillis(), 1920, 300, 400, 100, 1000, 100, "div"
 		);
 
 		// 비활성 세션 이벤트 추가
@@ -76,7 +76,7 @@ public class EventBufferSchedulerTest {
 		verify(activityHandleService, times(1)).processInactiveBatchForSession(eq(oldSessionKey));
 
 		// 활성 세션은 처리되지 않았는지 확인
-		verify(activityHandleService, never()).processInactiveBatchForSession(eq(activeSessionKey));
+		verify(activityHandleService, never()).processActiveBatchForSession(eq(activeSessionKey));
 
 		// 활성 세션 이벤트는 여전히 남아 있음
 		List<PointerClickEventRequest> remaining = eventBuffer.getClickBuffer().getEvents(activeSessionKey);
