@@ -25,9 +25,10 @@ public class PointerEventConverter {
 			.timestamp(event.getCreateDate())
 			.browserWidth(event.getBrowserWidth())
 			.solutionData(solutionData)
-			// .element(event.getElement()) element 추가시 빌더 추가 예정
-			// .scrollHeight(event.getScrollHeight()) 현재 브라우저 스크롤 상태
-			// .viewportHeight(event.getViewportHeight()) 현재 브라우저 height
+			.tag(event.getTag())
+			.scrollY(event.getScrollY())
+			.scrollHeight(event.getScrollHeight())
+			.viewportHeight(event.getViewportHeight())
 			.build();
 
 	}
@@ -42,9 +43,10 @@ public class PointerEventConverter {
 			.timestamp(event.getCreateDate())
 			.browserWidth(event.getBrowserWidth())
 			.solutionData(solutionData)
-			// .element(event.getElement()) element 추가시 빌더 추가 예정
-			// .scrollHeight(event.getScrollHeight()) 현재 브라우저 스크롤 상태
-			// .viewportHeight(event.getViewportHeight()) 현재 브라우저 height
+			.scrollY(event.getScrollY())
+			.scrollHeight(event.getScrollHeight())
+			.viewportHeight(event.getViewportHeight())
+			// .tag(event.getTag()) tag 추가시 빌더 추가 예정
 			.build();
 	}
 
@@ -57,9 +59,8 @@ public class PointerEventConverter {
 			.timestamp(event.getCreateDate())
 			.browserWidth(event.getBrowserWidth())
 			.solutionData(solutionData)
-			// .element(event.getElement()) element 추가시 빌더 추가 예정
-			// .scrollHeight(event.getScrollHeight()) 현재 브라우저 스크롤 상태
-			// .viewportHeight(event.getViewportHeight()) 현재 브라우저 height
+			.scrollHeight(event.getScrollHeight())
+			.viewportHeight(event.getViewportHeight())
 			.build();
 	}
 

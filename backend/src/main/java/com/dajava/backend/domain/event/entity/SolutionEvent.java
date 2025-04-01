@@ -37,18 +37,24 @@ public class SolutionEvent extends BaseTimeEntity {
 	@NotNull
 	private String type; // click, move, scroll 등
 
-	private Integer clientX;
-	private Integer clientY;
+	@NotNull
 	private Integer scrollY;
+
+	@NotNull
 	private Integer scrollHeight;
+
+	@NotNull
 	private Integer viewportHeight;
-	private String element;
+
+	@NotNull
+	private Integer browserWidth;
 
 	@NotNull
 	private LocalDateTime timestamp;
 
-	@NotNull
-	private Integer browserWidth;
+	private Integer clientX;
+	private Integer clientY;
+	private String tag;
 
 	@ManyToOne()
 	@JoinColumn(name = "solution_data_id")

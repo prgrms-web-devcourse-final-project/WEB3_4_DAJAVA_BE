@@ -32,6 +32,18 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 	Integer clientY;
 
 	@Column(nullable = false)
+	int scrollY;
+
+	@Column(nullable = false)
+	int scrollHeight;
+
+	@Column(nullable = false)
+	int viewportHeight;
+
+	@Column(nullable = false)
+	String tag;
+
+	@Column(nullable = false)
 	String pageUrl;
 
 	@Column(nullable = false)
