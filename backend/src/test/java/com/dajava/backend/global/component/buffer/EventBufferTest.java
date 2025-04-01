@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+
 /*
  * 로그 이벤트를 임시 저장하는 버퍼 자료구조 테스트 입니다
  *
