@@ -47,11 +47,7 @@ public class SolutionServiceImpl implements SolutionService {
 
 	@Override
 	public Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber) {
-		WebClient client = WebClient.builder()
-			.baseUrl(geminiApiConfig.getApiUrl())
-			.defaultHeader("Content-Type", "application/json")
-			.build();
-		return client.post()
+		return geminiApiConfig.geminiWebClient().post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
 			.bodyValue(refineData)
 			.retrieve()
