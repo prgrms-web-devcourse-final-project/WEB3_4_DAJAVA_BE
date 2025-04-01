@@ -1,9 +1,8 @@
 package com.dajava.backend.domain.solution.dto;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
 
-@Data
-public class SolutionResponseDto {
-	private String registerSerialNumber;
-	private String text;
-}
+public record SolutionResponseDto (
+	@NotBlank String registerSerialNumber,
+	@NotBlank  String text
+) {}
