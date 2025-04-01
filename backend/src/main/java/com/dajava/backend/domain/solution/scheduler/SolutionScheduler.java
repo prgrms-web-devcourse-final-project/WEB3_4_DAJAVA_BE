@@ -28,8 +28,7 @@ public class SolutionScheduler {
 
 	@Scheduled(cron = "0 0 0 * * *")	//매일 자정(00:00)에 실행
 	public void processExpiredRegisters() {
-		LocalDateTime today = LocalDateTime.now();
-		List<Register> expiredRegisters = registerRepository.findByEndDateLessThanEqual(today);
+		List<Register> expiredRegisters = registerRepository.findByIsServiceExpiredTrue();
 
 		for (Register register : expiredRegisters) {
 			try {

@@ -5,10 +5,8 @@ import static com.dajava.backend.global.exception.ErrorCode.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
@@ -19,6 +17,7 @@ import com.dajava.backend.domain.solution.dto.SolutionResponse;
 import com.dajava.backend.domain.solution.entity.Solution;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.domain.solution.repository.SolutionRepository;
+import com.dajava.backend.global.config.GeminiApiConfig;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,32 +33,22 @@ import reactor.core.publisher.Mono;
  */
 @Service
 @RequiredArgsConstructor
-
 @Slf4j
 public class SolutionServiceImpl implements SolutionService {
-	@Value("${dajava.apiKey}")
-	private String apiKey;
-	@Value("${dajava.url}")
-	private String apiUrl;
 
-	@Autowired
 	private final SolutionRepository solutionRepository;
 
-	@Autowired
 	private final RegisterRepository registerRepository;
 
-	@Autowired
 	private final SolutionDataRepository solutionDataRepository;
 
+	private final GeminiApiConfig geminiApiConfig;
+
 	@Override
+	@Transactional
 	public Mono<SolutionResponse> getAISolution(String refineData, String serialNumber) {
-		Register register = registerRepository.findBySerialNumber(serialNumber);
-		WebClient client = WebClient.builder()
-			.baseUrl(apiUrl)
-			.defaultHeader("Content-Type", "application/json")
-			.build();
-		return client.post()
-			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
+		return geminiApiConfig.geminiWebClient().post()
+			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
 			.bodyValue(refineData)
 			.retrieve()
 			.bodyToMono(String.class)
@@ -68,18 +57,18 @@ public class SolutionServiceImpl implements SolutionService {
 				try {
 					JsonNode rootNode = objectMapper.readTree(result);
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
-
+					Register register = registerRepository.findBySerialNumber(serialNumber);
 					if (register == null) {
 						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					}
 					if (text != null) {
-						Solution solution = new Solution();
-						solution.setText(text);
-						solution.setRegister(register);
+						Solution solution = Solution.builder()
+							.text(text)
+							.register(register)
+							.build();
 						solutionRepository.save(solution);
-						SolutionResponse solutionResponseDto = new SolutionResponse();
-						solutionResponseDto.setText(text);
-						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
+						SolutionResponse solutionResponseDto = new SolutionResponse(text);
+						solution.getRegister().setSolutionComplete(true);
 
 						return Mono.just(solutionResponseDto);
 					} else {
@@ -97,9 +86,8 @@ public class SolutionServiceImpl implements SolutionService {
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
 			.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_INVALID));
-		PasswordUtils passwordUtils = new PasswordUtils();
 		//해시화된 password 검증로직
-		if (!passwordUtils.verifyPassword(password, findRegister.getPassword())) {
+		if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
 			throw new SolutionException(SOLUTION_PASSWORD_INVALID);
 		}
 		Solution solution = solutionRepository.findByRegister(findRegister)

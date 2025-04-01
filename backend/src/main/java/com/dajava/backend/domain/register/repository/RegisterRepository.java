@@ -54,7 +54,13 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 
 	Register findBySerialNumber(String serialNumber);
 
-	List<Register> findByEndDateLessThanEqual(LocalDateTime endDate);
+	/**
+	 * Register 엔티티의 isServiceExpired 값이 true 인 데이터 조회
+	 * @return List<Register>
+	 */
+	List<Register> findByIsServiceExpiredTrue();
+
+
 }
 
 
