@@ -69,6 +69,7 @@ public class SolutionServiceImpl implements SolutionService {
 						solutionRepository.save(solution);
 						SolutionResponse solutionResponseDto = new SolutionResponse(text);
 						solution.getRegister().setSolutionComplete(true);
+						registerRepository.save(register);
 
 						return Mono.just(solutionResponseDto);
 					} else {
