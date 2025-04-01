@@ -65,10 +65,9 @@ class SolutionServiceImplTest {
 			.isServiceExpired(false)
 			.isSolutionComplete(false)
 			.build();
-		solution = new Solution();
-		solution.setText("test");
-		solution.setRegister(register);
-
+		solution = Solution.builder()
+			.text("test")
+			.build();
 	}
 	@Test
 	void getAISolution() {

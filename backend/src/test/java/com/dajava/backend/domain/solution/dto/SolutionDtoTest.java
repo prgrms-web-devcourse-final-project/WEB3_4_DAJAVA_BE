@@ -64,10 +64,10 @@ public class SolutionDtoTest {
 		SolutionRequest.EventDataDto eventData = solutionRequest.eventData().get(0);
 		assertEquals("session1", eventData.sessionId(), "sessionId 값이 일치해야 합니다.");
 		assertEquals("click", eventData.type(), "type 값이 일치해야 합니다.");
-		assertEquals(100, eventData.x(), "x 값이 일치해야 합니다.");
-		assertEquals(200, eventData.y(), "y 값이 일치해야 합니다.");
+		assertEquals(100, eventData.clientX(), "x 값이 일치해야 합니다.");
+		assertEquals(200, eventData.clientY(), "y 값이 일치해야 합니다.");
 		assertEquals("button", eventData.element(), "element 값이 일치해야 합니다.");
 		assertEquals("https://example.com", eventData.pageUrl(), "pageUrl 값이 일치해야 합니다.");
-		assertEquals(1024, eventData.broswerWidth(), "browserWidth 값이 일치해야 합니다.");
+		assertEquals(1024, eventData.browserWidth(), "browserWidth 값이 일치해야 합니다.");
 	}
 }
