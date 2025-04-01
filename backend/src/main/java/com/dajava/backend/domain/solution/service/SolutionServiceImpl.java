@@ -101,9 +101,8 @@ public class SolutionServiceImpl implements SolutionService {
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
 			.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_INVALID));
-		PasswordUtils passwordUtils = new PasswordUtils();
 		//해시화된 password 검증로직
-		if (!passwordUtils.verifyPassword(password, findRegister.getPassword())) {
+		if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
 			throw new SolutionException(SOLUTION_PASSWORD_INVALID);
 		}
 		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
