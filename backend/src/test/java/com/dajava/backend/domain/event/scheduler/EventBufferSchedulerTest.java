@@ -46,12 +46,12 @@ public class EventBufferSchedulerTest {
 
 		PointerClickEventRequest oldEvent = new PointerClickEventRequest(
 			"session1", "https://example.com", "user001",
-			System.currentTimeMillis(), 1920, 100, 200
+			System.currentTimeMillis(), 1920, 100, 200,100,1000,100,"div"
 		);
 
 		PointerClickEventRequest activeEvent = new PointerClickEventRequest(
 			"session2", "https://example.com", "user002",
-			System.currentTimeMillis(), 1920, 300, 400
+			System.currentTimeMillis(), 1920, 300, 400,100,1000,100,"div"
 		);
 
 		// 비활성 세션 이벤트 추가
