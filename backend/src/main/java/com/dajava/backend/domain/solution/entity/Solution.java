@@ -7,9 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 /**
- * AI를 통해 제공받은 솔루션 데이터를 저장하는 JPA 엔티티입니다.
- * 솔루션 신청(Register)와 연관되며, 텍스트 데이터가 포함.
- * BaseTimeEntity를 통해 생성 및 수정 시간이 자동으로 관리됩니다.
+ * <p>{@code SolutionEntity}는 AI를 통해 제공받은 솔루션 데이터를 저장하는 JPA 엔티티입니다.</p>
+ * <p>{@code Register)와 연관되며, {@code text} 데이터가 있습니다.</p>
+ * <p>{@code BaseTimeEntity}를 통해 생성 및 수정 시간이 자동으로 관리됩니다.</p>
  */
 @Entity
 @Table(name = "solution")
@@ -17,7 +17,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class SolutionEntity extends BaseTimeEntity {
+public class Solution extends BaseTimeEntity {
 	/**
 	 * 솔루션 엔티티의 고유 식별자
 	 */

@@ -16,7 +16,7 @@ import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
 import com.dajava.backend.domain.solution.dto.SolutionResponse;
-import com.dajava.backend.domain.solution.entity.SolutionEntity;
+import com.dajava.backend.domain.solution.entity.Solution;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.domain.solution.repository.SolutionRepository;
 import com.dajava.backend.global.utils.PasswordUtils;
@@ -73,10 +73,10 @@ public class SolutionServiceImpl implements SolutionService {
 						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					}
 					if (text != null) {
-						SolutionEntity solutionEntity = new SolutionEntity();
-						solutionEntity.setText(text);
-						solutionEntity.setRegister(register);
-						solutionRepository.save(solutionEntity);
+						Solution solution = new Solution();
+						solution.setText(text);
+						solution.setRegister(register);
+						solutionRepository.save(solution);
 						SolutionResponse solutionResponseDto = new SolutionResponse();
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
@@ -102,9 +102,9 @@ public class SolutionServiceImpl implements SolutionService {
 		if (!passwordUtils.verifyPassword(password, findRegister.getPassword())) {
 			throw new SolutionException(SOLUTION_PASSWORD_INVALID);
 		}
-		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
+		Solution solution = solutionRepository.findByRegister(findRegister)
 			.orElseThrow(() -> new SolutionException(SOLUTION_NOT_FOUND));
-		return new SolutionInfoResponse(solutionEntity.getText());
+		return new SolutionInfoResponse(solution.getText());
 
 	}
 
