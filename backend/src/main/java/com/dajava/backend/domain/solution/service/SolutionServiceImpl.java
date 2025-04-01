@@ -79,8 +79,8 @@ public class SolutionServiceImpl implements SolutionService {
 						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
-						if(!register.isServiceExpired()){
-							return Mono.error(new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND));
+						if(register.isServiceExpired()){	//isServiceExpired 값이 true여야 에러 발생
+							return Mono.error(new SolutionException(SOLUTION_EXPIRED_ERROR));
 						}else{
 							register.setSolutionComplete(true);
 					}
