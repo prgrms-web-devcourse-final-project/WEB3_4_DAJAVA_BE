@@ -35,7 +35,11 @@ public class EventBufferTest {
 			System.currentTimeMillis(),
 			1920,
 			clientX,
-			clientY
+			clientY,
+			100,
+			1000,
+			100,
+			"div"
 		);
 	}
 

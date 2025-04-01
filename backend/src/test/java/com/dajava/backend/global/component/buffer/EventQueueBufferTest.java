@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-
 /*
  * 이벤트 버퍼 내부 제네릭 해시맵 구조를 테스트 합니다
  *
@@ -31,12 +30,12 @@ public class EventQueueBufferTest {
 	void t1() {
 		PointerClickEventRequest event1 = new PointerClickEventRequest(
 			"session123", "https://example.com", "user001",
-			System.currentTimeMillis(), 1920, 100, 200, 0, 1500, 500, "div"
+			System.currentTimeMillis(), 1920, 100, 200,100,100,100,"div"
 		);
 
 		PointerClickEventRequest event2 = new PointerClickEventRequest(
 			"session123", "https://example.com", "user001",
-			System.currentTimeMillis(), 1920, 150, 250, 0, 1500, 500, "div"
+			System.currentTimeMillis(), 1920, 150, 250,200,100,100,"div"
 		);
 
 		buffer.addEvent(sessionKey, event1);
@@ -51,7 +50,7 @@ public class EventQueueBufferTest {
 	void t2() {
 		PointerClickEventRequest event = new PointerClickEventRequest(
 			"session123", "https://example.com", "user001",
-			System.currentTimeMillis(), 1280, 50, 80, 0, 1500, 500, "div"
+			System.currentTimeMillis(), 1280, 50, 80,100,200,100,"div"
 		);
 
 		buffer.addEvent(sessionKey, event);
