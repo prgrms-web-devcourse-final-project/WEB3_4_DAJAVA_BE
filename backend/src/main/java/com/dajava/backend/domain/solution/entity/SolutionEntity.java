@@ -33,6 +33,6 @@ public class SolutionEntity extends BaseTimeEntity {
 	private String text;
 
 	@OneToOne
-	@JoinColumn(name = "register_id")
+	@JoinColumn(name = "register_id", nullable = false)
 	private Register register;
 }
