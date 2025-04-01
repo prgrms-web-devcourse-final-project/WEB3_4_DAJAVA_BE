@@ -52,16 +52,16 @@ public class SolutionDtoTest {
 	@Test
 	@DisplayName("SolutionData 객체를 SolutionRequestDto로 변환")
 	void testFromSolutionData() {
-		SolutionRequestDto solutionRequestDto = SolutionRequestDto.from(mockSolutionData);
+		SolutionRequest solutionRequest = SolutionRequest.from(mockSolutionData);
 
 		// solutionRequestDto의 값 검증
-		assertNotNull(solutionRequestDto, "SolutionRequestDto 객체는 null이 아니어야 합니다.");
-		assertEquals("11db0706-4879-463a-a4d7-f7c347668cc6", solutionRequestDto.serialNumber(), "serialNumber 값이 일치해야 합니다.");
-		assertNotNull(solutionRequestDto.eventData(), "eventData 리스트는 null이 아니어야 합니다.");
-		assertEquals(1, solutionRequestDto.eventData().size(), "eventData 리스트의 크기가 1이어야 합니다.");
+		assertNotNull(solutionRequest, "SolutionRequestDto 객체는 null이 아니어야 합니다.");
+		assertEquals("11db0706-4879-463a-a4d7-f7c347668cc6", solutionRequest.serialNumber(), "serialNumber 값이 일치해야 합니다.");
+		assertNotNull(solutionRequest.eventData(), "eventData 리스트는 null이 아니어야 합니다.");
+		assertEquals(1, solutionRequest.eventData().size(), "eventData 리스트의 크기가 1이어야 합니다.");
 
 		// eventData의 요소 검증
-		SolutionRequestDto.EventDataDto eventData = solutionRequestDto.eventData().get(0);
+		SolutionRequest.EventDataDto eventData = solutionRequest.eventData().get(0);
 		assertEquals("session1", eventData.sessionId(), "sessionId 값이 일치해야 합니다.");
 		assertEquals("click", eventData.type(), "type 값이 일치해야 합니다.");
 		assertEquals(100, eventData.x(), "x 값이 일치해야 합니다.");

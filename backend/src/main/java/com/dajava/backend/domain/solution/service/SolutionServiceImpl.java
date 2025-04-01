@@ -15,7 +15,7 @@ import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
-import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
+import com.dajava.backend.domain.solution.dto.SolutionResponse;
 import com.dajava.backend.domain.solution.entity.SolutionEntity;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.domain.solution.repository.SolutionRepository;
@@ -52,7 +52,8 @@ public class SolutionServiceImpl implements SolutionService {
 	private final SolutionDataRepository solutionDataRepository;
 
 	@Override
-	public Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber) {
+	public Mono<SolutionResponse> getAISolution(String refineData, String serialNumber) {
+		Register register = registerRepository.findBySerialNumber(serialNumber);
 		WebClient client = WebClient.builder()
 			.baseUrl(apiUrl)
 			.defaultHeader("Content-Type", "application/json")
@@ -67,7 +68,7 @@ public class SolutionServiceImpl implements SolutionService {
 				try {
 					JsonNode rootNode = objectMapper.readTree(result);
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
-					Register register = registerRepository.findBySerialNumber(serialNumber);
+
 					if (register == null) {
 						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					}
@@ -76,14 +77,9 @@ public class SolutionServiceImpl implements SolutionService {
 						solutionEntity.setText(text);
 						solutionEntity.setRegister(register);
 						solutionRepository.save(solutionEntity);
-						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
+						SolutionResponse solutionResponseDto = new SolutionResponse();
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
-						if(!register.isServiceExpired()){
-							return Mono.error(new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND));
-						}else{
-							register.setSolutionComplete(true);
-					}
 
 						return Mono.just(solutionResponseDto);
 					} else {

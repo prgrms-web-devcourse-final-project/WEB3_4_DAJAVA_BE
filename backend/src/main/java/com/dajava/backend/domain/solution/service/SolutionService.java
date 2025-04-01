@@ -3,7 +3,7 @@ package com.dajava.backend.domain.solution.service;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
-import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
+import com.dajava.backend.domain.solution.dto.SolutionResponse;
 
 import reactor.core.publisher.Mono;
 
@@ -14,7 +14,7 @@ public interface SolutionService {
 	 * @param serialNumber // 신청자에게 제공된 시리얼 넘버
 	 * @return result // 처리된 응답 데이터
 	 */
-	Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber);
+	Mono<SolutionResponse> getAISolution(String refineData, String serialNumber);
 
 	/**
 	 * 시리얼 넘버와 비밀번호로 솔루션 정보를 조회하는 메서드

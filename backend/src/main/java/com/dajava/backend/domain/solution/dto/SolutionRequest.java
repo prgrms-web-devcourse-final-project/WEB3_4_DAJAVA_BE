@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.entity.SolutionEvent;
 
-public record SolutionRequestDto(
+public record SolutionRequest(
 	String serialNumber,
 	List<EventDataDto> eventData) {
 	public record EventDataDto(
@@ -20,12 +20,12 @@ public record SolutionRequestDto(
 		String pageUrl,
 		Integer broswerWidth
 	) {}
-	public static SolutionRequestDto from(SolutionData solutionData) { // SolutionData 객체를 인자로 받도록 수정
+	public static SolutionRequest from(SolutionData solutionData) { // SolutionData 객체를 인자로 받도록 수정
 		List<EventDataDto> eventDataDtos = solutionData.getSolutionEvents().stream()
-			.map(SolutionRequestDto::convertToEventDataDto)
+			.map(SolutionRequest::convertToEventDataDto)
 			.collect(Collectors.toList());
 
-		return new SolutionRequestDto(solutionData.getSerialNumber(), eventDataDtos);
+		return new SolutionRequest(solutionData.getSerialNumber(), eventDataDtos);
 	}
 
 	private static EventDataDto convertToEventDataDto(SolutionEvent event) {

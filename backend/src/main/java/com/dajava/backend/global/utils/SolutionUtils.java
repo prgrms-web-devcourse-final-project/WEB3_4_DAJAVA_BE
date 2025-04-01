@@ -4,7 +4,7 @@ import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import java.util.List;
 
-import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
+import com.dajava.backend.domain.solution.dto.SolutionRequest;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 
 public final class SolutionUtils {
@@ -13,7 +13,7 @@ public final class SolutionUtils {
 	 * @param eventData 사용자 로그 데이터만 담은 객체
 	 * @return 생성된 프롬프트 문자열
 	 */
-	public static String refinePrompt(List<SolutionRequestDto.EventDataDto> eventData) {
+	public static String refinePrompt(List<SolutionRequest.EventDataDto> eventData) {
 		return String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요. 브라우저 width는 1024px이고 브라우저 환경은 Chrome이야: %s", eventData);
 	}
 	/**
@@ -26,26 +26,26 @@ public final class SolutionUtils {
 	}
 	/**
 	 * SolutionData 객체에서 serialNumber를 추출합니다.
-	 * @param solutionRequestDto solutionRequestDto 객체
+	 * @param solutionRequest solutionRequestDto 객체
 	 * @return solutionRequestDto.serialNumber() serialNumber
 	 * @throws IllegalArgumentException solutionRequestDto가 null인 경우
 	 */
-	public static String extractsSerialNumber(SolutionRequestDto solutionRequestDto) {
-		if (solutionRequestDto.serialNumber() == null) {
+	public static String extractsSerialNumber(SolutionRequest solutionRequest) {
+		if (solutionRequest.serialNumber() == null) {
 			throw new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND);
 		}
-		return solutionRequestDto.serialNumber();
+		return solutionRequest.serialNumber();
 	}
 	/**
 	 * SolutionData 객체에서 event data를 추출합니다.
-	 * @param solutionRequestDto solutionRequestDto 객체
+	 * @param solutionRequest solutionRequestDto 객체
 	 * @return solutionRequestDto.eventData() event data
 	 * @throws IllegalArgumentException solutionRequestDto가 null인 경우
 	 */
-	public static List<SolutionRequestDto.EventDataDto> extractSolutionEvents(SolutionRequestDto solutionRequestDto) {
-		if (solutionRequestDto.eventData() == null) {
+	public static List<SolutionRequest.EventDataDto> extractSolutionEvents(SolutionRequest solutionRequest) {
+		if (solutionRequest.eventData() == null) {
 			throw new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND);
 		}
-		return solutionRequestDto.eventData();
+		return solutionRequest.eventData();
 	}
 }
