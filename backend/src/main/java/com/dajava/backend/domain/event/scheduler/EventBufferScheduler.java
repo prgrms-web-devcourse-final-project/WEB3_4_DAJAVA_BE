@@ -2,6 +2,7 @@ package com.dajava.backend.domain.event.scheduler;
 
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -26,10 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 public class EventBufferScheduler {
 
 	// 비활성 상태 간주 시간 (10분)
-	private static final long INACTIVITY_THRESHOLD_MS = 10L * 60 * 1000;
-
-	// 활성 상태 세션 주기적 저장 주기 (5분)
-	private static final long ACTIVE_SESSION_FLUSH_INTERVAL_MS = 5L * 60 * 1000;
+	// secret yml 을 통해 주기를 조정할 수 있습니다.
+	@Value("${event.scheduler.inactive-threshold-ms}")
+	private long inactiveThresholdMs;
 
 	private final ActivityHandleService activityHandleService;
 	private final EventBuffer eventBuffer;
@@ -38,8 +38,9 @@ public class EventBufferScheduler {
 	 * 1분마다 실행되어 비활성 세션을 감지하고 처리합니다.
 	 * 마지막 활동 시간이 기준 시간(10분)을 초과한 세션의 데이터를
 	 * 저장하고 버퍼와 캐시에서 제거합니다.
+	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
-	@Scheduled(fixedRate = 60_000) // 1분마다 실행
+	@Scheduled(fixedRateString = "${event.scheduler.inactive-session-detect-threshold-ms}")
 	public void flushInactiveEventBuffers() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
@@ -59,7 +60,7 @@ public class EventBufferScheduler {
 			Long latestUpdate = getLatestUpdate(lastClickUpdate, lastMoveUpdate, lastScrollUpdate);
 
 			// 비활성 세션 여부 확인
-			if (latestUpdate == null || (now - latestUpdate) >= INACTIVITY_THRESHOLD_MS) {
+			if (latestUpdate == null || (now - latestUpdate) >= inactiveThresholdMs) {
 				log.info("비활성 세션 감지: {}", sessionKey);
 				inactiveCount++;
 
@@ -75,8 +76,9 @@ public class EventBufferScheduler {
 	 * 5분마다 실행되어 모든 활성 세션의 데이터를 주기적으로 저장합니다.
 	 * 세션의 활성 상태와 관계없이 현재 버퍼에 있는 모든 세션 데이터를
 	 * 처리하여 데이터 손실 위험을 줄입니다.
+	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
-	@Scheduled(fixedRate = ACTIVE_SESSION_FLUSH_INTERVAL_MS) // 5분마다 실행
+	@Scheduled(fixedRateString = "${event.scheduler.active-session-flush-interval-ms}")
 	public void flushAllEventBuffers() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 
