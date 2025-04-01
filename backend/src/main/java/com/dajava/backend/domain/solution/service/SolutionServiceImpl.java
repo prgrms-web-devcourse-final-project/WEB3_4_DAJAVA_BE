@@ -62,6 +62,7 @@ public class SolutionServiceImpl implements SolutionService {
 						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					}
 					if (text != null) {
+
 						Solution solution = Solution.builder()
 							.text(text)
 							.register(register)
