@@ -42,13 +42,10 @@ public class SolutionServiceImpl implements SolutionService {
 	@Value("${dajava.url}")
 	private String apiUrl;
 
-	@Autowired
 	private final SolutionRepository solutionRepository;
 
-	@Autowired
 	private final RegisterRepository registerRepository;
 
-	@Autowired
 	private final SolutionDataRepository solutionDataRepository;
 
 	@Override
