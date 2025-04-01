@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
@@ -32,7 +33,6 @@ import reactor.core.publisher.Mono;
  */
 @Service
 @RequiredArgsConstructor
-
 @Slf4j
 public class SolutionServiceImpl implements SolutionService {
 
@@ -45,6 +45,7 @@ public class SolutionServiceImpl implements SolutionService {
 	private final GeminiApiConfig geminiApiConfig;
 
 	@Override
+	@Transactional
 	public Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber) {
 		return geminiApiConfig.geminiWebClient().post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
@@ -68,6 +69,7 @@ public class SolutionServiceImpl implements SolutionService {
 						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
+						solutionEntity.getRegister().setSolutionComplete(true);
 
 						return Mono.just(solutionResponseDto);
 					} else {

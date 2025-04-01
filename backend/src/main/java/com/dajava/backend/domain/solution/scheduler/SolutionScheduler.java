@@ -16,6 +16,9 @@ import com.dajava.backend.domain.solution.controller.SolutionController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * AISolution 데이터 도출을 위해 돌아가는 스케줄러 클래스
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
