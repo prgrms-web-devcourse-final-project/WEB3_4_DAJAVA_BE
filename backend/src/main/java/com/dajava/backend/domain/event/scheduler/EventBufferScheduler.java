@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.service.ActivityHandleService;
+import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
 
@@ -28,11 +29,10 @@ public class EventBufferScheduler {
 
 	// 비활성 상태 간주 시간 (10분)
 	// secret yml 을 통해 주기를 조정할 수 있습니다.
-	@Value("${event.scheduler.inactive-threshold-ms}")
-	private long inactiveThresholdMs;
-
 	private final ActivityHandleService activityHandleService;
 	private final EventBuffer eventBuffer;
+
+	private final BufferSchedulerProperties properties;
 
 	/**
 	 * 1분마다 실행되어 비활성 세션을 감지하고 처리합니다.
@@ -40,7 +40,7 @@ public class EventBufferScheduler {
 	 * 저장하고 버퍼와 캐시에서 제거합니다.
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
-	@Scheduled(fixedRateString = "${event.scheduler.inactive-session-detect-threshold-ms}")
+	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.inactiveSessionDetectThresholdMs}")
 	public void flushInactiveEventBuffers() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
@@ -60,7 +60,7 @@ public class EventBufferScheduler {
 			Long latestUpdate = getLatestUpdate(lastClickUpdate, lastMoveUpdate, lastScrollUpdate);
 
 			// 비활성 세션 여부 확인
-			if (latestUpdate == null || (now - latestUpdate) >= inactiveThresholdMs) {
+			if (latestUpdate == null || (now - latestUpdate) >= properties.getInactiveThresholdMs()) {
 				log.info("비활성 세션 감지: {}", sessionKey);
 				inactiveCount++;
 
@@ -78,7 +78,7 @@ public class EventBufferScheduler {
 	 * 처리하여 데이터 손실 위험을 줄입니다.
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
-	@Scheduled(fixedRateString = "${event.scheduler.active-session-flush-interval-ms}")
+	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.activeSessionFlushIntervalMs}")
 	public void flushAllEventBuffers() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 

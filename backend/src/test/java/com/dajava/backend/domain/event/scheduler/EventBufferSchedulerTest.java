@@ -13,6 +13,7 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.service.ActivityHandleService;
 import com.dajava.backend.domain.event.service.EventBatchService;
+import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 
 /*
@@ -32,9 +33,14 @@ public class EventBufferSchedulerTest {
 
 	@BeforeEach
 	void setUp() {
+		BufferSchedulerProperties props = new BufferSchedulerProperties();
+		props.setInactiveSessionDetectThresholdMs("60000"); // String
+		props.setActiveSessionFlushIntervalMs("300000");    // String
+		props.setInactiveThresholdMs(600000L);
+
 		activityHandleService = mock(ActivityHandleService.class);  // EventBatchService mock 추가
 		eventBuffer = new EventBuffer();
-		scheduler = new EventBufferScheduler(activityHandleService, eventBuffer);
+		scheduler = new EventBufferScheduler(activityHandleService, eventBuffer,props);
 	}
 
 	@Test
