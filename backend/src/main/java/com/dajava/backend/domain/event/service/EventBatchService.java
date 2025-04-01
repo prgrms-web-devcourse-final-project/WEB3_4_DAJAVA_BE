@@ -92,6 +92,10 @@ public class EventBatchService {
 			PointerClickEvent event = PointerClickEvent.create(
 				request.clientX(),
 				request.clientY(),
+				request.scrollY(),
+				request.scrollHeight(),
+				request.viewportHeight(),
+				request.tag(),
 				request.pageUrl(),
 				request.browserWidth(),
 				request.sessionId(),
@@ -120,6 +124,9 @@ public class EventBatchService {
 			PointerMoveEvent event = PointerMoveEvent.create(
 				request.clientX(),
 				request.clientY(),
+				request.scrollY(),
+				request.scrollHeight(),
+				request.viewportHeight(),
 				request.pageUrl(),
 				request.browserWidth(),
 				request.sessionId(),
@@ -147,6 +154,8 @@ public class EventBatchService {
 		for (PointerScrollEventRequest request : scrollEvents) {
 			PointerScrollEvent event = PointerScrollEvent.create(
 				request.scrollY(),
+				request.scrollHeight(),
+				request.viewportHeight(),
 				request.pageUrl(),
 				request.browserWidth(),
 				request.sessionId(),

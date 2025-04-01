@@ -13,7 +13,11 @@ public record PointerClickEventRequest(
 	@NotNull Long timestamp,
 	@NotNull Integer browserWidth,
 	@NotNull Integer clientX,
-	@NotNull Integer clientY
+	@NotNull Integer clientY,
+	@NotNull Integer scrollY,
+	@NotNull Integer scrollHeight,
+	@NotNull Integer viewportHeight,
+	@NotNull String tag
 ) {
 }
 

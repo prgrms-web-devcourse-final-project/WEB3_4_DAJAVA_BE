@@ -59,6 +59,9 @@ public class PointerMoveEvent extends BaseTimeEntity implements PointerEvent {
 	public static PointerMoveEvent create(
 		int clientX,
 		int clientY,
+		int scrollY,
+		int scrollHeight,
+		int viewportHeight,
 		String pageUrl,
 		int browserWidth,
 		String sessionId,
@@ -68,6 +71,9 @@ public class PointerMoveEvent extends BaseTimeEntity implements PointerEvent {
 		PointerMoveEvent event = PointerMoveEvent.builder()
 			.clientX(clientX)
 			.clientY(clientY)
+			.scrollY(scrollY)
+			.scrollHeight(scrollHeight)
+			.viewportHeight(viewportHeight)
 			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)

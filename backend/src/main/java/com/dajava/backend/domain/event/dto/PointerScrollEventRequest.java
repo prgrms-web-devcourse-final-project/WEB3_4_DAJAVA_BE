@@ -12,7 +12,8 @@ public record PointerScrollEventRequest(
 	@NotNull String memberSerialNumber,
 	@NotNull Long timestamp,
 	@NotNull Integer browserWidth,
-	@NotNull Integer scrollX,
-	@NotNull Integer scrollY
+	@NotNull Integer scrollY,
+	@NotNull Integer scrollHeight,
+	@NotNull Integer viewportHeight
 ) {
 }
