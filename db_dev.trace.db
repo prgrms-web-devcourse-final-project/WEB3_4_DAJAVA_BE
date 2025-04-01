@@ -1,3 +1,0 @@
-2025-03-28 17:18:43.751232+09:00 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * [*]FRO SESSION_DATA"; SQL statement:
-SELECT * FRO SESSION_DATA [42000-232]
