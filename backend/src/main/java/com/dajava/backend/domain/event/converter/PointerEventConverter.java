@@ -25,7 +25,7 @@ public class PointerEventConverter {
 			.timestamp(event.getCreateDate())
 			.browserWidth(event.getBrowserWidth())
 			.solutionData(solutionData)
-			.tag(event.getTag())
+			.element(event.getElement())
 			.scrollY(event.getScrollY())
 			.scrollHeight(event.getScrollHeight())
 			.viewportHeight(event.getViewportHeight())

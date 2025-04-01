@@ -17,7 +17,7 @@ public record PointerClickEventRequest(
 	@NotNull Integer scrollY,
 	@NotNull Integer scrollHeight,
 	@NotNull Integer viewportHeight,
-	@NotNull String tag
+	@NotNull String element
 ) {
 }
 

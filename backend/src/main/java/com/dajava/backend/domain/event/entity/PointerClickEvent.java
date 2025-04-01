@@ -41,7 +41,7 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 	int viewportHeight;
 
 	@Column(nullable = false)
-	String tag;
+	String element;
 
 	@Column(nullable = false)
 	String pageUrl;
@@ -65,7 +65,7 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 		int scrollY,
 		int scrollHeight,
 		int viewportHeight,
-		String tag,
+		String element,
 		String pageUrl,
 		int browserWidth,
 		String sessionId,
@@ -78,7 +78,7 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 			.scrollY(scrollY)
 			.scrollHeight(scrollHeight)
 			.viewportHeight(viewportHeight)
-			.tag(tag)
+			.element(element)
 			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)

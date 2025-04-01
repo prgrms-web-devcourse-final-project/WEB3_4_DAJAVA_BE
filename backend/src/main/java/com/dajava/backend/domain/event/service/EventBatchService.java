@@ -95,7 +95,7 @@ public class EventBatchService {
 				request.scrollY(),
 				request.scrollHeight(),
 				request.viewportHeight(),
-				request.tag(),
+				request.element(),
 				request.pageUrl(),
 				request.browserWidth(),
 				request.sessionId(),

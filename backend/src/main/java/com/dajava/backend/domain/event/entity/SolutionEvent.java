@@ -54,7 +54,7 @@ public class SolutionEvent extends BaseTimeEntity {
 
 	private Integer clientX;
 	private Integer clientY;
-	private String tag;
+	private String element;
 
 	@ManyToOne()
 	@JoinColumn(name = "solution_data_id")
