@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
@@ -69,11 +68,6 @@ public class SolutionServiceImpl implements SolutionService {
 						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
 						solutionResponseDto.setText(text);
 						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
-						if(register.isServiceExpired()){	//(isServiceExpired == true) => 에러 발생
-							return Mono.error(new SolutionException(SOLUTION_EXPIRED_ERROR));
-						}else{
-							register.setSolutionComplete(true);
-					}
 
 						return Mono.just(solutionResponseDto);
 					} else {

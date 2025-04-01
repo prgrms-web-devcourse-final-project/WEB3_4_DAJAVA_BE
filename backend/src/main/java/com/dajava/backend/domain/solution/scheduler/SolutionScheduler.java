@@ -1,6 +1,5 @@
 package com.dajava.backend.domain.solution.scheduler;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,8 +27,7 @@ public class SolutionScheduler {
 
 	@Scheduled(cron = "0 0 0 * * *")	//매일 자정(00:00)에 실행
 	public void processExpiredRegisters() {
-		LocalDateTime today = LocalDateTime.now();
-		List<Register> expiredRegisters = registerRepository.findByEndDateLessThanEqual(today);
+		List<Register> expiredRegisters = registerRepository.findByIsServiceExpiredTrue();
 
 		for (Register register : expiredRegisters) {
 			try {
@@ -37,9 +35,9 @@ public class SolutionScheduler {
 				if (solutionData != null) {
 					SolutionRequestDto solutionRequestDto = SolutionRequestDto.from(solutionData);
 					solutionController.getUXSolution(solutionRequestDto);
-					log.info("Processed expired register: {}", register.getSerialNumber());
+					log.info("SolutionScheduler 동작 시리얼 번호: {}", register.getSerialNumber());
 				} else {
-					log.info("No session data for register: {}", register.getSerialNumber());
+					log.info("SolutionData == null 시리얼 번호: {}", register.getSerialNumber());
 				}
 
 			} catch (Exception e) {
