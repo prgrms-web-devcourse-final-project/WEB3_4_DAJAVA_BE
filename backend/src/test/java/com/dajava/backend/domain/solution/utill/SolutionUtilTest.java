@@ -34,6 +34,7 @@ class SolutionUtilTest {
 			"click", // 이벤트 타입
 			100, // 클릭 X 좌표
 			200, // 클릭 Y 좌표
+			100,
 			"button", // 이벤트가 발생한 UI 요소
 			"http://example.com", // 페이지 URL
 			1920 // 브라우저 width
