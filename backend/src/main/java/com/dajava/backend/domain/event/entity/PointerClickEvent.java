@@ -32,6 +32,18 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 	Integer clientY;
 
 	@Column(nullable = false)
+	int scrollY;
+
+	@Column(nullable = false)
+	int scrollHeight;
+
+	@Column(nullable = false)
+	int viewportHeight;
+
+	@Column(nullable = false)
+	String element;
+
+	@Column(nullable = false)
 	String pageUrl;
 
 	@Column(nullable = false)
@@ -50,6 +62,10 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 	public static PointerClickEvent create(
 		int clientX,
 		int clientY,
+		int scrollY,
+		int scrollHeight,
+		int viewportHeight,
+		String element,
 		String pageUrl,
 		int browserWidth,
 		String sessionId,
@@ -59,6 +75,10 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 		PointerClickEvent event = PointerClickEvent.builder()
 			.clientX(clientX)
 			.clientY(clientY)
+			.scrollY(scrollY)
+			.scrollHeight(scrollHeight)
+			.viewportHeight(viewportHeight)
+			.element(element)
 			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)
@@ -68,19 +88,6 @@ public class PointerClickEvent extends BaseTimeEntity implements PointerEvent {
 		sessionData.addClickEvent(event); // 양방향 연관관계 설정
 
 		return event;
-	}
-
-	@Override
-	public String toString() {
-		return "PointerClickEvent{"
-			+ "id=" + id
-			+ ", clientX=" + clientX
-			+ ", clientY=" + clientY
-			+ ", pageUrl='" + pageUrl + '\''
-			+ ", browserWidth=" + browserWidth
-			+ ", sessionId='" + sessionId + '\''
-			+ ", memberSerialNumber='" + memberSerialNumber + '\''
-			+ '}';
 	}
 }
 

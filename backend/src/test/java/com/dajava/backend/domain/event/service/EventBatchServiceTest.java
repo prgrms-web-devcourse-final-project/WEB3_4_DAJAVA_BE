@@ -73,7 +73,7 @@ public class EventBatchServiceTest {
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
 			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
-				System.currentTimeMillis(), 1920, 100, 200)
+				System.currentTimeMillis(), 1920, 100, 200, 0, 1500, 500, "div")
 		);
 
 		when(eventBuffer.getClickEvents(key)).thenReturn(clickEvents);
@@ -102,7 +102,7 @@ public class EventBatchServiceTest {
 		List<PointerClickEventRequest> clickEvents = Collections.emptyList();
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
 			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
-				System.currentTimeMillis(), 1920, 300, 400)
+				System.currentTimeMillis(), 1920, 300, 400, 0, 1500, 500)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.emptyList();
 
@@ -154,15 +154,15 @@ public class EventBatchServiceTest {
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
 			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
-				System.currentTimeMillis(), 1920, 100, 200)
+				System.currentTimeMillis(), 1920, 100, 200, 0, 1500, 500, "div")
 		);
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
 			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
-				System.currentTimeMillis(), 1920, 300, 400)
+				System.currentTimeMillis(), 1920, 300, 400, 0, 1500, 500)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.singletonList(
 			new PointerScrollEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
-				System.currentTimeMillis(), 1920, 0, 500)
+				System.currentTimeMillis(), 1920, 0, 1500, 500)
 		);
 
 		when(eventBuffer.getClickEvents(key)).thenReturn(clickEvents);
