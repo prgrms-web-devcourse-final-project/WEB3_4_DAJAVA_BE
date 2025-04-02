@@ -2,6 +2,7 @@ package com.dajava.backend.domain.register.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -51,7 +52,7 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 		LocalDateTime currentTime1,
 		LocalDateTime currentTime2);
 
-	Register findBySerialNumber(String serialNumber);
+	Optional<Register> findBySerialNumber(String serialNumber);
 
 	/**
 	 * Register 엔티티의 isServiceExpired 값이 true 인 데이터 조회

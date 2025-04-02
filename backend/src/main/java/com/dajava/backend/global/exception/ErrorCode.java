@@ -16,6 +16,7 @@ public enum ErrorCode {
 	ALREADY_REGISTER_URL(HttpStatus.BAD_REQUEST, "이미 등록되어 있습니다"),
 	MODIFY_DATE_EXCEEDED(HttpStatus.BAD_REQUEST, "현재 종료일로부터 " + DEFAULT_REGISTER_DURATION + "일을 초과할 수 없습니다."),
 	INVALID_PAGE_CAPTURE(HttpStatus.BAD_REQUEST, "pageCapture 리스트는 공백이거나 null 일 수 없습니다."),
+	REGISTER_NOT_FOUND(HttpStatus.NOT_FOUND, "Register 정보를 찾을 수 없습니다."),
 
 	// Solution
 	SOLUTION_SERIAL_NUMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "시리얼 넘버가 없습니다."),

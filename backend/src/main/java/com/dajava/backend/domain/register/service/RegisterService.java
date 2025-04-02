@@ -20,9 +20,11 @@ import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Order;
 import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
 import com.dajava.backend.domain.register.repository.OrderRepository;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -125,7 +127,8 @@ public class RegisterService {
 	 */
 	@Transactional
 	public void modifyPageCaptureIfAbsent(String serialNumber, String captureData) {
-		Register register = registerRepository.findBySerialNumber(serialNumber);
+		Register register = registerRepository.findBySerialNumber(serialNumber)
+			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
 
 		if (register.getPageCapture() == null || register.getPageCapture().isEmpty()) {
 			register.updatePageCapture(captureData);

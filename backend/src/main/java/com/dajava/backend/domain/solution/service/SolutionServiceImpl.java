@@ -3,7 +3,6 @@ package com.dajava.backend.domain.solution.service;
 import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,10 +56,8 @@ public class SolutionServiceImpl implements SolutionService {
 				try {
 					JsonNode rootNode = objectMapper.readTree(result);
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
-					Register register = registerRepository.findBySerialNumber(serialNumber);
-					if (register == null) {
-						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
-					}
+					Register register = registerRepository.findBySerialNumber(serialNumber)
+						.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					if (text != null) {
 
 						Solution solution = Solution.builder()
@@ -86,7 +83,7 @@ public class SolutionServiceImpl implements SolutionService {
 
 	@Override
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
-		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
+		Register findRegister = registerRepository.findBySerialNumber(serialNumber)
 			.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_INVALID));
 		//해시화된 password 검증로직
 		if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {

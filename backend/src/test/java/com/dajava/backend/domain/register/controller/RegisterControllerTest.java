@@ -26,8 +26,10 @@ import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.RegisterService;
+import com.dajava.backend.global.exception.ErrorCode;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -203,7 +205,8 @@ class RegisterControllerTest {
 				.content(objectMapper.writeValueAsString(pageCaptureRequest)))
 			.andExpect(status().isOk());
 
-		Register updateRegister = registerRepository.findBySerialNumber(serialNumber);
+		Register updateRegister = registerRepository.findBySerialNumber(serialNumber)
+			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
 		String expectedCapture = String.join("", captureData);
 
 		assertEquals(expectedCapture, updateRegister.getPageCapture());
@@ -238,6 +241,6 @@ class RegisterControllerTest {
 		mockMvc.perform(patch("/v1/register/" + wrongSerialNumber + "/page-capture")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(pageCaptureRequest)))
-			.andExpect(status().isInternalServerError());
+			.andExpect(status().isNotFound());
 	}
 }
