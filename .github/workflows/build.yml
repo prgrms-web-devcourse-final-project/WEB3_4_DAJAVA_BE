@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       # 1. 코드 체크아웃
       - name: Checkout code
         uses: actions/checkout@v2.3.4
@@ -46,33 +45,85 @@ jobs:
         working-directory: ./backend
         run: chmod +x ./gradlew
 
-      # Gradle 빌드
+      # Gradle 빌드 (테스트 포함)
       - name: Build with Gradle
         working-directory: ./backend
         run: ./gradlew clean build
 
-      # 테스트 실행
-      - name: Run tests with Gradle
-        working-directory: ./backend
-        run: ./gradlew test
+  makeTagAndRelease:
+    runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.create_tag.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Tag
+        id: create_tag
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.new_tag }}
+          release_name: Release ${{ steps.create_tag.outputs.new_tag }}
+          body: ${{ steps.create_tag.outputs.changelog }}
+          draft: false
+          prerelease: false
 
-      # 7. 빌드 아티팩트 저장 (옵션)
-      # - name: Archive build artifacts
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: backend-build
-      #     path: ./backend/build/libs/*.jar
+  buildImageAndPush:
+    name: 도커 이미지 빌드와 푸시
+    needs: makeTagAndRelease
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE_NAME: dajava
+    steps:
+      - uses: actions/checkout@v4
+      - name: application-secret.yml 생성
+        env:
+          APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET_YML }}
+        run: echo "$APPLICATION_SECRET" > src/main/resources/application-secret.yml
+      - name: Docker Buildx 설치
+        uses: docker/setup-buildx-action@v2
+      - name: 레지스트리 로그인
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
+        env:
+          OWNER: "${{ github.repository_owner }}"
+      - name: 빌드 앤 푸시
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_LC }}/${{ env.DOCKER_IMAGE_NAME }}:${{ needs.makeTagAndRelease.outputs.tag_name }},
+            ghcr.io/${{ env.OWNER_LC }}/${{ env.DOCKER_IMAGE_NAME }}:latest
 
-      # 8. 배포 (옵션: AWS, Docker, Heroku 등)
-      # 추후 배포 작업 시
-#      - name: AWS
-#        uses: aws-actions/configure-aws-credentials@v1
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: 'us-west-2'
-#
-#      - name: Deploy to AWS (optional)
-#        run: |
-#          # 예시로 AWS EC2에 배포하는 명령어를 추가할 수 있습니다.
-#          aws ec2 describe-instances --region us-west-2
+  # deploy:
+  # runs-on: ubuntu-latest
+  # needs: [ buildImageAndPush ]
+  # steps:
+  #   - name: AWS SSM Send-Command
+  #     uses: peterkimzz/aws-ssm-send-command@master
+  #     id: ssm
+  #     with:
+  #       aws-region: ${{ secrets.AWS_REGION }}
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       instance-ids: "i-0c0026b04463751ec"
+  #       working-directory: /
+  #       comment: Deploy
+  #       command: |
+  #         docker pull ghcr.io/choihyunsan/app20250314:latest
+  #         docker stop app1 2>/dev/null
+  #         docker rm app1 2>/dev/null
+  #         docker run -d --name app1 -p 8080:8080 ghcr.io/choihyunsan/app20250314:latest
+  #         docker rmi $(docker images -f "dangling=true" -q)
