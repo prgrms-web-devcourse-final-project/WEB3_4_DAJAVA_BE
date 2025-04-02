@@ -111,6 +111,10 @@ public class Register extends BaseTimeEntity {
 		this.endDate = newEndDate;
 	}
 
+	public void updatePageCapture(String pageCapture) {
+		this.pageCapture = pageCapture;
+	}
+
 	@Override
 	public String toString() {
 		return "Solution{"

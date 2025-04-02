@@ -151,5 +151,6 @@ public class RegisterController {
 		@RequestBody PageCaptureRequest request
 	) {
 		String captureData = String.join("", request.pageCapture());
+		registerService.modifyPageCaptureIfAbsent(serialNumber, captureData);
 	}
 }

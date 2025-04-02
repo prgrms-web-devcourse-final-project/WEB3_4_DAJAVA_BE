@@ -1,6 +1,5 @@
 package com.dajava.backend.domain.register.repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,16 +27,16 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	 * @return 존재 여부
 	 */
 	@Query("""
-      SELECT CASE 
-             WHEN COUNT(s) = 0 THEN true
-             WHEN (SELECT s2.endDate FROM Register s2 
-                  WHERE s2.url = :url 
-                  ORDER BY s2.createDate DESC LIMIT 1) < :pastDate THEN true
-             ELSE false
-             END
-      FROM Register s
-      WHERE s.url = :url
-    """)
+		  SELECT CASE 
+		         WHEN COUNT(s) = 0 THEN true
+		         WHEN (SELECT s2.endDate FROM Register s2 
+		              WHERE s2.url = :url 
+		              ORDER BY s2.createDate DESC LIMIT 1) < :pastDate THEN true
+		         ELSE false
+		         END
+		  FROM Register s
+		  WHERE s.url = :url
+		""")
 	boolean checkUrlAvailability(
 		@Param("url") String url,
 		@Param("pastDate") LocalDateTime pastDate);
@@ -59,7 +58,6 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	 * @return List<Register>
 	 */
 	List<Register> findByIsServiceExpiredTrue();
-
 
 }
 
