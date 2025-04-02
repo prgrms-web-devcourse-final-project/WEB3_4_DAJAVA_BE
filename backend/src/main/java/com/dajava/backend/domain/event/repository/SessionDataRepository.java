@@ -33,5 +33,7 @@ public interface SessionDataRepository extends JpaRepository<SessionData, Long> 
 				ORDER BY s.modifiedDate ASC
 		""")
 	List<SessionData> findEndedSession();
+
+	Optional<List<SessionData>> findByMemberSerialNumber(String memberSerialNumber);
 }
 

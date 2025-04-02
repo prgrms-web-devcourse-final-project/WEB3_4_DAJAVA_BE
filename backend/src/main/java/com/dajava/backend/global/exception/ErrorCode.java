@@ -35,7 +35,10 @@ public enum ErrorCode {
 
 	// Event
 	ALREADY_ENDED_SESSION(HttpStatus.BAD_REQUEST, "세션이 이미 종료되었습니다."),
-	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다.");
+	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다."),
+
+	// Session
+	SESSION_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "세션 데이터를 찾을 수 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String description;
