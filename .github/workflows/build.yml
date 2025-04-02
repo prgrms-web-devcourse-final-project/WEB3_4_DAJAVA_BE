@@ -1,4 +1,4 @@
-name: PR Verification
+name: Build Test
 
 on:
   pull_request:
