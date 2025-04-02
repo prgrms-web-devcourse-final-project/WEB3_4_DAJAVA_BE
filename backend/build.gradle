@@ -48,6 +48,11 @@ dependencies {
 
     // env
     implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+
+    // Caffeine Cache
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework:spring-context-support")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
 }
 
 test {
