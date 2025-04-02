@@ -6,15 +6,15 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
-import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
-import com.dajava.backend.domain.solution.entity.SolutionEntity;
+import com.dajava.backend.domain.solution.dto.SolutionResponse;
+import com.dajava.backend.domain.solution.entity.Solution;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.domain.solution.repository.SolutionRepository;
 import com.dajava.backend.global.config.GeminiApiConfig;
@@ -33,7 +33,6 @@ import reactor.core.publisher.Mono;
  */
 @Service
 @RequiredArgsConstructor
-
 @Slf4j
 public class SolutionServiceImpl implements SolutionService {
 
@@ -46,7 +45,8 @@ public class SolutionServiceImpl implements SolutionService {
 	private final GeminiApiConfig geminiApiConfig;
 
 	@Override
-	public Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber) {
+	@Transactional
+	public Mono<SolutionResponse> getAISolution(String refineData, String serialNumber) {
 		return geminiApiConfig.geminiWebClient().post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
 			.bodyValue(refineData)
@@ -62,18 +62,15 @@ public class SolutionServiceImpl implements SolutionService {
 						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					}
 					if (text != null) {
-						SolutionEntity solutionEntity = new SolutionEntity();
-						solutionEntity.setText(text);
-						solutionEntity.setRegister(register);
-						solutionRepository.save(solutionEntity);
-						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
-						solutionResponseDto.setText(text);
-						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
-						if(register.isServiceExpired()){	//(isServiceExpired == true) => 에러 발생
-							return Mono.error(new SolutionException(SOLUTION_EXPIRED_ERROR));
-						}else{
-							register.setSolutionComplete(true);
-					}
+
+						Solution solution = Solution.builder()
+							.text(text)
+							.register(register)
+							.build();
+						solutionRepository.save(solution);
+						SolutionResponse solutionResponseDto = new SolutionResponse(text);
+						solution.getRegister().setSolutionComplete(true);
+						registerRepository.save(register);
 
 						return Mono.just(solutionResponseDto);
 					} else {
@@ -95,9 +92,9 @@ public class SolutionServiceImpl implements SolutionService {
 		if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
 			throw new SolutionException(SOLUTION_PASSWORD_INVALID);
 		}
-		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
+		Solution solution = solutionRepository.findByRegister(findRegister)
 			.orElseThrow(() -> new SolutionException(SOLUTION_NOT_FOUND));
-		return new SolutionInfoResponse(solutionEntity.getText());
+		return new SolutionInfoResponse(solution.getText());
 
 	}
 

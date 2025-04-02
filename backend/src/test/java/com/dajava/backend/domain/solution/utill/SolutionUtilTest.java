@@ -10,7 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.dajava.backend.global.utils.SolutionUtils;
-import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
+import com.dajava.backend.domain.solution.dto.SolutionRequest;
 
 /**
  * SolutionUtils의 메서드를 테스트하는 클래스입니다.
@@ -19,7 +19,7 @@ import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
 class SolutionUtilTest {
 
 	/** 테스트에 사용될 mock SolutionRequestDto 객체 */
-	private SolutionRequestDto mockSolutionRequestDto;
+	private SolutionRequest mockSolutionRequest;
 
 	/**
 	 * 테스트 실행 전, 독립성을 위해 초기화
@@ -28,28 +28,29 @@ class SolutionUtilTest {
 	@BeforeEach
 	@DisplayName("테스트 실행 전, mockSolutionEvent mockSolutionData 초기화")
 	void setUp() {
-		SolutionRequestDto.EventDataDto dummy = new SolutionRequestDto.EventDataDto(
+		SolutionRequest.EventDataDto dummy = new SolutionRequest.EventDataDto(
 			"session1", // 세션 ID
 			LocalDateTime.now().minusMinutes(10), // 이벤트 발생 시간
 			"click", // 이벤트 타입
 			100, // 클릭 X 좌표
 			200, // 클릭 Y 좌표
+			100,
 			"button", // 이벤트가 발생한 UI 요소
 			"http://example.com", // 페이지 URL
 			1920 // 브라우저 width
 		);
-		mockSolutionRequestDto = new SolutionRequestDto("12345", List.of(dummy));
+		mockSolutionRequest = new SolutionRequest("12345", List.of(dummy));
 	}
 
 	/**
 	 * SolutionRequestDto에서 serialNumber 값을 추출하는 테스트입니다.
-	 * @see SolutionUtils#extractsSerialNumber(SolutionRequestDto)
+	 * @see SolutionUtils#extractsSerialNumber(SolutionRequest)
 	 */
 	@Test
 	@DisplayName("SolutionRequestDto에서 serialNumber 추출")
 	void testExtractsSerialNumber() {
 		// SolutionRequestDto에서 serialNumber 추출
-		String result = SolutionUtils.extractsSerialNumber(mockSolutionRequestDto);
+		String result = SolutionUtils.extractsSerialNumber(mockSolutionRequest);
 
 		// serialNumber가 올바르게 추출되는지 확인
 		assertEquals("12345", result);
@@ -57,16 +58,16 @@ class SolutionUtilTest {
 
 	/**
 	 * SolutionRequestDto에서 event data를 추출하는 테스트입니다.
-	 * @see SolutionUtils#extractSolutionEvents(SolutionRequestDto)
+	 * @see SolutionUtils#extractSolutionEvents(SolutionRequest)
 	 */
 	@Test
 	@DisplayName("SolutionRequestDto에서 event data 추출")
 	void testExtractsEventData() {
 		// SolutionRequestDto에서 eventData 추출
-		List<SolutionRequestDto.EventDataDto> result = SolutionUtils.extractSolutionEvents(mockSolutionRequestDto);
+		List<SolutionRequest.EventDataDto> result = SolutionUtils.extractSolutionEvents(mockSolutionRequest);
 
 		// eventData가 올바르게 추출되는지 확인
-		assertEquals(mockSolutionRequestDto.eventData(), result);
+		assertEquals(mockSolutionRequest.eventData(), result);
 	}
 
 	/**
@@ -79,7 +80,7 @@ class SolutionUtilTest {
 		String expectedPrompt = "다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요. 브라우저 width는 1024px이고 브라우저 환경은 Chrome이야:";
 
 		// eventData 추출
-		List<SolutionRequestDto.EventDataDto> eventData = mockSolutionRequestDto.eventData();
+		List<SolutionRequest.EventDataDto> eventData = mockSolutionRequest.eventData();
 
 		// SolutionUtils.refinePrompt 메서드 실행
 		String result = SolutionUtils.refinePrompt(eventData);
