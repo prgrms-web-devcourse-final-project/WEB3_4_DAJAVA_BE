@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.register.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,5 +87,21 @@ class RegisterServiceTest {
 
 		Assertions.assertEquals(5, registerList.registerInfos().size());
 		;
+	}
+
+	@Test
+	@DisplayName("캡쳐 데이터 Patch")
+	public void t4() {
+		// Given
+		t1();
+
+		Register solution = repository.findAll().get(0);
+		String serialNumber = solution.getSerialNumber();
+		String captureData = "testCaptureDataString";
+
+		service.modifyPageCaptureIfAbsent(serialNumber, captureData);
+
+		Optional<Register> modifiedSolution = repository.findBySerialNumber(serialNumber);
+		Assertions.assertEquals(modifiedSolution.get().getPageCapture(), captureData);
 	}
 }
