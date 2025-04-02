@@ -48,6 +48,9 @@ dependencies {
 
     // env
     implementation 'me.paulschwarz:spring-dotenv:3.0.0'
+
+    //ES
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 }
 
 test {

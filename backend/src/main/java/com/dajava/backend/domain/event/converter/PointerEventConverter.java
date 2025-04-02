@@ -2,12 +2,19 @@ package com.dajava.backend.domain.event.converter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
+import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
+import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.entity.PointerClickEvent;
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.entity.SolutionEvent;
+import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
 
 public class PointerEventConverter {
 
@@ -86,5 +93,53 @@ public class PointerEventConverter {
 
 		return result;
 	}
+
+	public static PointerClickEventDocument toClickEventDocument(PointerClickEventRequest request) {
+		return PointerClickEventDocument.builder()
+			.id(UUID.randomUUID().toString())
+			.sessionId(request.sessionId())
+			.pageUrl(request.pageUrl())
+			.memberSerialNumber(request.memberSerialNumber())
+			.timestamp(request.timestamp())
+			.browserWidth(request.browserWidth())
+			.clientX(request.clientX())
+			.clientY(request.clientY())
+			.scrollY(request.scrollY())
+			.scrollHeight(request.scrollHeight())
+			.viewportHeight(request.viewportHeight())
+			.element(request.element())
+			.build();
+	}
+
+	public static PointerMoveEventDocument toMoveEventDocument(PointerMoveEventRequest request) {
+		return PointerMoveEventDocument.builder()
+			.id(UUID.randomUUID().toString())
+			.sessionId(request.sessionId())
+			.pageUrl(request.pageUrl())
+			.memberSerialNumber(request.memberSerialNumber())
+			.timestamp(request.timestamp())
+			.browserWidth(request.browserWidth())
+			.clientX(request.clientX())
+			.clientY(request.clientY())
+			.scrollY(request.scrollY())
+			.scrollHeight(request.scrollHeight())
+			.viewportHeight(request.viewportHeight())
+			.build();
+	}
+
+	public static PointerScrollEventDocument toScrollEventDocument(PointerScrollEventRequest request) {
+		return PointerScrollEventDocument.builder()
+			.id(UUID.randomUUID().toString())
+			.sessionId(request.sessionId())
+			.pageUrl(request.pageUrl())
+			.memberSerialNumber(request.memberSerialNumber())
+			.timestamp(request.timestamp())
+			.browserWidth(request.browserWidth())
+			.scrollY(request.scrollY())
+			.scrollHeight(request.scrollHeight())
+			.viewportHeight(request.viewportHeight())
+			.build();
+	}
 }
+
 

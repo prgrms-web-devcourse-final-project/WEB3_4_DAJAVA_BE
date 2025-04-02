@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.event.service;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
+import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -50,5 +53,6 @@ public class SessionDataService {
 	public void removeFromCache(SessionDataKey key) {
 		sessionCache.remove(key);
 	}
+
 }
 
