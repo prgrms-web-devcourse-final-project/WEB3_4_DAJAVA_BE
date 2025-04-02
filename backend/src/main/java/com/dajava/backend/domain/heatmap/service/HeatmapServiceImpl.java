@@ -46,6 +46,11 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 	@Override
 	public HeatmapResponse createHeatmap(List<SessionData> sessions, String type) {
-
+		// TODO
+		//  - 각 세션 데이터에서 타입에 맞는 데이터 추출
+		//  - 추출한 데이터에서 전체 페이지 크기 계산으로 그리드 수 계산
+		//  - for 반복문으로 각 그리드에 X, Y 좌표에 따른 count 수 추가
+		//  - 추출한 데이터로 메타 데이터 생성
+		//  - register 에서 이미지 데이터 get
 	}
 }
