@@ -8,6 +8,10 @@ import jakarta.validation.constraints.NotNull;
  * @author Metronon
  */
 public record PointerClickEventRequest(
+
+	@Schema(description = "랜덤으로 생성된 이벤트 식별자", example = "e25f6b52-4a1b-4721-8651-8839f23727cb", requiredMode = Schema.RequiredMode.REQUIRED)
+	@NotNull String eventId,
+
 	@Schema(description = "사용자의 fingerPrint 로 생성된 식별자", example = "e25f6b52-4a1b-4721-8651-8839f23727cb", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull String sessionId,
 
@@ -42,4 +46,3 @@ public record PointerClickEventRequest(
 	@NotNull String element
 ) {
 }
-

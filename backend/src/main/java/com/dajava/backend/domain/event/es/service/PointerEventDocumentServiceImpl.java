@@ -21,12 +21,4 @@ public class PointerEventDocumentServiceImpl implements PointerEventDocumentServ
 
 	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
-	//더티 체킹 안되니 직접 저장해야함
-	@Override
-	public void endSession(String sessionId) {
-		SessionDataDocument doc = sessionDataDocumentRepository.findBySessionId(sessionId).orElseThrow(() ->
-		new PointerEventException(ErrorCode.EVENT_DOCUMENT_NOT_FOUND));
-		doc.endSession();
-		sessionDataDocumentRepository.save(doc); // 전체 저장
-	}
 }

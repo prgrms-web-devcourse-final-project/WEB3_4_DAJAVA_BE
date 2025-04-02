@@ -8,5 +8,4 @@ package com.dajava.backend.domain.event.es.service;
  */
 public interface PointerEventDocumentService {
 
-	public void endSession(String sessionId);
 }

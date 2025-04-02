@@ -23,18 +23,17 @@ import lombok.NoArgsConstructor;
 public class SessionDataDocument {
 
 	@Id
-	private String id; // UUID or sessionId 사용 가능
-
-	private String sessionId;
+	private String id; // sessionId + pageurl + memberSerialNumber 사용
 
 	private String memberSerialNumber;
 
 	private String pageUrl;
 
-
 	private boolean isOutlier;
 
 	private boolean isMissingValue;
+
+	private Long timestamp;
 
 	private boolean isSessionEnded;
 

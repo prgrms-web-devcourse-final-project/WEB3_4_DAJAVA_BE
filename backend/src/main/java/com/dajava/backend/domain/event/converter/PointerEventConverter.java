@@ -96,7 +96,7 @@ public class PointerEventConverter {
 
 	public static PointerClickEventDocument toClickEventDocument(PointerClickEventRequest request) {
 		return PointerClickEventDocument.builder()
-			.id(UUID.randomUUID().toString())
+			.id(request.eventId() + request.timestamp())
 			.sessionId(request.sessionId())
 			.pageUrl(request.pageUrl())
 			.memberSerialNumber(request.memberSerialNumber())
@@ -113,7 +113,7 @@ public class PointerEventConverter {
 
 	public static PointerMoveEventDocument toMoveEventDocument(PointerMoveEventRequest request) {
 		return PointerMoveEventDocument.builder()
-			.id(UUID.randomUUID().toString())
+			.id(request.eventId() + request.timestamp())
 			.sessionId(request.sessionId())
 			.pageUrl(request.pageUrl())
 			.memberSerialNumber(request.memberSerialNumber())
@@ -129,7 +129,7 @@ public class PointerEventConverter {
 
 	public static PointerScrollEventDocument toScrollEventDocument(PointerScrollEventRequest request) {
 		return PointerScrollEventDocument.builder()
-			.id(UUID.randomUUID().toString())
+			.id(request.eventId() + request.timestamp())
 			.sessionId(request.sessionId())
 			.pageUrl(request.pageUrl())
 			.memberSerialNumber(request.memberSerialNumber())

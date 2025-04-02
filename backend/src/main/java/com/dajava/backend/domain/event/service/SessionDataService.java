@@ -25,14 +25,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SessionDataService {
 	private final SessionDataRepository sessionDataRepository;
+	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
 	private final Map<SessionDataKey, SessionData> sessionCache = new ConcurrentHashMap<>();
+	private final Map<SessionDataKey, SessionDataDocument> sessionEsCache = new ConcurrentHashMap<>();
 
 	@Transactional
 	public SessionData createOrFindSessionData(SessionDataKey key) {
 		return sessionCache.computeIfAbsent(key, k ->
 			sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
-					k.sessionId(), k.pageUrl(), k.memberSerialNumber()
+					k.pageUrl(), k.sessionId(), k.memberSerialNumber()
 				)
 				.orElseGet(() -> {
 					SessionData newSession = SessionData.builder()
@@ -52,6 +54,34 @@ public class SessionDataService {
 	// DB에 반영 완료시 Cache 에서 제거하는 로직
 	public void removeFromCache(SessionDataKey key) {
 		sessionCache.remove(key);
+	}
+
+	//session 엔티티 일련번호는 sessionId+url+serialNum으로 한다.
+	//트랜잭션이 보장 되지 않기 때문에 중복된 데이터가 들어간 경우 원래 있던 데이터에 덮어쓰기 형태가 되어야함.
+	public SessionDataDocument createOrFindSessionDataDocument(SessionDataKey key) {
+		return sessionEsCache.computeIfAbsent(key, k ->
+			sessionDataDocumentRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
+					k.pageUrl(), k.sessionId(), k.memberSerialNumber()
+				)
+				.orElseGet(() -> {
+					SessionDataDocument newSession = SessionDataDocument.builder()
+						.id(k.sessionId() + k.pageUrl() + k.memberSerialNumber())
+						.pageUrl(k.pageUrl())
+						.memberSerialNumber(k.memberSerialNumber())
+						.timestamp(System.currentTimeMillis())
+						.isOutlier(false)
+						.isMissingValue(false)
+						.isSessionEnded(false)
+						.isVerified(false)
+						.build();
+					return sessionDataDocumentRepository.save(newSession);
+				})
+		);
+	}
+
+	// DB에 반영 완료시 Cache 에서 제거하는 로직
+	public void removeFromEsCache(SessionDataKey key) {
+		sessionEsCache.remove(key);
 	}
 
 }
