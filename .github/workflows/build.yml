@@ -45,10 +45,15 @@ jobs:
         working-directory: ./backend
         run: chmod +x ./gradlew
 
-      # Gradle 빌드 (테스트 포함)
+      # Gradle 빌드 
       - name: Build with Gradle
         working-directory: ./backend
         run: ./gradlew clean build
+
+      # 테스트 실행
+      - name: Run tests with Gradle
+        working-directory: ./backend
+        run: ./gradlew test
 
   makeTagAndRelease:
     runs-on: ubuntu-latest
