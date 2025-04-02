@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.register.controller;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,9 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dajava.backend.domain.register.dto.capture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
@@ -26,6 +29,7 @@ import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.dajava.backend.global.utils.PasswordUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.Cookie;
@@ -164,5 +168,76 @@ class RegisterControllerTest {
 			.andExpect(status().isOk());
 
 		resultActions.andExpect(jsonPath("$.registerInfos").isNotEmpty());
+	}
+
+	@Test
+	@DisplayName("솔루션 캡쳐 데이터 저장 : 성공")
+	void t7() throws Exception {
+		// given
+		LocalDateTime now = LocalDateTime.now();
+		RegisterCreateRequest request = new RegisterCreateRequest(
+			"test@example.com",
+			"password123",
+			"localhost:3000/test",
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
+			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
+		);
+
+		// when & then
+		MvcResult result = mockMvc.perform(post("/v1/register")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andReturn();
+
+		// Given Second
+		String createResponse = result.getResponse().getContentAsString();
+		JsonNode createJson = objectMapper.readTree(createResponse);
+		String serialNumber = createJson.get("serialNumber").asText();
+
+		List<String> captureData = List.of("example1", "example2", "example3");
+		PageCaptureRequest pageCaptureRequest = new PageCaptureRequest(captureData);
+
+		// When & Then Second
+		mockMvc.perform(patch("/v1/register/" + serialNumber + "/page-capture")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(pageCaptureRequest)))
+			.andExpect(status().isOk());
+
+		Register updateRegister = registerRepository.findBySerialNumber(serialNumber);
+		String expectedCapture = String.join("", captureData);
+
+		assertEquals(expectedCapture, updateRegister.getPageCapture());
+	}
+
+	@Test
+	@DisplayName("솔루션 캡쳐 데이터 저장 : 실패, 사유 : 잘못된 식별자")
+	void t8() throws Exception {
+		// given
+		LocalDateTime now = LocalDateTime.now();
+		RegisterCreateRequest request = new RegisterCreateRequest(
+			"test@example.com",
+			"password123",
+			"localhost:3000/test",
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
+			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
+		);
+
+		// when & then
+		MvcResult result = mockMvc.perform(post("/v1/register")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andReturn();
+
+		// Given Second
+		String wrongSerialNumber = "wrongSerialNumber";
+
+		List<String> captureData = List.of("example1", "example2", "example3");
+		PageCaptureRequest pageCaptureRequest = new PageCaptureRequest(captureData);
+
+		// When & Then Second
+		mockMvc.perform(patch("/v1/register/" + wrongSerialNumber + "/page-capture")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(pageCaptureRequest)))
+			.andExpect(status().isInternalServerError());
 	}
 }
