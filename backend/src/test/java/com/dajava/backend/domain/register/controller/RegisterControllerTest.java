@@ -28,6 +28,7 @@ import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.register.service.RegisterCacheService;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.dajava.backend.global.exception.ErrorCode;
 import com.dajava.backend.global.utils.PasswordUtils;
@@ -50,6 +51,9 @@ class RegisterControllerTest {
 
 	@Autowired
 	private RegisterService registerService;
+
+	@Autowired
+	private RegisterCacheService registerCacheService;
 
 	@Autowired
 	private RegisterRepository registerRepository;
@@ -199,6 +203,8 @@ class RegisterControllerTest {
 		List<String> captureData = List.of("example1", "example2", "example3");
 		PageCaptureRequest pageCaptureRequest = new PageCaptureRequest(captureData);
 
+		registerCacheService.refreshCacheAll();
+
 		// When & Then Second
 		mockMvc.perform(patch("/v1/register/" + serialNumber + "/page-capture")
 				.contentType(MediaType.APPLICATION_JSON)
@@ -237,10 +243,12 @@ class RegisterControllerTest {
 		List<String> captureData = List.of("example1", "example2", "example3");
 		PageCaptureRequest pageCaptureRequest = new PageCaptureRequest(captureData);
 
+		registerCacheService.refreshCacheAll();
+
 		// When & Then Second
 		mockMvc.perform(patch("/v1/register/" + wrongSerialNumber + "/page-capture")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(pageCaptureRequest)))
-			.andExpect(status().isNotFound());
+			.andExpect(status().isUnauthorized());
 	}
 }

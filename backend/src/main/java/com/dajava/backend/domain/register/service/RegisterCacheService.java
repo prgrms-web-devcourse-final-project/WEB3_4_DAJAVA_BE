@@ -52,6 +52,26 @@ public class RegisterCacheService {
 		log.info("Register serialNumber 캐시 갱신 완료 - {} 건", serialNumberCache.size());
 	}
 
+	/**
+	 * 테스트용: 존재하는 모든 Register 의 serialNumber 를 캐시에 담아 반환하는 메서드.
+	 * (진행중인 Register 만이 아니라 전체를 로드함)
+	 */
+	public Set<String> refreshCacheAll() {
+		List<Register> allRegisters = registerRepository.findAll();
+
+		Set<String> newCache = new HashSet<>();
+		for (Register register : allRegisters) {
+			newCache.add(register.getSerialNumber());
+		}
+
+		this.serialNumberCache = Collections.newSetFromMap(new ConcurrentHashMap<>());
+		this.serialNumberCache.addAll(newCache);
+
+		log.info("모든 Register serialNumber 캐시 갱신 완료 - {} 건", serialNumberCache.size());
+
+		return this.serialNumberCache;
+	}
+
 	public boolean isValidSerialNumber(String serialNumber) {
 		return serialNumberCache.contains(serialNumber);
 	}
