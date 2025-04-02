@@ -108,6 +108,7 @@ public class PointerEventConverter {
 			.scrollHeight(request.scrollHeight())
 			.viewportHeight(request.viewportHeight())
 			.element(request.element())
+			.isOutlier(false)
 			.build();
 	}
 
@@ -124,6 +125,7 @@ public class PointerEventConverter {
 			.scrollY(request.scrollY())
 			.scrollHeight(request.scrollHeight())
 			.viewportHeight(request.viewportHeight())
+			.isOutlier(false)
 			.build();
 	}
 
@@ -138,6 +140,7 @@ public class PointerEventConverter {
 			.scrollY(request.scrollY())
 			.scrollHeight(request.scrollHeight())
 			.viewportHeight(request.viewportHeight())
+			.isOutlier(false)
 			.build();
 	}
 }

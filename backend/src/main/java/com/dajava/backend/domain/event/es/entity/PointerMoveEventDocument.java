@@ -43,5 +43,5 @@ public class PointerMoveEventDocument {
 
 	private Integer viewportHeight;
 
-
+	private Boolean isOutlier;
 }

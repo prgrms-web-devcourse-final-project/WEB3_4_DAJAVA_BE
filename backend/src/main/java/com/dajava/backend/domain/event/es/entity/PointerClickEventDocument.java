@@ -39,5 +39,5 @@ public class PointerClickEventDocument {
 	private Integer viewportHeight;
 	private String element;
 
-
+	private Boolean isOutlier;
 }

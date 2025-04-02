@@ -39,4 +39,6 @@ public class PointerScrollEventDocument {
 
 	private Integer viewportHeight;
 
+	private Boolean isOutlier;
+
 }

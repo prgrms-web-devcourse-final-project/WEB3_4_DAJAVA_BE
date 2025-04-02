@@ -18,6 +18,10 @@ import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
 import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
 import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;
@@ -50,6 +54,18 @@ public class EventBatchServiceTest {
 
 	private ActivityHandleService activityHandleService;
 
+	@Mock
+	private PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
+
+	@Mock
+	private PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
+
+	@Mock
+	private PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
+
+	@Mock
+	private SessionDataDocumentRepository sessionDataDocumentRepository;
+
 	@BeforeEach
 	void setUp() {
 		eventBatchService = new EventBatchService(
@@ -58,7 +74,12 @@ public class EventBatchServiceTest {
 			clickRepository,
 			moveRepository,
 			scrollRepository,
-			sessionDataRepository
+			sessionDataRepository,
+			pointerClickEventDocumentRepository,
+			pointerMoveEventDocumentRepository,
+			pointerScrollEventDocumentRepository,
+			sessionDataDocumentRepository
+
 		);
 
 		activityHandleService = new ActivityHandleService(eventBatchService);
@@ -72,7 +93,7 @@ public class EventBatchServiceTest {
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
-			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerClickEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 100, 200, 0, 1500, 500, "div")
 		);
 
@@ -90,6 +111,7 @@ public class EventBatchServiceTest {
 		verify(clickRepository, times(1)).saveAll(anyList());
 		verify(sessionDataRepository, times(1)).save(sessionData);
 		verify(sessionDataService, never()).removeFromCache(key);
+		//verify(clickEventDocumentRepository, times(1)).saveAll(anyList());
 	}
 
 	@Test
@@ -101,7 +123,7 @@ public class EventBatchServiceTest {
 
 		List<PointerClickEventRequest> clickEvents = Collections.emptyList();
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
-			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerMoveEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 300, 400, 0, 1500, 500)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.emptyList();
@@ -153,15 +175,15 @@ public class EventBatchServiceTest {
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
-			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerClickEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 100, 200, 0, 1500, 500, "div")
 		);
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
-			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerMoveEventRequest("user2", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 300, 400, 0, 1500, 500)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.singletonList(
-			new PointerScrollEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerScrollEventRequest("user3", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 0, 1500, 500)
 		);
 
@@ -182,7 +204,6 @@ public class EventBatchServiceTest {
 		verify(moveRepository, times(1)).saveAll(anyList());
 		verify(scrollRepository, times(1)).saveAll(anyList());
 		verify(sessionDataRepository, times(1)).save(sessionData);
+
 	}
 }
-
-

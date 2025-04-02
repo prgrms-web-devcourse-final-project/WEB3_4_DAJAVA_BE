@@ -25,6 +25,8 @@ public class SessionDataDocument {
 	@Id
 	private String id; // sessionId + pageurl + memberSerialNumber 사용
 
+	private String sessionId;
+
 	private String memberSerialNumber;
 
 	private String pageUrl;

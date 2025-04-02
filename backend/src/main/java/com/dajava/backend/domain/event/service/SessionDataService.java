@@ -66,6 +66,7 @@ public class SessionDataService {
 				.orElseGet(() -> {
 					SessionDataDocument newSession = SessionDataDocument.builder()
 						.id(k.sessionId() + k.pageUrl() + k.memberSerialNumber())
+						.sessionId(k.sessionId())
 						.pageUrl(k.pageUrl())
 						.memberSerialNumber(k.memberSerialNumber())
 						.timestamp(System.currentTimeMillis())
