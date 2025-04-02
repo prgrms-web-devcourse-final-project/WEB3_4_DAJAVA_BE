@@ -13,12 +13,15 @@ import com.dajava.backend.global.common.BaseTimeEntity;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -67,6 +70,11 @@ public class Register extends BaseTimeEntity {
 	@OneToOne(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Solution solution;
 
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	@Column(name = "page_capture", columnDefinition = "TEXT")
+	private String pageCapture;
+
 	public static Register create(
 		final RegisterCreateRequest request
 	) {
@@ -80,6 +88,7 @@ public class Register extends BaseTimeEntity {
 			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
 			.isServiceExpired(false)
 			.isSolutionComplete(false)
+			.pageCapture("")
 			.build();
 	}
 

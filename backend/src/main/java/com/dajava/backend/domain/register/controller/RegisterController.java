@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dajava.backend.domain.register.dto.capture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
@@ -132,5 +133,23 @@ public class RegisterController {
 		HttpServletResponse response
 	) {
 		adminService.login(adminCode, response);
+	}
+
+	/**
+	 * 캡쳐 데이터 PATCH API
+	 * 사용자가 세션 생성시 캡쳐하게 되는 페이지 캡쳐 데이터로 register 의 pageCapture 를 Patch 합니다.
+	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
+	 * @param request 분리된 이미지 캡쳐 String 의 List 입니다.
+	 */
+	@Operation(
+		summary = "솔루션 전체 페이지 캡쳐 데이터 삽입",
+		description = "page-capture 데이터가 없는 경우 데이터를 삽입합니다.")
+	@PatchMapping("/v1/register/{serialNumber}/page-capture")
+	@ResponseStatus(HttpStatus.OK)
+	public void updatePageCapture(
+		@PathVariable String serialNumber,
+		@RequestBody PageCaptureRequest request
+	) {
+		String captureData = String.join("", request.pageCapture());
 	}
 }
