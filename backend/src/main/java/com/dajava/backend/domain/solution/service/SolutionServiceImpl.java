@@ -44,6 +44,12 @@ public class SolutionServiceImpl implements SolutionService {
 
 	private final GeminiApiConfig geminiApiConfig;
 
+	/**
+	 * Gemini API 통신 후 UI 개선 솔루션을 받기 위한 메서드
+	 * @param refineData // 요청할 데이터
+	 * @param serialNumber // 신청자에게 제공된 시리얼 넘버
+	 * @return Mono<SolutionResponse>
+	 */
 	@Override
 	@Transactional
 	public Mono<SolutionResponse> getAISolution(String refineData, String serialNumber) {
@@ -84,6 +90,12 @@ public class SolutionServiceImpl implements SolutionService {
 			});
 	}
 
+	/**
+	 * 솔루션 정보 조회 메서드
+	 * @param serialNumber // 신청자에게 제공된 시리얼 넘버
+	 * @param password // 신청자가 작성한 비밀번호
+	 * @return SolutionInfoResponse
+	 */
 	@Override
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
@@ -98,6 +110,11 @@ public class SolutionServiceImpl implements SolutionService {
 
 	}
 
+	/**
+	 * 이상치 데이터라고 판단된 데이터(SolutionData)들을 조회하는 메서드
+	 * @param serialNumber
+	 * @return SolutionData
+	 */
 	@Override
 	public SolutionData getSolutionData(String serialNumber) {
 		return solutionDataRepository.findBySerialNumber(serialNumber);
