@@ -55,6 +55,13 @@ public class SessionDataDocument {
 		this.isSessionEnded = true;
 	}
 
+	public void markAsVerified() {
+		if (this.isVerified) {
+			throw new PointerEventException(ErrorCode.ALREADY_VERIFIED_SESSION);
+		}
+		this.isVerified = true;
+	}
+
 	public static SessionDataDocument create(String sessionId, String memberSerialNumber, String pageUrl, Long timestamp) {
 		String id = sessionId + "_" + pageUrl + "_" + memberSerialNumber;
 

@@ -9,6 +9,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import com.dajava.backend.domain.event.exception.PointerEventException;
+import com.dajava.backend.global.exception.ErrorCode;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,4 +48,11 @@ public class PointerClickEventDocument {
 	private String element;
 
 	private Boolean isOutlier;
+
+	public void markAsOutlier() {
+		if (this.isOutlier) {
+			throw new PointerEventException(ErrorCode.ALREADY_OUTLIER_DOCUMENT);
+		}
+		this.isOutlier = true;
+	}
 }

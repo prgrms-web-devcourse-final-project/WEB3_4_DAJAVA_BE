@@ -35,7 +35,9 @@ public enum ErrorCode {
 	ALREADY_ENDED_SESSION(HttpStatus.BAD_REQUEST, "세션이 이미 종료되었습니다."),
 	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다."),
 	EVENT_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 이벤트 데이터가 없습니다"),
-	SESSION_DATA_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 세션 데이터가 없습니다");
+	SESSION_DATA_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 세션 데이터가 없습니다"),
+	ALREADY_OUTLIER_DOCUMENT(HttpStatus.BAD_REQUEST, "이미 이상치로 판별된 ES 이벤트 데이터 입니다.");
+
 
 	private final HttpStatus httpStatus;
 	private final String description;

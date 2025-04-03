@@ -10,13 +10,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.event.entity.PointerClickEvent;
-import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
-import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
-import com.dajava.backend.domain.event.scheduler.vaildation.Analyzer;
+import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.component.analyzer.ClickAnalyzerProperties;
-import com.dajava.backend.global.utils.EventsUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,7 +72,6 @@ public class EsClickEventAnalyzer implements EsAnalyzer<PointerClickEventDocumen
 			return;
 		}
 
-		Set<PointerClickEventDocument> rageClicks = new HashSet<>();
 		PointerClickEventDocument[] window = new PointerClickEventDocument[clickEvents.size()];
 		int start = 0, end = 0;
 
@@ -97,16 +92,18 @@ public class EsClickEventAnalyzer implements EsAnalyzer<PointerClickEventDocumen
 			if (count >= minClickCount) {
 				for (int i = start; i < end; i++) {
 					if (isInProximity(window[i], current)) {
-						rageClicks.add(window[i]);
+						try {
+							window[i].markAsOutlier();
+						} catch (PointerEventException ignored) {
+							// 이미 outlier인 경우 무시
+						}
 					}
 				}
 				start = end; // 중복 방지
 			}
 		}
 
-		log.info("감지된 rage click 이벤트 수: {}", rageClicks.size());
-
-		return;
+		log.info("rage click 감지 완료");
 	}
 
 	private boolean isOutOfTimeRange(PointerClickEventDocument first, PointerClickEventDocument current) {
@@ -120,7 +117,7 @@ public class EsClickEventAnalyzer implements EsAnalyzer<PointerClickEventDocumen
 	}
 
 	/**
-	 * 비정상적인 클릭 이벤트를 필터링합니다.
+	 * 비정상적인 클릭 이벤트를 이상치값으로 체크합니다.
 	 *
 	 * @param events PointerClickEventDocument 리스트
 	 * @return void
@@ -130,7 +127,15 @@ public class EsClickEventAnalyzer implements EsAnalyzer<PointerClickEventDocumen
 			return;
 		}
 
-
+		for (PointerClickEventDocument event : events) {
+			if (isSuspiciousClick(event)) {
+				try {
+					event.markAsOutlier();
+				} catch (PointerEventException ignored) {
+					// 이미 이상치로 마킹된 경우는 무시
+				}
+			}
+		}
 	}
 
 	private boolean isSuspiciousClick(PointerClickEventDocument event) {

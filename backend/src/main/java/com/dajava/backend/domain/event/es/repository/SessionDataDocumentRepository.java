@@ -1,7 +1,10 @@
 package com.dajava.backend.domain.event.es.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -32,4 +35,8 @@ public interface SessionDataDocumentRepository
 	);
 
 	Optional<SessionDataDocument> findBySessionId(String sessionId);
+
+	List<SessionDataDocument> findByIsSessionEndedTrue();
+
+	Page<SessionDataDocument> findByIsSessionEndedTrue(Pageable pageable);
 }

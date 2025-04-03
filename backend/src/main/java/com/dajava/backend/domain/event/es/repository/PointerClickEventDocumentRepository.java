@@ -1,5 +1,7 @@
 package com.dajava.backend.domain.event.es.repository;
 
+import java.util.List;
+
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
@@ -10,4 +12,6 @@ import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
  */
 public interface PointerClickEventDocumentRepository
 	extends ElasticsearchRepository<PointerClickEventDocument, String> {
+
+	List<PointerClickEventDocument> findBySessionId(String sessionId);
 }

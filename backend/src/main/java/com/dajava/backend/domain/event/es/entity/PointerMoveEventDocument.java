@@ -8,6 +8,9 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import com.dajava.backend.domain.event.exception.PointerEventException;
+import com.dajava.backend.global.exception.ErrorCode;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,4 +53,11 @@ public class PointerMoveEventDocument {
 	private Integer viewportHeight;
 
 	private Boolean isOutlier;
+
+	public void markAsOutlier() {
+		if (this.isOutlier) {
+			throw new PointerEventException(ErrorCode.ALREADY_OUTLIER_DOCUMENT);
+		}
+		this.isOutlier = true;
+	}
 }

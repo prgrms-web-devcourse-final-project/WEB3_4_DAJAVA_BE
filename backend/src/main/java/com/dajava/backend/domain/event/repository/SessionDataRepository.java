@@ -35,3 +35,4 @@ public interface SessionDataRepository extends JpaRepository<SessionData, Long> 
 	List<SessionData> findEndedSession();
 }
 
+
