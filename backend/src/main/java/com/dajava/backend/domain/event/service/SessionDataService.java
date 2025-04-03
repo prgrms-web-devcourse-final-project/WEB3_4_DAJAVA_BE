@@ -12,6 +12,7 @@ import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
+import com.dajava.backend.global.utils.TimeUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -64,17 +65,12 @@ public class SessionDataService {
 					k.pageUrl(), k.sessionId(), k.memberSerialNumber()
 				)
 				.orElseGet(() -> {
-					SessionDataDocument newSession = SessionDataDocument.builder()
-						.id(k.sessionId() + k.pageUrl() + k.memberSerialNumber())
-						.sessionId(k.sessionId())
-						.pageUrl(k.pageUrl())
-						.memberSerialNumber(k.memberSerialNumber())
-						.timestamp(System.currentTimeMillis())
-						.isOutlier(false)
-						.isMissingValue(false)
-						.isSessionEnded(false)
-						.isVerified(false)
-						.build();
+					SessionDataDocument newSession = SessionDataDocument.create(
+						k.sessionId(),
+						k.memberSerialNumber(),
+						k.pageUrl(),
+						System.currentTimeMillis()
+					);
 					return sessionDataDocumentRepository.save(newSession);
 				})
 		);

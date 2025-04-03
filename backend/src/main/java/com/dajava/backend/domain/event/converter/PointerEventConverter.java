@@ -15,6 +15,7 @@ import com.dajava.backend.domain.event.entity.SolutionEvent;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
+import com.dajava.backend.global.utils.TimeUtils;
 
 public class PointerEventConverter {
 
@@ -100,7 +101,7 @@ public class PointerEventConverter {
 			.sessionId(request.sessionId())
 			.pageUrl(request.pageUrl())
 			.memberSerialNumber(request.memberSerialNumber())
-			.timestamp(request.timestamp())
+			.timestamp(TimeUtils.convertLongToLocalDateTime(request.timestamp()))
 			.browserWidth(request.browserWidth())
 			.clientX(request.clientX())
 			.clientY(request.clientY())
@@ -118,7 +119,7 @@ public class PointerEventConverter {
 			.sessionId(request.sessionId())
 			.pageUrl(request.pageUrl())
 			.memberSerialNumber(request.memberSerialNumber())
-			.timestamp(request.timestamp())
+			.timestamp(TimeUtils.convertLongToLocalDateTime(request.timestamp()))
 			.browserWidth(request.browserWidth())
 			.clientX(request.clientX())
 			.clientY(request.clientY())
@@ -135,7 +136,7 @@ public class PointerEventConverter {
 			.sessionId(request.sessionId())
 			.pageUrl(request.pageUrl())
 			.memberSerialNumber(request.memberSerialNumber())
-			.timestamp(request.timestamp())
+			.timestamp(TimeUtils.convertLongToLocalDateTime(request.timestamp()))
 			.browserWidth(request.browserWidth())
 			.scrollY(request.scrollY())
 			.scrollHeight(request.scrollHeight())
