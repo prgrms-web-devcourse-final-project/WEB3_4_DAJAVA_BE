@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.entity.SolutionEvent;
+import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,6 @@ public record SolutionRequest(
 	@NotBlank(message = "시리얼 번호는 필수입니다.") String serialNumber,
 	@NotNull(message = "이벤트 데이터 목록은 필수입니다.") List<EventDataDto> eventData
 ) {
-
 	/**
 	 * <p>{@code EventDataDto}는 개별 이벤트 데이터를 나타내는 내부 DTO입니다.</p>
 	 * <p>필수 필드는 {@code @NotBlank} 또는 {@code @NotNull} 어노테이션을 사용하여 검증됩니다.</p>
@@ -52,6 +52,20 @@ public record SolutionRequest(
 				event.getBrowserWidth()
 			);
 		}
+
+		public static EventDataDto from(SolutionEventDocument event) {
+			return new EventDataDto(
+				event.getSessionId(),
+				event.getTimestamp(),
+				event.getType(),
+				event.getScrollY(),
+				event.getClientX(),
+				event.getClientY(),
+				event.getElement(),
+				event.getPageUrl(),
+				event.getBrowserWidth()
+			);
+		}
 	}
 
 	/**
@@ -67,4 +81,18 @@ public record SolutionRequest(
 
 		return new SolutionRequest(solutionData.getSerialNumber(), eventDataDtos);
 	}
+
+	/**
+	 * <p>{@code SolutionEventDocument} 리스트를 {@code SolutionRequest} DTO로 변환하는 정적 메서드입니다.</p>
+	 * @param solutionEventDocumentList 변환할 {@code SolutionData} 객체
+	 * @return 변환된 {@code SolutionRequest} 객체
+	 */
+	public static SolutionRequest from(String serialNumber, List<SolutionEventDocument> solutionEventDocumentList) {
+		List<EventDataDto> eventDataDtos = solutionEventDocumentList.stream()
+			.map(EventDataDto::from)
+			.toList();
+
+		return new SolutionRequest(serialNumber, eventDataDtos);
+	}
+
 }
