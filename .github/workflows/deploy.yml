@@ -1,0 +1,131 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/src/**"
+      - "backend/build.gradle"
+      - "backend/build.gradle.kts"
+      - ".github/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 코드 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v2.3.4
+
+      # 1-1. 시크릿 필드 가져오기
+      - name: application-secret.yml 생성
+        env:
+          APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET_YML }}
+        run: echo "$APPLICATION_SECRET" > backend/src/main/resources/application-secret.yml
+
+      # 2. JDK 설정
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      # 3. Gradle 의존성 캐시
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/build.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Gradle 실행 권한 부여
+      - name: Grant execute permission for gradlew
+        working-directory: ./backend
+        run: chmod +x ./gradlew
+
+      # Gradle 빌드 (테스트 포함)
+      - name: Build with Gradle
+        working-directory: ./backend
+        run: ./gradlew clean build
+
+  makeTagAndRelease:
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.create_tag.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Tag
+        id: create_tag
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.new_tag }}
+          release_name: Release ${{ steps.create_tag.outputs.new_tag }}
+          body: ${{ steps.create_tag.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+  buildImageAndPush:
+    name: 도커 이미지 빌드와 푸시
+    needs: makeTagAndRelease
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_IMAGE_NAME: dajava
+    steps:
+      - uses: actions/checkout@v4
+      - name: application-secret.yml 생성
+        env:
+          APPLICATION_SECRET: ${{ secrets.APPLICATION_SECRET_YML }}
+        run: echo "$APPLICATION_SECRET" > backend/src/main/resources/application-secret.yml
+      - name: Docker Buildx 설치
+        uses: docker/setup-buildx-action@v2
+      - name: 레지스트리 로그인
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: set lower case owner name
+        run: |
+          echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
+        env:
+          OWNER: "${{ github.repository_owner }}"
+      - name: 빌드 앤 푸시
+        uses: docker/build-push-action@v3
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_LC }}/${{ env.DOCKER_IMAGE_NAME }}:${{ needs.makeTagAndRelease.outputs.tag_name }},
+            ghcr.io/${{ env.OWNER_LC }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+
+  # deploy:
+  # runs-on: ubuntu-latest
+  # needs: [ buildImageAndPush ]
+  # steps:
+  #   - name: AWS SSM Send-Command
+  #     uses: peterkimzz/aws-ssm-send-command@master
+  #     id: ssm
+  #     with:
+  #       aws-region: ${{ secrets.AWS_REGION }}
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       instance-ids: "i-0c0026b04463751ec"
+  #       working-directory: /
+  #       comment: Deploy
+  #       command: |
+  #         docker pull ghcr.io/choihyunsan/app20250314:latest
+  #         docker stop app1 2>/dev/null
+  #         docker rm app1 2>/dev/null
+  #         docker run -d --name app1 -p 8080:8080 ghcr.io/choihyunsan/app20250314:latest
+  #         docker rmi $(docker images -f "dangling=true" -q)
