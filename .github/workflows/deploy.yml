@@ -124,8 +124,8 @@ jobs:
   #       working-directory: /
   #       comment: Deploy
   #       command: |
-  #         docker pull ghcr.io/choihyunsan/app20250314:latest
-  #         docker stop app1 2>/dev/null
-  #         docker rm app1 2>/dev/null
-  #         docker run -d --name app1 -p 8080:8080 ghcr.io/choihyunsan/app20250314:latest
+  #         docker pull ghcr.io/prgrms-web-devcourse-final-project/dajava:latest
+  #         docker stop dajava 2>/dev/null
+  #         docker rm dajava 2>/dev/null
+  #         docker run -d --name dajava -p 8080:8080 --network common ghcr.io/prgrms-web-devcourse-final-project/dajava:latest
   #         docker rmi $(docker images -f "dangling=true" -q)
