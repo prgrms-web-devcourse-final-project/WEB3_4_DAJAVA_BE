@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.stereotype.Repository;
 
 import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 
@@ -13,6 +14,7 @@ import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
  *
  * author ChoiHyunSan
  */
+@Repository
 public interface SolutionEventDocumentRepository extends ElasticsearchRepository<SolutionEventDocument, Long> {
 
 	/**
