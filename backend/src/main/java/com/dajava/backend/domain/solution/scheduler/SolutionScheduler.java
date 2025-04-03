@@ -36,7 +36,7 @@ public class SolutionScheduler {
 		for (Register register : expiredRegisters) {
 			try {
 				List<SolutionEventDocument> solutionEventDocumentList = solutionEventDocumentRepository
-					.findBySerialNumber(register.getSerialNumber());
+					.findBySerialNumberAndIsOutlier(register.getSerialNumber(), false);
 
 				if (solutionEventDocumentList.isEmpty()) {
 					log.info("No session data for register: {}", register.getSerialNumber());
