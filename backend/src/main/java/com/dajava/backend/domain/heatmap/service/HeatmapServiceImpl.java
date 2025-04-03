@@ -52,8 +52,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 			Register findRegister = registerRepository.findBySerialNumber(serialNumber)
 				.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_INVALID));
 
-			// TODO: 이미지 멀티파트 구현 완료시 이미지 데이터 추가 예정
-
 			// 해싱된 password 로 접근 권한 확인
 			if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
 				throw new SolutionException(SOLUTION_PASSWORD_INVALID);
@@ -82,6 +80,11 @@ public class HeatmapServiceImpl implements HeatmapService {
 			} else {
 				response = createCoordinateHeatmap(events, type);
 			}
+
+			// toBuilder 를 통해 pageCapture 경로값 추가
+			response = response.toBuilder()
+				.pageCapture(findRegister.getPageCapture())
+				.build();
 
 			// 소요 시간 측정
 			long endTime = System.currentTimeMillis();
@@ -112,7 +115,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 			.metadata(HeatmapMetadata.builder()
 				.maxCount(0)
 				.totalEvents(0)
-				.pageUrl("invalid")
+				.pageUrl("unknown")
 				.totalSessions(0)
 				.build())
 			.build();
@@ -244,7 +247,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		HeatmapMetadata metadata = HeatmapMetadata.builder()
 			.maxCount(maxCount)
 			.totalEvents(totalEvents)
-			.pageUrl(pageUrl != null ? pageUrl : "invalid")
+			.pageUrl(pageUrl != null ? pageUrl : "unknown")
 			.totalSessions(totalSessions)
 			.firstEventTime(firstEventTime)
 			.lastEventTime(lastEventTime)
@@ -381,7 +384,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		HeatmapMetadata metadata = HeatmapMetadata.builder()
 			.maxCount((int)(maxDuration / 100))
 			.totalEvents(events.size())
-			.pageUrl(pageUrl != null ? pageUrl : "invalid")
+			.pageUrl(pageUrl != null ? pageUrl : "unknown")
 			.totalSessions(totalSessions)
 			.firstEventTime(firstEventTime)
 			.lastEventTime(lastEventTime)
