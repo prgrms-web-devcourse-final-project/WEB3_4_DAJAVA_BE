@@ -56,7 +56,7 @@ public class SessionDataServiceTest {
 			.build();
 
 		when(sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
-			sessionId, pageUrl, memberSerialNumber
+			pageUrl, sessionId, memberSerialNumber
 		)).thenReturn(Optional.of(existingSession));
 
 		// when
@@ -65,13 +65,13 @@ public class SessionDataServiceTest {
 		// then
 		assertThat(result).isEqualTo(existingSession);
 		verify(sessionDataRepository, times(1))
-			.findByPageUrlAndSessionIdAndMemberSerialNumber(sessionId, pageUrl, memberSerialNumber);
+			.findByPageUrlAndSessionIdAndMemberSerialNumber(pageUrl, sessionId, memberSerialNumber);
 		verify(sessionDataRepository, times(0)).save(any());
 
 		// 동일한 키로 다시 호출하면 캐시에서 가져와야 함
 		sessionDataService.createOrFindSessionData(key);
 		verify(sessionDataRepository, times(1))  // 추가 조회 없음
-			.findByPageUrlAndSessionIdAndMemberSerialNumber(sessionId, pageUrl, memberSerialNumber);
+			.findByPageUrlAndSessionIdAndMemberSerialNumber(pageUrl, sessionId, memberSerialNumber);
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class SessionDataServiceTest {
 		SessionDataKey key = new SessionDataKey(sessionId, pageUrl, memberSerialNumber);
 
 		when(sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
-			sessionId, pageUrl, memberSerialNumber
+			pageUrl, sessionId, memberSerialNumber
 		)).thenReturn(Optional.empty());
 
 		SessionData newSession = SessionData.builder()
@@ -105,7 +105,7 @@ public class SessionDataServiceTest {
 		// then
 		ArgumentCaptor<SessionData> sessionCaptor = ArgumentCaptor.forClass(SessionData.class);
 		verify(sessionDataRepository, times(1))
-			.findByPageUrlAndSessionIdAndMemberSerialNumber(sessionId, pageUrl, memberSerialNumber);
+			.findByPageUrlAndSessionIdAndMemberSerialNumber(pageUrl, sessionId, memberSerialNumber);
 		verify(sessionDataRepository, times(1)).save(sessionCaptor.capture());
 
 		SessionData capturedSession = sessionCaptor.getValue();
@@ -126,14 +126,14 @@ public class SessionDataServiceTest {
 
 		// 먼저 캐시에 세션 데이터 추가
 		when(sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
-			key.sessionId(), key.pageUrl(), key.memberSerialNumber()
+			key.pageUrl(), key.sessionId(), key.memberSerialNumber()
 		)).thenReturn(Optional.of(sessionData));
 
 		sessionDataService.createOrFindSessionData(key);
 
 		// 캐시에서 확인을 위해 저장소 접근 모의 객체 초기화
 		when(sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
-			key.sessionId(), key.pageUrl(), key.memberSerialNumber()
+			key.pageUrl(), key.sessionId(), key.memberSerialNumber()
 		)).thenReturn(Optional.of(sessionData));
 
 		// when
@@ -144,7 +144,7 @@ public class SessionDataServiceTest {
 		sessionDataService.createOrFindSessionData(key);
 		verify(sessionDataRepository, times(2))  // 초기 + 캐시 제거 후 = 2번
 			.findByPageUrlAndSessionIdAndMemberSerialNumber(
-				key.sessionId(), key.pageUrl(), key.memberSerialNumber());
+				key.pageUrl(), key.sessionId(), key.memberSerialNumber());
 	}
 
 	@Test
