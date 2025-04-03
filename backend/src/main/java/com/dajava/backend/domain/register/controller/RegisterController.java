@@ -153,9 +153,9 @@ public class RegisterController {
 	}
 
 	/**
-	 * 캡쳐 데이터 PATCH API
+	 * 캡쳐 데이터 POST API
 	 * 사용자가 세션 생성시 캡쳐하게 되는 페이지 캡쳐 데이터(멀티파트 파일)를 로컬에 저장합니다.
-	 * 이후 반환된 로컬 이미지 경로를 register 의 pageCapture 에 Patch 합니다.
+	 * 이후 반환된 로컬 이미지 경로를 register 의 pageCapture 에 POST 합니다.
 	 *
 	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
 	 * @param imageFile 멀티파트 파일 형식으로 들어오는 전체 페이지 캡쳐 파일입니다.
@@ -163,7 +163,7 @@ public class RegisterController {
 	@Operation(
 		summary = "솔루션 전체 페이지 캡쳐 데이터 삽입",
 		description = "멀티파트 파일로 전송된 이미지를 저장하고, pageCapture 컬럼에 이미지 접근 경로를 삽입합니다.")
-	@PatchMapping(value = "/v1/register/{serialNumber}/page-capture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/v1/register/{serialNumber}/page-capture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	public String updatePageCapture(
 		@PathVariable String serialNumber,

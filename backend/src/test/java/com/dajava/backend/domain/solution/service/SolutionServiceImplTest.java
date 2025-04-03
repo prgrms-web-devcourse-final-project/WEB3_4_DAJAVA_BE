@@ -123,11 +123,10 @@ class SolutionServiceImplTest {
 		String wrongSerialNumber = "aaaa";
 		when(solutionDataRepository.findBySerialNumber(wrongSerialNumber)).thenReturn(null);
 
-		// when
-		SolutionData result = solutionService.getSolutionData(wrongSerialNumber);
+		// when & then
+		assertThrows(Exception.class,
+			() -> solutionService.getSolutionData(wrongSerialNumber));
 
-		// then
-		assertNull(result);
 		verify(solutionDataRepository, times(1)).findBySerialNumber(wrongSerialNumber);
 	}
 }

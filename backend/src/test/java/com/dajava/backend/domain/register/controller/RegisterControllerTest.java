@@ -15,13 +15,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.register.dto.capture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
@@ -200,22 +200,28 @@ class RegisterControllerTest {
 		JsonNode createJson = objectMapper.readTree(createResponse);
 		String serialNumber = createJson.get("serialNumber").asText();
 
-		List<String> captureData = List.of("example1", "example2", "example3");
-		PageCaptureRequest pageCaptureRequest = new PageCaptureRequest(captureData);
+		// 테스트용 이미지 파일 생성
+		MockMultipartFile imageFile = new MockMultipartFile(
+			"imageFile",
+			"test-image.png",
+			"image/png",
+			"테스트 이미지 데이터".getBytes()
+		);
 
 		registerCacheService.refreshCacheAll();
 
 		// When & Then Second
-		mockMvc.perform(patch("/v1/register/" + serialNumber + "/page-capture")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(pageCaptureRequest)))
-			.andExpect(status().isOk());
+		mockMvc.perform(multipart("/v1/register/" + serialNumber + "/page-capture")
+				.file(imageFile))
+			.andExpect(status().isOk())
+			.andExpect(content().string("페이지 캡쳐 데이터가 성공적으로 업데이트되었습니다."));
 
 		Register updateRegister = registerRepository.findBySerialNumber(serialNumber)
 			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
-		String expectedCapture = String.join("", captureData);
 
-		assertEquals(expectedCapture, updateRegister.getPageCapture());
+		// 파일 URL 형식 검증 - UUID 패턴으로 시작하는지 확인
+		assertNotNull(updateRegister.getPageCapture());
+		assertTrue(updateRegister.getPageCapture().startsWith("/page-capture/"));
 	}
 
 	@Test
@@ -232,7 +238,7 @@ class RegisterControllerTest {
 		);
 
 		// when & then
-		MvcResult result = mockMvc.perform(post("/v1/register")
+		mockMvc.perform(post("/v1/register")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andReturn();
@@ -240,15 +246,19 @@ class RegisterControllerTest {
 		// Given Second
 		String wrongSerialNumber = "wrongSerialNumber";
 
-		List<String> captureData = List.of("example1", "example2", "example3");
-		PageCaptureRequest pageCaptureRequest = new PageCaptureRequest(captureData);
+		// 테스트용 이미지 파일 생성
+		MockMultipartFile imageFile = new MockMultipartFile(
+			"imageFile",
+			"test-image.png",
+			"image/png",
+			"테스트 이미지 데이터".getBytes()
+		);
 
 		registerCacheService.refreshCacheAll();
 
 		// When & Then Second
-		mockMvc.perform(patch("/v1/register/" + wrongSerialNumber + "/page-capture")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(pageCaptureRequest)))
+		mockMvc.perform(multipart("/v1/register/" + wrongSerialNumber + "/page-capture")
+				.file(imageFile))
 			.andExpect(status().isUnauthorized());
 	}
 }
