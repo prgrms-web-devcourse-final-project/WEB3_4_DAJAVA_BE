@@ -18,6 +18,7 @@ import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
@@ -120,6 +121,7 @@ public class EventBatchServiceTest {
 		// given
 		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
+		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1", "https://example.com", System.currentTimeMillis());
 
 		List<PointerClickEventRequest> clickEvents = Collections.emptyList();
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
@@ -135,6 +137,7 @@ public class EventBatchServiceTest {
 		when(eventBuffer.flushMoveEvents(key)).thenReturn(moveEvents);
 		when(eventBuffer.flushScrollEvents(key)).thenReturn(scrollEvents);
 		when(sessionDataService.createOrFindSessionData(key)).thenReturn(sessionData);
+		when(sessionDataService.createOrFindSessionDataDocument(key)).thenReturn(sessionDataDocument);
 
 		// when
 		activityHandleService.processInactiveBatchForSession(key);

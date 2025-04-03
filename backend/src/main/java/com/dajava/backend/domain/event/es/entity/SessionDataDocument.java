@@ -47,4 +47,20 @@ public class SessionDataDocument {
 		}
 		this.isSessionEnded = true;
 	}
+
+	public static SessionDataDocument create(String sessionId, String memberSerialNumber, String pageUrl, Long timestamp) {
+		String id = sessionId + "_" + pageUrl + "_" + memberSerialNumber;
+
+		return SessionDataDocument.builder()
+			.id(id)
+			.sessionId(sessionId)
+			.memberSerialNumber(memberSerialNumber)
+			.pageUrl(pageUrl)
+			.timestamp(timestamp)
+			.isOutlier(false)
+			.isMissingValue(false)
+			.isSessionEnded(false)
+			.isVerified(false)
+			.build();
+	}
 }
