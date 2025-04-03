@@ -156,12 +156,12 @@ public class SessionDataServiceTest {
 		String memberSerialNumber = "es_user001";
 		SessionDataKey key = new SessionDataKey(sessionId, pageUrl, memberSerialNumber);
 
-		SessionDataDocument existingDocument = SessionDataDocument.builder()
-			.id(sessionId + pageUrl + memberSerialNumber)
-			.pageUrl(pageUrl)
-			.memberSerialNumber(memberSerialNumber)
-			.timestamp(System.currentTimeMillis())
-			.build();
+		SessionDataDocument existingDocument = SessionDataDocument.create(
+			sessionId,
+			memberSerialNumber,
+			pageUrl,
+			System.currentTimeMillis()
+		);
 
 		when(sessionDataDocumentRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
 			pageUrl, sessionId, memberSerialNumber
@@ -195,16 +195,12 @@ public class SessionDataServiceTest {
 			pageUrl, sessionId, memberSerialNumber
 		)).thenReturn(Optional.empty());
 
-		SessionDataDocument newDoc = SessionDataDocument.builder()
-			.id(sessionId + pageUrl + memberSerialNumber)
-			.pageUrl(pageUrl)
-			.memberSerialNumber(memberSerialNumber)
-			.timestamp(System.currentTimeMillis())
-			.isOutlier(false)
-			.isMissingValue(false)
-			.isSessionEnded(false)
-			.isVerified(false)
-			.build();
+		SessionDataDocument newDoc = SessionDataDocument.create(
+			sessionId,
+			memberSerialNumber,
+			pageUrl,
+			System.currentTimeMillis()
+		);
 
 		when(sessionDataDocumentRepository.save(any())).thenReturn(newDoc);
 
@@ -228,12 +224,12 @@ public class SessionDataServiceTest {
 		String memberSerialNumber = "es_user003";
 		SessionDataKey key = new SessionDataKey(sessionId, pageUrl, memberSerialNumber);
 
-		SessionDataDocument doc = SessionDataDocument.builder()
-			.id(sessionId + pageUrl + memberSerialNumber)
-			.pageUrl(pageUrl)
-			.memberSerialNumber(memberSerialNumber)
-			.timestamp(System.currentTimeMillis())
-			.build();
+		SessionDataDocument doc = SessionDataDocument.create(
+			sessionId,
+			memberSerialNumber,
+			pageUrl,
+			System.currentTimeMillis()
+		);
 
 		when(sessionDataDocumentRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
 			pageUrl, sessionId, memberSerialNumber

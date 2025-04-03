@@ -1,7 +1,12 @@
 package com.dajava.backend.domain.event.es.entity;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,7 +34,8 @@ public class PointerMoveEventDocument {
 
 	private String memberSerialNumber;
 
-	private Long timestamp;
+	@Field(type = FieldType.Date, format = DateFormat.date_time)
+	private LocalDateTime timestamp;
 
 	private Integer browserWidth;
 

@@ -1,10 +1,16 @@
 package com.dajava.backend.domain.event.es.entity;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.exception.ErrorCode;
+import com.dajava.backend.global.utils.TimeUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +41,8 @@ public class SessionDataDocument {
 
 	private boolean isMissingValue;
 
-	private Long timestamp;
+	@Field(type = FieldType.Date, format = DateFormat.date_time)
+	private LocalDateTime timestamp;
 
 	private boolean isSessionEnded;
 
@@ -56,7 +63,7 @@ public class SessionDataDocument {
 			.sessionId(sessionId)
 			.memberSerialNumber(memberSerialNumber)
 			.pageUrl(pageUrl)
-			.timestamp(timestamp)
+			.timestamp(TimeUtils.convertLongToLocalDateTime(timestamp))
 			.isOutlier(false)
 			.isMissingValue(false)
 			.isSessionEnded(false)
