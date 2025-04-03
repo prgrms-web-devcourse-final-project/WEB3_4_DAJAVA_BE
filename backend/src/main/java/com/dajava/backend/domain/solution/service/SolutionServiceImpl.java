@@ -97,6 +97,7 @@ public class SolutionServiceImpl implements SolutionService {
 
 	@Override
 	public SolutionData getSolutionData(String serialNumber) {
-		return solutionDataRepository.findBySerialNumber(serialNumber);
+		return solutionDataRepository.findBySerialNumber(serialNumber)
+			.orElseThrow(() -> new SolutionException(SOLUTION_DATA_NOT_FOUND));
 	}
 }

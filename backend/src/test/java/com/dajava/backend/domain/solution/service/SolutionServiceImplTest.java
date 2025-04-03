@@ -106,7 +106,7 @@ class SolutionServiceImplTest {
 	@Test
 	void getSolutionData_success() {
 		//given
-		when(solutionDataRepository.findBySerialNumber(serialNumber)).thenReturn(solutionData);
+		when(solutionDataRepository.findBySerialNumber(serialNumber)).thenReturn(Optional.ofNullable(solutionData));
 
 		// when
 		SolutionData result = solutionService.getSolutionData(serialNumber);

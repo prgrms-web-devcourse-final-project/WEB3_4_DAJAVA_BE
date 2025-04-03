@@ -1,8 +1,5 @@
 package com.dajava.backend.domain.heatmap.service;
 
-import java.util.List;
-
-import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 
 public interface HeatmapService {
@@ -14,12 +11,4 @@ public interface HeatmapService {
 	 * @return HeatmapResponse
 	 */
 	HeatmapResponse getHeatmap(String serialNumber, String password, String type);
-
-	/**
-	 *
-	 * @param sessions serialNumber 를 통해 가져온 세션 데이터
-	 * @param type 세션 데이터에서 추출할 로그 데이터의 타입
-	 * @return HeatmapResponse
-	 */
-	HeatmapResponse createHeatmap(List<SessionData> sessions, String type);
 }

@@ -3,7 +3,9 @@ package com.dajava.backend.domain.heatmap.dto;
 import java.time.LocalDateTime;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
+@Builder
 @Schema(description = "히트맵 메타데이터")
 public record HeatmapMetadata(
 	@Schema(description = "최대 이벤트 발생 횟수", example = "25")

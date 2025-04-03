@@ -20,6 +20,7 @@ public enum ErrorCode {
 
 	// Solution
 	SOLUTION_SERIAL_NUMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "시리얼 넘버가 없습니다."),
+	SOLUTION_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "솔루션 데이터가 없습니다."),
 	SOLUTION_EVENT_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "이벤트 데이터가 없습니다."),
 	SOLUTION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 솔루션이 없습니다."),
 	SOLUTION_SERIAL_NUMBER_INVALID(HttpStatus.UNAUTHORIZED, "시리얼 넘버가 일치하지 않습니다."),
@@ -38,7 +39,10 @@ public enum ErrorCode {
 	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다."),
 
 	// Session
-	SESSION_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "세션 데이터를 찾을 수 없습니다.");
+	SESSION_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "세션 데이터를 찾을 수 없습니다."),
+
+	// Heatmap
+	INVALID_EVENT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 이벤트 타입입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String description;

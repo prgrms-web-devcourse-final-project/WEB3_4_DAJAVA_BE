@@ -3,7 +3,9 @@ package com.dajava.backend.domain.heatmap.dto;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 
+@Builder
 @Schema(description = "히트맵 응답 DTO")
 public record HeatmapResponse(
 	@Schema(description = "그리드 크기 (픽셀 단위, 현재는 10으로 고정)", example = "10")
