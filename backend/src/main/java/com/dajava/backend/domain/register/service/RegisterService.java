@@ -120,18 +120,29 @@ public class RegisterService {
 	}
 
 	/**
+	 * 일련번호를 통해 Register 정보를 가져옵니다.
+	 *
+	 * @param serialNumber 고유 일련번호 입니다.
+	 * @return Register
+	 */
+	public Register getRegisterBySerialNumber(String serialNumber) {
+		return registerRepository.findBySerialNumber(serialNumber)
+			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
+	}
+
+	/**
 	 * Register pageCapture 수정 메서드
 	 *
 	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
-	 * @param captureData 분리되어 전송된 캡쳐 데이터를 합친 Lob 입니다.
+	 * @param captureDataPath 멀티파트 파일이 저장된 경로입니다.
 	 */
 	@Transactional
-	public void modifyPageCaptureIfAbsent(String serialNumber, String captureData) {
+	public void modifyPageCaptureIfAbsent(String serialNumber, String captureDataPath) {
 		Register register = registerRepository.findBySerialNumber(serialNumber)
 			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
 
 		if (register.getPageCapture() == null || register.getPageCapture().isEmpty()) {
-			register.updatePageCapture(captureData);
+			register.updatePageCapture(captureDataPath);
 			registerRepository.save(register);
 		}
 	}
