@@ -17,7 +17,7 @@ public record HeatmapResponse(
 	@Schema(description = "페이지 전체 높이", example = "3000")
 	int pageHeight,
 
-	@Schema(description = "전체 페이지 캡쳐 이미지 경로", example = "file:///C:/page-capture/91710d82-fb14-4c7c-aed6-761fa2db02f8.png")
+	@Schema(description = "전체 페이지 캡쳐 이미지 경로", example = "/page-capture/91710d82-fb14-4c7c-aed6-761fa2db02f8.png")
 	String pageCapture,
 
 	@Schema(description = "히트맵 그리드 셀 데이터")

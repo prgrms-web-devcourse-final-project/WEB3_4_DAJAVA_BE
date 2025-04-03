@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * HeatmapController
  * 히트맵과 관련된 API 요청 컨트롤러입니다.
  * @author Metronon
+ * @since 2025-04-02
  */
 @RestController
 @RequestMapping("/v1/solution")

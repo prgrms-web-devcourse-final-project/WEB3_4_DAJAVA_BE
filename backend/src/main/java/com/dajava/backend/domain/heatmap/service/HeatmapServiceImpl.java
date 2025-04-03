@@ -31,6 +31,13 @@ import com.dajava.backend.global.utils.PasswordUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 그리드 데이터 생성을 위한 서비스 로직
+ * 모든 SolutionEvent 를 각 타입별로 구분하여 그리드 데이터를 누적합니다.
+ * 30분 이내에 동일한 요청이 들어오면 캐싱된 데이터를 반환합니다.
+ * @author Metronon
+ * @since 2025-04-03
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
