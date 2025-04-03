@@ -325,13 +325,13 @@ public class HeatmapServiceImpl implements HeatmapService {
 			}
 
 			// 전체 페이지 크기 업데이트
-			if (prevEvent.getBrowserWidth() != null) {
-				maxPageWidth = Math.max(maxPageWidth, prevEvent.getBrowserWidth());
+			if (cntEvent.getBrowserWidth() != null) {
+				maxPageWidth = Math.max(maxPageWidth, cntEvent.getBrowserWidth());
 			}
-			if (prevEvent.getScrollHeight() != null) {
-				maxPageHeight = Math.max(maxPageHeight, prevEvent.getScrollHeight());
-			} else if (prevEvent.getViewportHeight() != null) {
-				maxPageHeight = Math.max(maxPageHeight, prevEvent.getViewportHeight());
+			if (cntEvent.getScrollHeight() != null) {
+				maxPageHeight = Math.max(maxPageHeight, cntEvent.getScrollHeight());
+			} else if (cntEvent.getViewportHeight() != null) {
+				maxPageHeight = Math.max(maxPageHeight, cntEvent.getViewportHeight());
 			}
 
 			// 두 이벤트 시간 간격 계산
