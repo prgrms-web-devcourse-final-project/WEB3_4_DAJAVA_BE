@@ -17,6 +17,11 @@ import com.dajava.backend.domain.solution.controller.SolutionController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 솔루션을 도출하기 위한 API(getUXSolution)를 스케줄러로 동작시키는 코드
+ * @author sungkibum
+ * @since 2025-04-01
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
