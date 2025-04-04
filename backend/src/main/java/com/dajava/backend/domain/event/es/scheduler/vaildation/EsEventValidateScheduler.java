@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -100,9 +101,18 @@ public class EsEventValidateScheduler {
 	public void processSession(SessionDataDocument sessionDataDocument) {
 		String sessionId = sessionDataDocument.getSessionId();
 
-		List<PointerClickEventDocument> clickEvents = clickEventDocumentRepository.findBySessionId(sessionId);
-		List<PointerMoveEventDocument> moveEvents = moveEventDocumentRepository.findBySessionId(sessionId);
-		List<PointerScrollEventDocument> scrollEvents = scrollEventDocumentRepository.findBySessionId(sessionId);
+		List<PointerClickEventDocument> clickEvents = clickEventDocumentRepository.findBySessionId(
+			sessionId,
+			Sort.by(Sort.Direction.ASC, "timestamp")
+		);
+		List<PointerMoveEventDocument> moveEvents = moveEventDocumentRepository.findBySessionId(
+			sessionId,
+			Sort.by(Sort.Direction.ASC, "timestamp")
+		);
+		List<PointerScrollEventDocument> scrollEvents = scrollEventDocumentRepository.findBySessionId(
+			sessionId,
+			Sort.by(Sort.Direction.ASC, "timestamp")
+		);
 
 		esClickEventAnalyzer.analyze(clickEvents);
 		esMoveEventAnalyzer.analyze(moveEvents);

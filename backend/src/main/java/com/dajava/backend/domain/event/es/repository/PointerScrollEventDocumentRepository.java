@@ -2,6 +2,7 @@ package com.dajava.backend.domain.event.es.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
@@ -15,4 +16,6 @@ public interface PointerScrollEventDocumentRepository
 	extends ElasticsearchRepository<PointerScrollEventDocument, String> {
 
 	List<PointerScrollEventDocument> findBySessionId(String sessionId);
+
+	List<PointerScrollEventDocument> findBySessionId(String sessionId, Sort sort);
 }
