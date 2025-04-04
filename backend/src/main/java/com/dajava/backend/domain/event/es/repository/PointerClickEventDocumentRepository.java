@@ -14,7 +14,11 @@ import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 public interface PointerClickEventDocumentRepository
 	extends ElasticsearchRepository<PointerClickEventDocument, String> {
 
-	List<PointerClickEventDocument> findBySessionId(String sessionId);
-
+	/**
+	 * sessionId에 해당하는 pointerClickEventDocument를 정렬해 가져옴
+	 *
+	 * @param sessionId
+	 * @return List<PointerClickEventDocument>
+	 */
 	List<PointerClickEventDocument> findBySessionId(String sessionId, Sort sort);
 }

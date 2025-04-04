@@ -13,6 +13,12 @@ import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.global.component.analyzer.ClickAnalyzerProperties;
 
+/*
+ * click docuements 를 분석하는 검증 로직 단위 테스트 입니다.
+ *
+ * @author NohDongHui
+ * @since 2025-04-04
+ */
 @DisplayName("EsClickEventAnalyzer 테스트")
 class EsClickEventAnalyzerTest {
 

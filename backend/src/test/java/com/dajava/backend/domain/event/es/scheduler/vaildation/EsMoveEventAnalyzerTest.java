@@ -12,6 +12,12 @@ import org.junit.jupiter.api.Test;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.global.component.analyzer.MoveAnalyzerProperties;
 
+/*
+ * move docuements 를 분석하는 검증 로직 단위 테스트 입니다.
+ *
+ * @author NohDongHui
+ * @since 2025-04-04
+ */
 @DisplayName("EsMoveEventAnalyzer 테스트")
 class EsMoveEventAnalyzerTest {
 

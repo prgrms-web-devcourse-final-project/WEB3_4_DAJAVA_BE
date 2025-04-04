@@ -61,6 +61,7 @@ public class EsEventValidateScheduler {
 	 * 이상치 데이터는 isoutlier가 true로 저장되며
 	 * click, move, scroll 이벤트 document는 soluitonEventDocument로 변환되어 es에 저장됩니다.
 	 * 한번에 많은 데이터가 메모리에 들어오는 걸 대비해 배치 처리합니다.
+	 * 배치 처리 구현에 페이징을 사용했습니다.
 	 */
 	@Scheduled(fixedRate = VALIDATE_END_SESSION_MS)
 	public void endedSessionValidate() {
@@ -97,7 +98,12 @@ public class EsEventValidateScheduler {
 		} while (!resultPage.isLast());
 	}
 
-
+	/**
+	 * 세션 검증을 진행하는 메소드로 sessionDataDocument의 sessionId로 각 클릭, 무브 ,스크롤
+	 * 데이터를 조회합니다. 조회 시 timestamp를 기준으로 오름차순 합니다.
+	 * 3종류 이벤트 데이터를 SolutionEventDocument로 통합시켜 저장합니다.
+	 *
+	 */
 	public void processSession(SessionDataDocument sessionDataDocument) {
 		String sessionId = sessionDataDocument.getSessionId();
 
@@ -118,7 +124,7 @@ public class EsEventValidateScheduler {
 		esMoveEventAnalyzer.analyze(moveEvents);
 		esScrollEventAnalyzer.analyze(scrollEvents);
 
-		sessionDataDocument.markAsVerified(); // 예외 발생 가능
+		sessionDataDocument.markAsVerified();
 
 		List<SolutionEventDocument> solutionEvents = PointerEventConverter.toSolutionEventDocuments(
 			clickEvents, moveEvents, scrollEvents);

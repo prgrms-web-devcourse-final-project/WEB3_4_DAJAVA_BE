@@ -30,6 +30,12 @@ import com.dajava.backend.domain.event.es.scheduler.vaildation.EsEventValidateSc
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsMoveEventAnalyzer;
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsScrollEventAnalyzer;
 
+/*
+ * es 리포지드에서 데이터를 꺼내 검증하는 스케줄러 통합테스트 입니다.
+ *
+ * @author NohDongHui
+ * @since 2025-04-04
+ */
 @ExtendWith(MockitoExtension.class)
 class EsEventValidateSchedulerTest {
 

@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
-import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 
 /**
@@ -15,7 +14,11 @@ import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 public interface PointerMoveEventDocumentRepository
 	extends ElasticsearchRepository<PointerMoveEventDocument, String> {
 
-	List<PointerMoveEventDocument> findBySessionId(String sessionId);
-
+	/**
+	 * sessionId에 해당하는 pointerMoveEventDocument를 정렬해 가져옴
+	 *
+	 * @param sessionId
+	 * @return List<PointerMoveEventDocument>
+	 */
 	List<PointerMoveEventDocument> findBySessionId(String sessionId, Sort sort);
 }
