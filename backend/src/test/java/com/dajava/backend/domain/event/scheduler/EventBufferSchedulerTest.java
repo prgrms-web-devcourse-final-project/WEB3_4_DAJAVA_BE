@@ -13,6 +13,7 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.service.ActivityHandleService;
 import com.dajava.backend.domain.event.service.EventBatchService;
+import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 
 /*
@@ -32,9 +33,14 @@ public class EventBufferSchedulerTest {
 
 	@BeforeEach
 	void setUp() {
+		BufferSchedulerProperties props = new BufferSchedulerProperties();
+		props.setInactiveSessionDetectThresholdMs("60000"); // String
+		props.setActiveSessionFlushIntervalMs("300000");    // String
+		props.setInactiveThresholdMs(600000L);
+
 		activityHandleService = mock(ActivityHandleService.class);  // EventBatchService mock 추가
 		eventBuffer = new EventBuffer();
-		scheduler = new EventBufferScheduler(activityHandleService, eventBuffer);
+		scheduler = new EventBufferScheduler(activityHandleService, eventBuffer,props);
 	}
 
 	@Test
@@ -46,12 +52,12 @@ public class EventBufferSchedulerTest {
 
 		PointerClickEventRequest oldEvent = new PointerClickEventRequest(
 			"session1", "https://example.com", "user001",
-			System.currentTimeMillis(), 1920, 100, 200
+			System.currentTimeMillis(), 1920, 100, 200, 100, 1000, 100, "div"
 		);
 
 		PointerClickEventRequest activeEvent = new PointerClickEventRequest(
 			"session2", "https://example.com", "user002",
-			System.currentTimeMillis(), 1920, 300, 400
+			System.currentTimeMillis(), 1920, 300, 400, 100, 1000, 100, "div"
 		);
 
 		// 비활성 세션 이벤트 추가
@@ -76,7 +82,7 @@ public class EventBufferSchedulerTest {
 		verify(activityHandleService, times(1)).processInactiveBatchForSession(eq(oldSessionKey));
 
 		// 활성 세션은 처리되지 않았는지 확인
-		verify(activityHandleService, never()).processInactiveBatchForSession(eq(activeSessionKey));
+		verify(activityHandleService, never()).processActiveBatchForSession(eq(activeSessionKey));
 
 		// 활성 세션 이벤트는 여전히 남아 있음
 		List<PointerClickEventRequest> remaining = eventBuffer.getClickBuffer().getEvents(activeSessionKey);

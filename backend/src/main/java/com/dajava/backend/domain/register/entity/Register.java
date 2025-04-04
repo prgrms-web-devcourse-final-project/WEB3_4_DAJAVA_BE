@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.exception.RegisterException;
-import com.dajava.backend.domain.solution.entity.SolutionEntity;
+import com.dajava.backend.domain.solution.entity.Solution;
 import com.dajava.backend.global.common.BaseTimeEntity;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
@@ -65,7 +65,7 @@ public class Register extends BaseTimeEntity {
 	private boolean isSolutionComplete;
 
 	@OneToOne(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true)
-	private SolutionEntity solution;
+	private Solution solution;
 
 	public static Register create(
 		final RegisterCreateRequest request

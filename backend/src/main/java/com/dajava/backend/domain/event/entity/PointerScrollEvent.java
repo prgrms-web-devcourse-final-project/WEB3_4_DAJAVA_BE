@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public class PointerScrollEvent extends BaseTimeEntity implements PointerEvent{
+public class PointerScrollEvent extends BaseTimeEntity implements PointerEvent {
 
 	@Id
 	@GeneratedValue
@@ -27,6 +27,12 @@ public class PointerScrollEvent extends BaseTimeEntity implements PointerEvent{
 
 	@Column(nullable = false)
 	Integer scrollY;
+
+	@Column(nullable = false)
+	int scrollHeight;
+
+	@Column(nullable = false)
+	int viewportHeight;
 
 	@Column(nullable = false)
 	String pageUrl;
@@ -46,6 +52,8 @@ public class PointerScrollEvent extends BaseTimeEntity implements PointerEvent{
 
 	public static PointerScrollEvent create(
 		int scrollY,
+		int scrollHeight,
+		int viewportHeight,
 		String pageUrl,
 		int browserWidth,
 		String sessionId,
@@ -54,6 +62,8 @@ public class PointerScrollEvent extends BaseTimeEntity implements PointerEvent{
 	) {
 		PointerScrollEvent event = PointerScrollEvent.builder()
 			.scrollY(scrollY)
+			.scrollHeight(scrollHeight)
+			.viewportHeight(viewportHeight)
 			.pageUrl(pageUrl)
 			.browserWidth(browserWidth)
 			.sessionId(sessionId)

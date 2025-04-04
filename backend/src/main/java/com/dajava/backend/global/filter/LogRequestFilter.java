@@ -1,12 +1,7 @@
 package com.dajava.backend.global.filter;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -16,13 +11,10 @@ import com.dajava.backend.domain.register.service.RegisterCacheService;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,7 +66,7 @@ public class LogRequestFilter implements Filter {
 					if (!registerCacheService.isValidSerialNumber(memberSerialNumber)) {
 						log.warn("유효하지 않은 memberSerialNumber: {}", memberSerialNumber);
 						httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-						httpResponse.getWriter().write("Invalid serial number");
+						httpResponse.getWriter().write("유효하지 않은 일련번호(member_serial_number) 입니다.");
 						return;
 					}
 
@@ -82,7 +74,7 @@ public class LogRequestFilter implements Filter {
 				} else {
 					log.warn("memberSerialNumber가 요청에 없습니다");
 					httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					httpResponse.getWriter().write("Missing serial number");
+					httpResponse.getWriter().write("일련번호(member_serial_number) 가 존재하지 않습니다.");
 					return;
 				}
 
@@ -91,88 +83,11 @@ public class LogRequestFilter implements Filter {
 			} catch (Exception e) {
 				log.error("로그 요청 처리 중 오류 발생", e);
 				httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				httpResponse.getWriter().write("Error processing request");
+				httpResponse.getWriter().write("로그 데이터 요청 중 오류가 발생했습니다.");
 			}
 		} else {
 			// 다른 요청은 필터 통과
 			chain.doFilter(request, response);
-		}
-	}
-}
-
-/**
- * 요청 바디를 캐시하여 여러 번 읽을 수 있게 하는 HttpServletRequest 래퍼 클래스
- */
-class CachedBodyHttpServletRequest extends HttpServletRequestWrapper {
-
-	private final byte[] cachedBody;
-	private final String cachedBodyString;
-
-	public CachedBodyHttpServletRequest(HttpServletRequest request) throws IOException {
-		super(request);
-
-		// 요청 바디를 바이트 배열로 읽어옴
-		InputStream requestInputStream = request.getInputStream();
-		this.cachedBody = IOUtils.toByteArray(requestInputStream);
-
-		// 인코딩이 null인 경우 기본값 사용
-		String encoding = request.getCharacterEncoding();
-		if (encoding == null) {
-			encoding = "UTF-8"; // 기본 인코딩으로 UTF-8 사용
-		}
-
-		this.cachedBodyString = new String(this.cachedBody, encoding);
-	}
-
-	@Override
-	public ServletInputStream getInputStream() throws IOException {
-		// 캐시된 바디를 기반으로 새 InputStream 반환
-		return new CachedServletInputStream(this.cachedBody);
-	}
-
-	@Override
-	public BufferedReader getReader() throws IOException {
-		// 캐시된 바디를 기반으로 새 Reader 반환
-		String encoding = getCharacterEncoding();
-		if (encoding == null) {
-			encoding = "UTF-8";
-		}
-		return new BufferedReader(new InputStreamReader(getInputStream(), encoding));
-	}
-
-	public String getBody() {
-		return this.cachedBodyString;
-	}
-
-	/**
-	 * 바이트 배열을 기반으로 하는 ServletInputStream 구현
-	 */
-	private static class CachedServletInputStream extends ServletInputStream {
-
-		private final ByteArrayInputStream buffer;
-
-		public CachedServletInputStream(byte[] contents) {
-			this.buffer = new ByteArrayInputStream(contents);
-		}
-
-		@Override
-		public int read() throws IOException {
-			return buffer.read();
-		}
-
-		@Override
-		public boolean isFinished() {
-			return buffer.available() == 0;
-		}
-
-		@Override
-		public boolean isReady() {
-			return true;
-		}
-
-		@Override
-		public void setReadListener(ReadListener listener) {
-			throw new UnsupportedOperationException("ReadListener not supported");
 		}
 	}
 }

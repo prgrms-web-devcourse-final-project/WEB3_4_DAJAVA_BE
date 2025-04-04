@@ -25,10 +25,7 @@ public enum ErrorCode {
 	SOLUTION_TEXT_EMPTY(HttpStatus.BAD_REQUEST, "솔루션 요청할 데이터가 없습니다."),
 	SOLUTION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "JSON 파싱에 오류가 발생했습니다."),
 	SOLUTION_RESPONSE_ERROR(HttpStatus.BAD_REQUEST, "응답 처리 중 오류가 발생했습니다."),
-
-
-
-
+	SOLUTION_EXPIRED_ERROR(HttpStatus.BAD_REQUEST, "솔루션이 이미 종료되었습니다."),
 
 	// Admin
 	INVALID_ADMIN_CODE(HttpStatus.UNAUTHORIZED, "관리자 코드가 올바르지 않습니다."),
@@ -36,10 +33,7 @@ public enum ErrorCode {
 
 	// Event
 	ALREADY_ENDED_SESSION(HttpStatus.BAD_REQUEST, "세션이 이미 종료되었습니다."),
-	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다."),
-
-	// Sample
-	SAMPLE_ERROR(HttpStatus.BAD_REQUEST, "Sample error");
+	ALREADY_VERIFIED_SESSION(HttpStatus.BAD_REQUEST, "이미 검증이 완료된 세션 데이터 입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String description;

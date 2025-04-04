@@ -10,13 +10,18 @@ import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
-import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
+import com.dajava.backend.domain.solution.dto.SolutionRequest;
 import com.dajava.backend.domain.solution.service.SolutionServiceImpl;
 import com.dajava.backend.domain.solution.controller.SolutionController;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 솔루션을 도출하기 위한 API(getUXSolution)를 스케줄러로 동작시키는 코드
+ * @author sungkibum
+ * @since 2025-04-01
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -28,15 +33,14 @@ public class SolutionScheduler {
 
 	@Scheduled(cron = "0 0 0 * * *")	//매일 자정(00:00)에 실행
 	public void processExpiredRegisters() {
-		LocalDateTime today = LocalDateTime.now();
-		List<Register> expiredRegisters = registerRepository.findByEndDateLessThanEqual(today);
+		List<Register> expiredRegisters = registerRepository.findByIsServiceExpiredTrue();
 
 		for (Register register : expiredRegisters) {
 			try {
 				SolutionData solutionData = solutionServiceImpl.getSolutionData(register.getSerialNumber());
 				if (solutionData != null) {
-					SolutionRequestDto solutionRequestDto = SolutionRequestDto.from(solutionData);
-					solutionController.getUXSolution(solutionRequestDto);
+					SolutionRequest solutionRequest = SolutionRequest.from(solutionData);
+					solutionController.getUXSolution(solutionRequest);
 					log.info("Processed expired register: {}", register.getSerialNumber());
 				} else {
 					log.info("No session data for register: {}", register.getSerialNumber());

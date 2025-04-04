@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
-import com.dajava.backend.domain.solution.dto.SolutionRequestDto;
+import com.dajava.backend.domain.solution.dto.SolutionRequest;
+import com.dajava.backend.domain.solution.dto.SolutionResponse;
 import com.dajava.backend.domain.solution.service.SolutionService;
 import com.dajava.backend.global.utils.SolutionUtils;
-import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
-
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,11 +33,11 @@ public class SolutionController {
 
 	@PostMapping
 	@Operation(summary = "사용자 로그 기반 UX 개선 솔루션 요청", description = "사용자의 이벤트 로그 데이터를 AI 모델에 보내 UI/UX 개선 솔루션을 받아옵니다.")
-	public Mono<SolutionResponseDto> getUXSolution(@RequestBody SolutionRequestDto solutionRequestDto) {
+	public Mono<SolutionResponse> getUXSolution(@RequestBody SolutionRequest solutionRequest) {
 		// serialNumber 추출
-		String serialNumber = SolutionUtils.extractsSerialNumber(solutionRequestDto);
+		String serialNumber = SolutionUtils.extractsSerialNumber(solutionRequest);
 		// 이벤트 로그 데이터 추출
-		List<SolutionRequestDto.EventDataDto> eventDataDto = SolutionUtils.extractSolutionEvents(solutionRequestDto);
+		List<SolutionRequest.EventDataDto> eventDataDto = SolutionUtils.extractSolutionEvents(solutionRequest);
 		// 이벤트 로그 데이터와 질문을 합쳐 스트링화
 		String prompt = SolutionUtils.refinePrompt(eventDataDto);
 		// AI 요구 구조로 parsing

@@ -23,11 +23,6 @@ spring:
         highlight_sql: true
         use_sql_comments: true
 
-gemini:
-  api:
-    key: ${DAJAVA_AI_API_KEY}
-    url: ${DAJAVA_AI_API_URL}
-
 logging:
   level:
     com.back: INFO

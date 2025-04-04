@@ -2,7 +2,6 @@ package com.dajava.backend.domain.solution.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static reactor.core.publisher.Mono.*;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,7 +17,7 @@ import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
-import com.dajava.backend.domain.solution.entity.SolutionEntity;
+import com.dajava.backend.domain.solution.entity.Solution;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.domain.solution.repository.SolutionRepository;
 import com.dajava.backend.global.exception.ErrorCode;
@@ -40,7 +39,7 @@ class SolutionServiceImplTest {
 
 	private SolutionData solutionData;
 	private Register register;
-	private SolutionEntity solutionEntity;
+	private Solution solution;
 
 
 	private String serialNumber;
@@ -66,10 +65,9 @@ class SolutionServiceImplTest {
 			.isServiceExpired(false)
 			.isSolutionComplete(false)
 			.build();
-		solutionEntity = new SolutionEntity();
-		solutionEntity.setText("test");
-		solutionEntity.setRegister(register);
-
+		solution = Solution.builder()
+			.text("test")
+			.build();
 	}
 	@Test
 	void getAISolution() {
@@ -79,14 +77,14 @@ class SolutionServiceImplTest {
 	void getSolutionInfo_correctSerialNumberAndPassword() {
 		//given
 		when(registerRepository.findBySerialNumber(serialNumber)).thenReturn(register);
-		when(solutionRepository.findByRegister(register)).thenReturn(Optional.of(solutionEntity));
+		when(solutionRepository.findByRegister(register)).thenReturn(Optional.of(solution));
 
 		// when
 		SolutionInfoResponse result = solutionService.getSolutionInfo(serialNumber, correctPassword);
 
 		//then
 		assertNotNull(result);
-		assertEquals(result.text(), solutionEntity.getText());
+		assertEquals(result.text(), solution.getText());
 		verify(registerRepository, times(1)).findBySerialNumber(serialNumber);
 		verify(solutionRepository, times(1)).findByRegister(register);
 	}
@@ -95,7 +93,7 @@ class SolutionServiceImplTest {
 	void getSolutionInfo_correctSerialNumberAndinCorrectPassword() {
 		//given
 		when(registerRepository.findBySerialNumber(serialNumber)).thenReturn(register);
-		when(solutionRepository.findByRegister(register)).thenReturn(Optional.of(solutionEntity));
+		when(solutionRepository.findByRegister(register)).thenReturn(Optional.of(solution));
 
 		// when
 		SolutionException exception = assertThrows(SolutionException.class,

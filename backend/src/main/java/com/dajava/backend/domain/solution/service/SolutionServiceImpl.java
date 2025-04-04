@@ -5,20 +5,19 @@ import static com.dajava.backend.global.exception.ErrorCode.*;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
-import com.dajava.backend.domain.solution.dto.SolutionResponseDto;
-import com.dajava.backend.domain.solution.entity.SolutionEntity;
+import com.dajava.backend.domain.solution.dto.SolutionResponse;
+import com.dajava.backend.domain.solution.entity.Solution;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.domain.solution.repository.SolutionRepository;
+import com.dajava.backend.global.config.GeminiApiConfig;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,31 +33,28 @@ import reactor.core.publisher.Mono;
  */
 @Service
 @RequiredArgsConstructor
-
 @Slf4j
 public class SolutionServiceImpl implements SolutionService {
-	@Value("${dajava.apiKey}")
-	private String apiKey;
-	@Value("${dajava.url}")
-	private String apiUrl;
 
-	@Autowired
 	private final SolutionRepository solutionRepository;
 
-	@Autowired
 	private final RegisterRepository registerRepository;
 
-	@Autowired
 	private final SolutionDataRepository solutionDataRepository;
 
+	private final GeminiApiConfig geminiApiConfig;
+
+	/**
+	 * Gemini API 통신 후 UI 개선 솔루션을 받기 위한 메서드
+	 * @param refineData // 요청할 데이터
+	 * @param serialNumber // 신청자에게 제공된 시리얼 넘버
+	 * @return Mono<SolutionResponse>
+	 */
 	@Override
-	public Mono<SolutionResponseDto> getAISolution(String refineData, String serialNumber) {
-		WebClient client = WebClient.builder()
-			.baseUrl(apiUrl)
-			.defaultHeader("Content-Type", "application/json")
-			.build();
-		return client.post()
-			.uri(uriBuilder -> uriBuilder.queryParam("key", apiKey).build())
+	@Transactional
+	public Mono<SolutionResponse> getAISolution(String refineData, String serialNumber) {
+		return geminiApiConfig.geminiWebClient().post()
+			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
 			.bodyValue(refineData)
 			.retrieve()
 			.bodyToMono(String.class)
@@ -72,18 +68,15 @@ public class SolutionServiceImpl implements SolutionService {
 						return Mono.error(new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 					}
 					if (text != null) {
-						SolutionEntity solutionEntity = new SolutionEntity();
-						solutionEntity.setText(text);
-						solutionEntity.setRegister(register);
-						solutionRepository.save(solutionEntity);
-						SolutionResponseDto solutionResponseDto = new SolutionResponseDto();
-						solutionResponseDto.setText(text);
-						solutionResponseDto.setRegisterSerialNumber(register.getSerialNumber());
-						if(!register.isServiceExpired()){
-							return Mono.error(new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND));
-						}else{
-							register.setSolutionComplete(true);
-					}
+
+						Solution solution = Solution.builder()
+							.text(text)
+							.register(register)
+							.build();
+						solutionRepository.save(solution);
+						SolutionResponse solutionResponseDto = new SolutionResponse(text);
+						solution.getRegister().setSolutionComplete(true);
+						registerRepository.save(register);
 
 						return Mono.just(solutionResponseDto);
 					} else {
@@ -97,21 +90,31 @@ public class SolutionServiceImpl implements SolutionService {
 			});
 	}
 
+	/**
+	 * 솔루션 정보 조회 메서드
+	 * @param serialNumber // 신청자에게 제공된 시리얼 넘버
+	 * @param password // 신청자가 작성한 비밀번호
+	 * @return SolutionInfoResponse
+	 */
 	@Override
 	public SolutionInfoResponse getSolutionInfo(String serialNumber, String password) {
 		Register findRegister = Optional.ofNullable(registerRepository.findBySerialNumber(serialNumber))
 			.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_INVALID));
-		PasswordUtils passwordUtils = new PasswordUtils();
 		//해시화된 password 검증로직
-		if (!passwordUtils.verifyPassword(password, findRegister.getPassword())) {
+		if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
 			throw new SolutionException(SOLUTION_PASSWORD_INVALID);
 		}
-		SolutionEntity solutionEntity = solutionRepository.findByRegister(findRegister)
+		Solution solution = solutionRepository.findByRegister(findRegister)
 			.orElseThrow(() -> new SolutionException(SOLUTION_NOT_FOUND));
-		return new SolutionInfoResponse(solutionEntity.getText());
+		return new SolutionInfoResponse(solution.getText());
 
 	}
 
+	/**
+	 * 이상치 데이터라고 판단된 데이터(SolutionData)들을 조회하는 메서드
+	 * @param serialNumber
+	 * @return SolutionData
+	 */
 	@Override
 	public SolutionData getSolutionData(String serialNumber) {
 		return solutionDataRepository.findBySerialNumber(serialNumber);
