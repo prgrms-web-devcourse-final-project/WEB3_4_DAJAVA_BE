@@ -2,6 +2,7 @@ server:
   port: 8080
 
 spring:
+
   profiles:
     default: dev
     include: secret
@@ -12,6 +13,8 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  cache:
+    type: redis
   jpa:
     hibernate:
       ddl-auto: create
@@ -26,6 +29,7 @@ spring:
     redis:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
+
 logging:
   level:
     com.back: INFO

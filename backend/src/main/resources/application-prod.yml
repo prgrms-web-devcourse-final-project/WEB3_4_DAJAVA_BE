@@ -19,11 +19,14 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
-
-gemini:
-  api:
-    key: ${DAJAVA_AI_API_KEY}
-    url: ${DAJAVA_AI_API_URL}
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+  gemini:
+    api:
+      key: ${DAJAVA_AI_API_KEY}
+      url: ${DAJAVA_AI_API_URL}
 
 logging:
   level:
