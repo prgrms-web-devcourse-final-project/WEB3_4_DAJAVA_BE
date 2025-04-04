@@ -1,9 +1,11 @@
 package com.dajava.backend.domain.heatmap.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
@@ -27,10 +29,11 @@ public class HeatmapController {
 
 	private final HeatmapService heatmapService;
 
-	@GetMapping("/heatmap/{serialNumber}/{password}")
 	@Operation(
 		summary = "시리얼 번호 기반 전체 히트맵 조회",
 		description = "등록된 시리얼 번호와 비밀번호를 이용해 각 이벤트 타입의 히트맵을 조회합니다.")
+	@GetMapping("/heatmap/{serialNumber}/{password}")
+	@ResponseStatus(HttpStatus.OK)
 	public HeatmapResponse getHeatmap(
 		@PathVariable String serialNumber,
 		@PathVariable String password,
