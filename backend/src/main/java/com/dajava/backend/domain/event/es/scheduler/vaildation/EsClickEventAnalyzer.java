@@ -1,12 +1,8 @@
 package com.dajava.backend.domain.event.es.scheduler.vaildation;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 

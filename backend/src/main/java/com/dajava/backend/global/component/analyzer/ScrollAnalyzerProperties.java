@@ -15,4 +15,5 @@ public class ScrollAnalyzerProperties {
 	private int rageThresholdPerWindow;
 	private int minDirectionChanges;
 	private double contentConsumedThreshold;
+	private int scrollBottomThreshold;
 }
