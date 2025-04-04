@@ -51,12 +51,12 @@ public class EventBufferSchedulerTest {
 		SessionDataKey activeSessionKey = new SessionDataKey("session2", "https://example.com", "user002");
 
 		PointerClickEventRequest oldEvent = new PointerClickEventRequest(
-			"session1", "https://example.com", "user001",
+			"user1", "session1", "https://example.com", "user001",
 			System.currentTimeMillis(), 1920, 100, 200, 100, 1000, 100, "div"
 		);
 
 		PointerClickEventRequest activeEvent = new PointerClickEventRequest(
-			"session2", "https://example.com", "user002",
+			"user2", "session2", "https://example.com", "user002",
 			System.currentTimeMillis(), 1920, 300, 400, 100, 1000, 100, "div"
 		);
 

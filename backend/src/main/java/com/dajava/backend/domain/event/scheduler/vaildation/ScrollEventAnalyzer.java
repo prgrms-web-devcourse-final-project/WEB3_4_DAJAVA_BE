@@ -18,7 +18,7 @@ import com.dajava.backend.global.utils.EventsUtils;
 
 /**
  * 스크롤 이벤트를 분석합니다.
- * 이상 데이터인 경우 true 를 반환합니다.
+ * 이상 데이터를 반환합니다.
  * @author NohDongHui
  */
 @Component
@@ -37,7 +37,7 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 		this.minEventCount = props.getMinEventCount();
 		this.rageThresholdPerWindow = props.getRageThresholdPerWindow();
 		this.minDirectionChanges = props.getMinDirectionChanges();
-		this.scrollBottomThreshold = props.getScrollBottomThreshold();
+		this.scrollBottomThreshold = 2000;
 	}
 
 	@Override
@@ -199,6 +199,7 @@ public class ScrollEventAnalyzer implements Analyzer<PointerScrollEvent> {
 	 * 컨텐츠 소모율 감지
 	 * 모든 스크롤 Y값이 특정 threshold 이하일 경우 이상치 반환
 	 * 프론트에서 scrollHeight 받을 수 있음 값이 아닌 비율로 측정하게 바꿀수 있음
+	 * 현재 이 코드는 사용하지 않음
 	 * @param events 스크롤 이벤트 목록 (시간순 정렬 가정)
 	 * @return 상단 반복 스크롤 감지 시 이상치 반환
 	 */

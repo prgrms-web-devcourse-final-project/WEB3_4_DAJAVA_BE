@@ -1,15 +1,15 @@
 package com.dajava.backend.domain.solution.dto;
 
-import java.util.List;
-import java.time.LocalDateTime;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.dajava.backend.domain.event.entity.SolutionData;
-import com.dajava.backend.domain.event.entity.SolutionEvent;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 
 /**
  * SolutionData 객체 SolutionRequestDto 변환 여부 테스트
@@ -20,14 +20,16 @@ import com.dajava.backend.domain.event.entity.SolutionEvent;
 public class SolutionDtoTest {
 
 	/** 테스트 객체 SolutionData */
-	private SolutionData mockSolutionData;
+	private List<SolutionEventDocument> solutionEventDocuments;
+
+	private String serialNumber;
 
 	/** 독립적 실행을 위해 테스트 실행 전, mockSolutionEvent mockSolutionData 초기화 메서드 */
 	@BeforeEach
 	@DisplayName("테스트 실행 전, mockSolutionEvent mockSolutionData 초기화")
 	void setUp() {
 		// SolutionEvent 객체 생성
-		SolutionEvent mockSolutionEvent = SolutionEvent.builder()
+		SolutionEventDocument mockSolutionEvent = SolutionEventDocument.builder()
 			.sessionId("session1")
 			.pageUrl("https://example.com")
 			.type("click")
@@ -38,11 +40,8 @@ public class SolutionDtoTest {
 			.browserWidth(1024)
 			.build();
 
-		// SolutionData 객체 생성 (SolutionEvent 포함)
-		mockSolutionData = SolutionData.builder()
-			.serialNumber("11db0706-4879-463a-a4d7-f7c347668cc6")
-			.solutionEvents(List.of(mockSolutionEvent))
-			.build();
+		serialNumber = "11db0706-4879-463a-a4d7-f7c347668cc6";
+		solutionEventDocuments = List.of(mockSolutionEvent);
 	}
 
 	/**
@@ -52,11 +51,12 @@ public class SolutionDtoTest {
 	@Test
 	@DisplayName("SolutionData 객체를 SolutionRequestDto로 변환")
 	void testFromSolutionData() {
-		SolutionRequest solutionRequest = SolutionRequest.from(mockSolutionData);
+		SolutionRequest solutionRequest = SolutionRequest.from(serialNumber, solutionEventDocuments);
 
 		// solutionRequestDto의 값 검증
 		assertNotNull(solutionRequest, "SolutionRequestDto 객체는 null이 아니어야 합니다.");
-		assertEquals("11db0706-4879-463a-a4d7-f7c347668cc6", solutionRequest.serialNumber(), "serialNumber 값이 일치해야 합니다.");
+		assertEquals("11db0706-4879-463a-a4d7-f7c347668cc6", solutionRequest.serialNumber(),
+			"serialNumber 값이 일치해야 합니다.");
 		assertNotNull(solutionRequest.eventData(), "eventData 리스트는 null이 아니어야 합니다.");
 		assertEquals(1, solutionRequest.eventData().size(), "eventData 리스트의 크기가 1이어야 합니다.");
 

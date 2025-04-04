@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dajava.backend.domain.event.converter.PointerEventConverter;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
@@ -14,6 +15,14 @@ import com.dajava.backend.domain.event.entity.PointerClickEvent;
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
+import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
+import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
 import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
 import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;
@@ -38,6 +47,10 @@ public class EventBatchService {
 	private final PointerMoveEventRepository moveRepository;
 	private final PointerScrollEventRepository scrollRepository;
 	private final SessionDataRepository sessionDataRepository;
+	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
+	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
+	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
+	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
 	/**
 	 * 각 이벤트 타입의 저장 로직을 배치화한 로직입니다.
@@ -54,6 +67,7 @@ public class EventBatchService {
 		}
 
 		SessionData sessionData = sessionDataService.createOrFindSessionData(sessionDataKey);
+		SessionDataDocument sessionDataDocument = sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		processClickEvents(sessionDataKey, sessionData);
 		processMoveEvents(sessionDataKey, sessionData);
@@ -61,10 +75,13 @@ public class EventBatchService {
 
 		if (isInactive) {
 			sessionDataService.removeFromCache(sessionDataKey);
+			sessionDataService.removeFromEsCache(sessionDataKey);
 			// 세션 종료 flag 값 true 로 변경
 			sessionData.endSession();
+			sessionDataDocument.endSession();
 		}
 		sessionDataRepository.save(sessionData);
+		sessionDataDocumentRepository.save(sessionDataDocument);
 	}
 
 	/**
@@ -80,6 +97,7 @@ public class EventBatchService {
 
 	/**
 	 * 클릭 이벤트의 버퍼에 접근 후, sessionData 에 데이터를 저장합니다.
+	 * 현재 es에도 같이 저장합니다.
 	 * @param sessionDataKey sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
 	 * @param sessionData sessionData 를 통해 클릭 이벤트 전체를 리스트화 해 저장합니다.
 	 */
@@ -88,6 +106,8 @@ public class EventBatchService {
 		log.info("세션 {}: 클릭 이벤트 {} 개 처리", sessionDataKey, clickEvents.size());
 
 		List<PointerClickEvent> entities = new ArrayList<>();
+		//es에 저장할 형태
+		List<PointerClickEventDocument> documents = new ArrayList<>();
 		for (PointerClickEventRequest request : clickEvents) {
 			PointerClickEvent event = PointerClickEvent.create(
 				request.clientX(),
@@ -103,10 +123,14 @@ public class EventBatchService {
 				sessionData
 			);
 			entities.add(event);
+
+			PointerClickEventDocument doc = PointerEventConverter.toClickEventDocument(request);
+			documents.add(doc);
 		}
 
 		if (!entities.isEmpty()) {
 			clickRepository.saveAll(entities);
+			pointerClickEventDocumentRepository.saveAll(documents); // Elasticsearch 저장
 		}
 	}
 
@@ -120,6 +144,8 @@ public class EventBatchService {
 		log.info("세션 {}: 이동 이벤트 {} 개 처리", sessionDataKey, moveEvents.size());
 
 		List<PointerMoveEvent> entities = new ArrayList<>();
+		//es에 저장할 형태
+		List<PointerMoveEventDocument> documents = new ArrayList<>();
 		for (PointerMoveEventRequest request : moveEvents) {
 			PointerMoveEvent event = PointerMoveEvent.create(
 				request.clientX(),
@@ -134,10 +160,14 @@ public class EventBatchService {
 				sessionData
 			);
 			entities.add(event);
+
+			PointerMoveEventDocument doc = PointerEventConverter.toMoveEventDocument(request);
+			documents.add(doc);
 		}
 
 		if (!entities.isEmpty()) {
 			moveRepository.saveAll(entities);
+			pointerMoveEventDocumentRepository.saveAll(documents);
 		}
 	}
 
@@ -151,6 +181,8 @@ public class EventBatchService {
 		log.info("세션 {}: 스크롤 이벤트 {} 개 처리", sessionDataKey, scrollEvents.size());
 
 		List<PointerScrollEvent> entities = new ArrayList<>();
+		//es에 저장할 형태
+		List<PointerScrollEventDocument> documents = new ArrayList<>();
 		for (PointerScrollEventRequest request : scrollEvents) {
 			PointerScrollEvent event = PointerScrollEvent.create(
 				request.scrollY(),
@@ -163,10 +195,14 @@ public class EventBatchService {
 				sessionData
 			);
 			entities.add(event);
+
+			PointerScrollEventDocument doc = PointerEventConverter.toScrollEventDocument(request);
+			documents.add(doc);
 		}
 
 		if (!entities.isEmpty()) {
 			scrollRepository.saveAll(entities);
+			pointerScrollEventDocumentRepository.saveAll(documents);
 		}
 	}
 }

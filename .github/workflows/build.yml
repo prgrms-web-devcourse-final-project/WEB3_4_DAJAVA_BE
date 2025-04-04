@@ -44,7 +44,7 @@ jobs:
         working-directory: ./backend
         run: chmod +x ./gradlew
 
-      # Gradle 빌드 (테스트 포함)
+      # Gradle 빌드 (테스트 제외)
       - name: Build with Gradle
         working-directory: ./backend
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test

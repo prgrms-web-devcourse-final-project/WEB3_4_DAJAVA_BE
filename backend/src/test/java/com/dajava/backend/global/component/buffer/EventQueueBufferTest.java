@@ -29,12 +29,12 @@ public class EventQueueBufferTest {
 	@Test
 	void t1() {
 		PointerClickEventRequest event1 = new PointerClickEventRequest(
-			"session123", "https://example.com", "user001",
+			"user1", "session123", "https://example.com", "user001",
 			System.currentTimeMillis(), 1920, 100, 200,100,100,100,"div"
 		);
 
 		PointerClickEventRequest event2 = new PointerClickEventRequest(
-			"session123", "https://example.com", "user001",
+			"user1","session123", "https://example.com", "user001",
 			System.currentTimeMillis(), 1920, 150, 250,200,100,100,"div"
 		);
 
@@ -49,7 +49,7 @@ public class EventQueueBufferTest {
 	@Test
 	void t2() {
 		PointerClickEventRequest event = new PointerClickEventRequest(
-			"session123", "https://example.com", "user001",
+			"user1", "session123", "https://example.com", "user001",
 			System.currentTimeMillis(), 1280, 50, 80,100,200,100,"div"
 		);
 

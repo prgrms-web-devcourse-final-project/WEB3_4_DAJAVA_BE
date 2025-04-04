@@ -29,6 +29,7 @@ public class EventBufferTest {
 
 	private PointerClickEventRequest createClickEvent(int clientX, int clientY) {
 		return new PointerClickEventRequest(
+		"user1",
 			"session123",
 			"https://example.com",
 			"user001",

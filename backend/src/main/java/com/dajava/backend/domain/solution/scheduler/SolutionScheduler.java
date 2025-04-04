@@ -1,18 +1,16 @@
 package com.dajava.backend.domain.solution.scheduler;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.event.entity.SolutionData;
+import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
+import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
-
-import com.dajava.backend.domain.solution.dto.SolutionRequest;
-import com.dajava.backend.domain.solution.service.SolutionServiceImpl;
 import com.dajava.backend.domain.solution.controller.SolutionController;
+import com.dajava.backend.domain.solution.dto.SolutionRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,22 +27,24 @@ public class SolutionScheduler {
 
 	private final RegisterRepository registerRepository;
 	private final SolutionController solutionController;
-	private final SolutionServiceImpl solutionServiceImpl;
+	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
 
-	@Scheduled(cron = "0 0 0 * * *")	//매일 자정(00:00)에 실행
+	@Scheduled(cron = "0 0 0 * * *")    //매일 자정(00:00)에 실행
 	public void processExpiredRegisters() {
 		List<Register> expiredRegisters = registerRepository.findByIsServiceExpiredTrue();
 
 		for (Register register : expiredRegisters) {
 			try {
-				SolutionData solutionData = solutionServiceImpl.getSolutionData(register.getSerialNumber());
-				if (solutionData != null) {
-					SolutionRequest solutionRequest = SolutionRequest.from(solutionData);
-					solutionController.getUXSolution(solutionRequest);
-					log.info("Processed expired register: {}", register.getSerialNumber());
-				} else {
+				List<SolutionEventDocument> solutionEventDocumentList = solutionEventDocumentRepository
+					.findBySerialNumberAndIsOutlier(register.getSerialNumber(), true);
+
+				if (solutionEventDocumentList.isEmpty()) {
 					log.info("No session data for register: {}", register.getSerialNumber());
 				}
+				SolutionRequest solutionRequest = SolutionRequest.from(register.getSerialNumber(),
+					solutionEventDocumentList);
+				solutionController.getUXSolution(solutionRequest);
+				log.info("Processed expired register: {}", register.getSerialNumber());
 
 			} catch (Exception e) {
 				log.error("Error processing expired register: {}", register.getSerialNumber(), e);

@@ -4,6 +4,7 @@ import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.BeforeEach;
 
+import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 
@@ -20,6 +21,7 @@ public class EventLogServiceTest {
 	private EventBuffer eventBuffer;
 	private EventLogService eventLogService;
 	private ActivityHandleService activityHandleService;
+	private SessionDataDocumentRepository sessionDataDocumentRepository;
 
 	@BeforeEach
 	void setUp() {
@@ -27,9 +29,9 @@ public class EventLogServiceTest {
 		sessionDataService = mock(SessionDataService.class);
 		eventBuffer = mock(EventBuffer.class);
 		activityHandleService = mock(ActivityHandleService.class);
+		sessionDataDocumentRepository = mock(SessionDataDocumentRepository.class);
 		eventLogService = new EventLogServiceImpl(sessionDataRepository, sessionDataService, eventBuffer,
-			activityHandleService);
+			activityHandleService, sessionDataDocumentRepository);
 	}
 
 }
-

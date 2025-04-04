@@ -37,3 +37,4 @@ public interface SessionDataRepository extends JpaRepository<SessionData, Long> 
 	Optional<List<SessionData>> findByMemberSerialNumber(String memberSerialNumber);
 }
 
+
