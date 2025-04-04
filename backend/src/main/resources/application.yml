@@ -2,7 +2,6 @@ server:
   port: 8080
 
 spring:
-
   profiles:
     default: dev
     include: secret
