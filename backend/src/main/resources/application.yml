@@ -2,6 +2,12 @@ server:
   port: 8080
 
 spring:
+  data:
+    elasticsearch:
+      host: localhost
+      port: 9200
+      repositories:
+        enabled: true
   profiles:
     default: dev
     include: secret
