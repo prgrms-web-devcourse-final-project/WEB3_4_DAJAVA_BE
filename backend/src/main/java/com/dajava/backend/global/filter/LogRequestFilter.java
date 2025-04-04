@@ -85,6 +85,21 @@ public class LogRequestFilter implements Filter {
 				httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				httpResponse.getWriter().write("로그 데이터 요청 중 오류가 발생했습니다.");
 			}
+		}
+		// pageCapture API 엔드포인트에 대한 필터
+		else if (path.matches("^/v1/register/[^/]+/page-capture$")) {
+			int prefixLength = "/v1/register/".length();
+			int suffixIndex = path.indexOf("/page-capture");
+			String serialNumber = path.substring(prefixLength, suffixIndex);
+
+			if (!registerCacheService.isValidSerialNumber(serialNumber)) {
+				log.warn("유효하지 않은 serialNumber: {}", serialNumber);
+				httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				httpResponse.getWriter().write("유효하지 않은 일련번호 입니다.");
+				return;
+			}
+			log.debug("유효한 serialNumber: {}", serialNumber);
+			chain.doFilter(request, response);
 		} else {
 			// 다른 요청은 필터 통과
 			chain.doFilter(request, response);

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
@@ -20,8 +21,13 @@ import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyResponse;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
+import com.dajava.backend.domain.register.entity.Register;
+import com.dajava.backend.domain.register.exception.RegisterException;
+import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.AdminService;
 import com.dajava.backend.domain.register.service.RegisterService;
+import com.dajava.backend.domain.register.service.pageCapture.FileStorageService;
+import com.dajava.backend.global.exception.ErrorCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,6 +53,8 @@ public class RegisterController {
 
 	private final RegisterService registerService;
 	private final AdminService adminService;
+	private final FileStorageService fileStorageService;
+	private final RegisterRepository registerRepository;
 
 	/**
 	 * 솔루션 신청 폼 접수 API
@@ -132,5 +140,35 @@ public class RegisterController {
 		HttpServletResponse response
 	) {
 		adminService.login(adminCode, response);
+	}
+
+	/**
+	 * 일련번호로 Register 값을 가져오는 로직입니다.
+	 * @param serialNumber 고유 일련번호 입니다
+	 * @return Register
+	 */
+	public Register findRegisterBySerialNumber(String serialNumber) {
+		return registerRepository.findBySerialNumber(serialNumber)
+			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
+	}
+
+	/**
+	 * 캡쳐 데이터 POST API
+	 * 사용자가 세션 생성시 캡쳐하게 되는 페이지 캡쳐 데이터(멀티파트 파일)를 존재하지 않는 경우, 로컬에 저장합니다.
+	 * 이후 반환된 로컬 이미지 경로를 register 의 pageCapture 에 POST 합니다.
+	 *
+	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
+	 * @param imageFile 멀티파트 파일 형식으로 들어오는 전체 페이지 캡쳐 파일입니다.
+	 */
+	@Operation(
+		summary = "솔루션 전체 페이지 캡쳐 데이터 삽입",
+		description = "멀티파트 파일로 전송된 이미지를 저장하고, pageCapture 컬럼에 이미지 접근 경로를 삽입합니다.")
+	@PostMapping(value = "/v1/register/{serialNumber}/page-capture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public String updatePageCapture(
+		@PathVariable String serialNumber,
+		@RequestParam("imageFile") MultipartFile imageFile
+	) {
+		return registerService.modifyPageCapture(serialNumber, imageFile);
 	}
 }
