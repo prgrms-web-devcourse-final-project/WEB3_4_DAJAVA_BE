@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dajava.backend.domain.register.RegisterInfo;
 import com.dajava.backend.domain.register.converter.RegisterConverter;
@@ -24,6 +25,7 @@ import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
 import com.dajava.backend.domain.register.repository.OrderRepository;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.register.service.pageCapture.FileStorageService;
 import com.dajava.backend.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class RegisterService {
 	private final RegisterRepository registerRepository;
 	private final OrderRepository orderRepository;
 	private final RegisterValidator registerValidator;
+	private final FileStorageService fileStorageService;
 
 	/**
 	 * 서비스 Register 생성 메서드
@@ -120,30 +123,27 @@ public class RegisterService {
 	}
 
 	/**
-	 * 일련번호를 통해 Register 정보를 가져옵니다.
-	 *
-	 * @param serialNumber 고유 일련번호 입니다.
-	 * @return Register
-	 */
-	public Register getRegisterBySerialNumber(String serialNumber) {
-		return registerRepository.findBySerialNumber(serialNumber)
-			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
-	}
-
-	/**
-	 * Register pageCapture 수정 메서드
+	 * 페이지 캡쳐 데이터를 업데이트합니다.
 	 *
 	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
-	 * @param captureDataPath 멀티파트 파일이 저장된 경로입니다.
+	 * @param imageFile 멀티파트 파일 형식으로 들어오는 전체 페이지 캡쳐 파일입니다.
+	 * @return 처리 결과 메시지
 	 */
-	@Transactional
-	public void modifyPageCaptureIfAbsent(String serialNumber, String captureDataPath) {
+	public String modifyPageCapture(String serialNumber, MultipartFile imageFile) {
 		Register register = registerRepository.findBySerialNumber(serialNumber)
 			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
 
-		if (register.getPageCapture() == null || register.getPageCapture().isEmpty()) {
-			register.updatePageCapture(captureDataPath);
-			registerRepository.save(register);
+		// 페이지 저장 경로가 존재한다면 이미지 저장 작업을 진행하지 않음
+		if (register.getPageCapture() != null && !register.getPageCapture().isEmpty()) {
+			return "이미 페이지 캡쳐 데이터가 존재합니다.";
 		}
+
+		// 파일 저장 서비스에 접근해 이미지 파일을 로컬에 저장, 경로 문자열을 반환받습니다.
+		String fileUrl = fileStorageService.storeFile(imageFile);
+
+		register.updatePageCapture(fileUrl);
+		registerRepository.save(register);
+
+		return "페이지 캡쳐 데이터가 성공적으로 업데이트되었습니다.";
 	}
 }

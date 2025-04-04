@@ -154,7 +154,7 @@ public class RegisterController {
 
 	/**
 	 * 캡쳐 데이터 POST API
-	 * 사용자가 세션 생성시 캡쳐하게 되는 페이지 캡쳐 데이터(멀티파트 파일)를 로컬에 저장합니다.
+	 * 사용자가 세션 생성시 캡쳐하게 되는 페이지 캡쳐 데이터(멀티파트 파일)를 존재하지 않는 경우, 로컬에 저장합니다.
 	 * 이후 반환된 로컬 이미지 경로를 register 의 pageCapture 에 POST 합니다.
 	 *
 	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
@@ -169,17 +169,6 @@ public class RegisterController {
 		@PathVariable String serialNumber,
 		@RequestParam("imageFile") MultipartFile imageFile
 	) {
-		Register register = registerService.getRegisterBySerialNumber(serialNumber);
-
-		// 페이지 저장 경로가 존재한다면 이미지 저장 작업을 진행하지 않음
-		if (register.getPageCapture() != null && !register.getPageCapture().isEmpty()) {
-			return "이미 페이지 캡쳐 데이터가 존재합니다.";
-		}
-
-		// 파일 저장 서비스에 접근해 이미지 파일을 로컬에 저장, 경로 문자열을 반환받습니다.
-		String fileUrl = fileStorageService.storeFile(imageFile);
-		registerService.modifyPageCaptureIfAbsent(serialNumber, fileUrl);
-
-		return "페이지 캡쳐 데이터가 성공적으로 업데이트되었습니다.";
+		return registerService.modifyPageCapture(serialNumber, imageFile);
 	}
 }
