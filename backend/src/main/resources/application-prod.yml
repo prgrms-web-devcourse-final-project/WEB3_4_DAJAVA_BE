@@ -2,6 +2,12 @@ server:
   port: 8080
 
 spring:
+  data:
+    elasticsearch:
+      host: elasticsearch
+      port: 9200
+      repositories:
+        enabled: true
   application:
     name: dajava_server
   datasource:

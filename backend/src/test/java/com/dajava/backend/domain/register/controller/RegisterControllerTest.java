@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
-import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -184,18 +183,14 @@ class RegisterControllerTest {
 	@Test
 	@DisplayName("솔루션 조회 : 성공")
 	void t6() throws Exception {
-		t1();
-
-		RegistersInfoRequest request = new RegistersInfoRequest(
-			10, 0
-		);
+		t1(); // 인증용 쿠키 설정 등 준비 코드
 
 		ResultActions resultActions = mockMvc.perform(get("/v1/registers")
-				.contentType(MediaType.APPLICATION_JSON)
-				.cookie(new Cookie(cookieKey, cookieValue))
-				.accept(MediaType.APPLICATION_JSON)  // Accept 헤더 추가
-				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isOk());
+			.accept(MediaType.APPLICATION_JSON)
+			.param("pageSize", "10")
+			.param("pageNum", "0")
+			.cookie(new Cookie(cookieKey, cookieValue)) // ✅ 여기 괄호 닫기
+		);
 
 		resultActions.andExpect(jsonPath("$.registerInfos").isNotEmpty());
 	}
