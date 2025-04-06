@@ -58,21 +58,21 @@ public class HeatmapServiceImpl implements HeatmapService {
 		long startTime = System.currentTimeMillis();
 		try {
 			Register findRegister = registerRepository.findBySerialNumber(serialNumber)
-				.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_INVALID));
+				.orElseThrow(() -> new HeatmapException(SOLUTION_SERIAL_NUMBER_INVALID));
 
 			// 해싱된 password 로 접근 권한 확인
 			if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
-				throw new SolutionException(SOLUTION_PASSWORD_INVALID);
+				throw new HeatmapException(SOLUTION_PASSWORD_INVALID);
 			}
 
 			// SolutionData 가져오기
 			SolutionData solutionData = solutionDataRepository.findBySerialNumber(serialNumber)
-				.orElseThrow(() -> new SolutionException(SOLUTION_DATA_NOT_FOUND));
+				.orElseThrow(() -> new HeatmapException(SOLUTION_DATA_NOT_FOUND));
 
 			// SolutionEvent 의 List 가져오기
 			List<SolutionEvent> events = solutionData.getSolutionEvents();
 			if (events.isEmpty()) {
-				throw new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND);
+				throw new HeatmapException(SOLUTION_EVENT_DATA_NOT_FOUND);
 			}
 
 			// 이벤트 샘플링으로 데이터가 방대한 경우 반환 시간 최적화
