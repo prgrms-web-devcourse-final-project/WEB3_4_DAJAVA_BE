@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.event.es.scheduler.vaildation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -9,12 +10,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.converter.PointerEventConverter;
-import com.dajava.backend.domain.event.entity.PointerClickEvent;
-import com.dajava.backend.domain.event.entity.PointerMoveEvent;
-import com.dajava.backend.domain.event.entity.PointerScrollEvent;
-import com.dajava.backend.domain.event.entity.SessionData;
-import com.dajava.backend.domain.event.entity.SolutionData;
-import com.dajava.backend.domain.event.entity.SolutionEvent;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
@@ -25,7 +20,11 @@ import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRep
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
+import com.dajava.backend.domain.event.es.service.PointerEventDocumentService;
+import com.dajava.backend.domain.event.es.service.SessionDataDocumentService;
+import com.dajava.backend.domain.event.es.service.SolutionEventDocumentService;
 import com.dajava.backend.domain.event.exception.PointerEventException;
+import com.dajava.backend.global.component.analyzer.ValidateSchedulerProperties;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 검증 로직을 주기적으로 실행하는 스케줄러 입니다.
  * es에서 데이터를 조회합니다.
+ *
  * @author NohDongHui
  */
 @Slf4j
@@ -40,21 +40,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EsEventValidateScheduler {
 
-	private final SessionDataDocumentRepository sessionDataDocumentRepository;
-	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
-	private final PointerClickEventDocumentRepository clickEventDocumentRepository;
-	private final PointerMoveEventDocumentRepository moveEventDocumentRepository;
-	private final PointerScrollEventDocumentRepository scrollEventDocumentRepository;
+	private final SessionDataDocumentService sessionDataDocumentService;
+	private final SolutionEventDocumentService solutionEventDocumentService;
+	private final PointerEventDocumentService pointerEventDocumentService;
 
 	private final EsClickEventAnalyzer esClickEventAnalyzer;
 	private final EsMoveEventAnalyzer esMoveEventAnalyzer;
 	private final EsScrollEventAnalyzer esScrollEventAnalyzer;
 
-	// 비활성 상태 간주 시간 (10분)
-	private static final long VALIDATE_END_SESSION_MS = 10L * 60 * 1000;
+	private final ValidateSchedulerProperties validateSchedulerProperties;
 
-	//배치 사이즈
-	private static final int BATCH_SIZE = 500;
+
 
 	/**
 	 * 주기적으로 es에서 세션 종료된 세션 데이터를 꺼내 검증합니다.
@@ -62,16 +58,18 @@ public class EsEventValidateScheduler {
 	 * click, move, scroll 이벤트 document는 soluitonEventDocument로 변환되어 es에 저장됩니다.
 	 * 한번에 많은 데이터가 메모리에 들어오는 걸 대비해 배치 처리합니다.
 	 * 배치 처리 구현에 페이징을 사용했습니다.
+	 * 그래도 메모리 터지는 경우 최대 데이터 상한선을 설정해 스케줄러가 처리 가능한 데이터 제한
 	 */
-	@Scheduled(fixedRate = VALIDATE_END_SESSION_MS)
+	@Scheduled(fixedRateString = "#{@validateSchedulerProperties.validateEndSessionMs}")
 	public void endedSessionValidate() {
 
+		int batchSize = validateSchedulerProperties.getBatchSize();
 		int page = 0;
+
 		Page<SessionDataDocument> resultPage;
 
 		do {
-			PageRequest pageRequest = PageRequest.of(page, BATCH_SIZE);
-			resultPage = sessionDataDocumentRepository.findByIsSessionEndedTrue(pageRequest);
+			resultPage = sessionDataDocumentService.getEndedSessions(page, batchSize);
 
 			log.info("Batch {}: SessionData size : {}", page, resultPage.getContent().size());
 
@@ -107,18 +105,10 @@ public class EsEventValidateScheduler {
 	public void processSession(SessionDataDocument sessionDataDocument) {
 		String sessionId = sessionDataDocument.getSessionId();
 
-		List<PointerClickEventDocument> clickEvents = clickEventDocumentRepository.findBySessionId(
-			sessionId,
-			Sort.by(Sort.Direction.ASC, "timestamp")
-		);
-		List<PointerMoveEventDocument> moveEvents = moveEventDocumentRepository.findBySessionId(
-			sessionId,
-			Sort.by(Sort.Direction.ASC, "timestamp")
-		);
-		List<PointerScrollEventDocument> scrollEvents = scrollEventDocumentRepository.findBySessionId(
-			sessionId,
-			Sort.by(Sort.Direction.ASC, "timestamp")
-		);
+		int batchSize = validateSchedulerProperties.getBatchSize();
+		List<PointerClickEventDocument> clickEvents = pointerEventDocumentService.fetchAllClickEventDocumentsBySessionId(sessionId, batchSize);
+		List<PointerMoveEventDocument> moveEvents = pointerEventDocumentService.fetchAllMoveEventDocumentsBySessionId(sessionId, batchSize);
+		List<PointerScrollEventDocument> scrollEvents = pointerEventDocumentService.fetchAllScrollEventDocumentsBySessionId(sessionId, batchSize);
 
 		esClickEventAnalyzer.analyze(clickEvents);
 		esMoveEventAnalyzer.analyze(moveEvents);
@@ -129,6 +119,7 @@ public class EsEventValidateScheduler {
 		List<SolutionEventDocument> solutionEvents = PointerEventConverter.toSolutionEventDocuments(
 			clickEvents, moveEvents, scrollEvents);
 
-		solutionEventDocumentRepository.saveAll(solutionEvents);
+		solutionEventDocumentService.saveAllSolutionEvents(solutionEvents);
 	}
+
 }

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,10 @@ import com.dajava.backend.domain.event.es.scheduler.vaildation.EsClickEventAnaly
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsEventValidateScheduler;
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsMoveEventAnalyzer;
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsScrollEventAnalyzer;
+import com.dajava.backend.domain.event.es.service.PointerEventDocumentService;
+import com.dajava.backend.domain.event.es.service.SessionDataDocumentService;
+import com.dajava.backend.domain.event.es.service.SolutionEventDocumentService;
+import com.dajava.backend.global.component.analyzer.ValidateSchedulerProperties;
 
 /*
  * es 리포지드에서 데이터를 꺼내 검증하는 스케줄러 통합테스트 입니다.
@@ -39,25 +44,31 @@ import com.dajava.backend.domain.event.es.scheduler.vaildation.EsScrollEventAnal
 @ExtendWith(MockitoExtension.class)
 class EsEventValidateSchedulerTest {
 
-	@Mock private SessionDataDocumentRepository sessionRepo;
-	@Mock private SolutionEventDocumentRepository solutionRepo;
-	@Mock private PointerClickEventDocumentRepository clickRepo;
-	@Mock private PointerMoveEventDocumentRepository moveRepo;
-	@Mock private PointerScrollEventDocumentRepository scrollRepo;
+	@Mock private SessionDataDocumentService sessionDataDocumentService;
+	@Mock private SolutionEventDocumentService solutionEventDocumentService;
+	@Mock private PointerEventDocumentService pointerEventDocumentService;
 
-	@Mock private EsClickEventAnalyzer clickAnalyzer;
-	@Mock private EsMoveEventAnalyzer moveAnalyzer;
-	@Mock private EsScrollEventAnalyzer scrollAnalyzer;
+	@Mock private EsClickEventAnalyzer esClickEventAnalyzer;
+	@Mock private EsMoveEventAnalyzer esMoveEventAnalyzer;
+	@Mock private EsScrollEventAnalyzer esScrollEventAnalyzer;
+
+	@Mock private ValidateSchedulerProperties validateSchedulerProperties;
 
 	@InjectMocks
 	private EsEventValidateScheduler scheduler;
+
+	@BeforeEach
+	void setup() {
+		when(validateSchedulerProperties.getBatchSize()).thenReturn(100);
+	}
 
 	@Test
 	@DisplayName("processSession이 정상적으로 동작하는 경우")
 	void testProcessSession_success() {
 		// given
+		String sessionId = "test-session";
 		SessionDataDocument session = mock(SessionDataDocument.class);
-		when(session.getSessionId()).thenReturn("test-session");
+		when(session.getSessionId()).thenReturn(sessionId);
 
 		List<PointerClickEventDocument> clickEvents = List.of(
 			PointerClickEventDocument.builder().isOutlier(false).timestamp(LocalDateTime.now()).build()
@@ -69,15 +80,12 @@ class EsEventValidateSchedulerTest {
 			PointerScrollEventDocument.builder().isOutlier(false).timestamp(LocalDateTime.now()).build()
 		);
 
-		when(clickRepo.findBySessionId(eq("test-session"), any(Sort.class))).thenReturn(clickEvents);
-		when(moveRepo.findBySessionId(eq("test-session"), any(Sort.class))).thenReturn(moveEvents);
-		when(scrollRepo.findBySessionId(eq("test-session"), any(Sort.class))).thenReturn(scrollEvents);
+		when(pointerEventDocumentService.fetchAllClickEventDocumentsBySessionId(eq(sessionId), anyInt())).thenReturn(clickEvents);
+		when(pointerEventDocumentService.fetchAllMoveEventDocumentsBySessionId(eq(sessionId), anyInt())).thenReturn(moveEvents);
+		when(pointerEventDocumentService.fetchAllScrollEventDocumentsBySessionId(eq(sessionId), anyInt())).thenReturn(scrollEvents);
 
-		List<SolutionEventDocument> solutionDocs = List.of(
-			mock(SolutionEventDocument.class)
-		);
+		List<SolutionEventDocument> solutionDocs = List.of(mock(SolutionEventDocument.class));
 
-		// static method mock (PointerEventConverter)
 		try (MockedStatic<PointerEventConverter> mocked = mockStatic(PointerEventConverter.class)) {
 			mocked.when(() -> PointerEventConverter.toSolutionEventDocuments(clickEvents, moveEvents, scrollEvents))
 				.thenReturn(solutionDocs);
@@ -86,11 +94,11 @@ class EsEventValidateSchedulerTest {
 			scheduler.processSession(session);
 
 			// then
-			verify(clickAnalyzer).analyze(clickEvents);
-			verify(moveAnalyzer).analyze(moveEvents);
-			verify(scrollAnalyzer).analyze(scrollEvents);
+			verify(esClickEventAnalyzer).analyze(clickEvents);
+			verify(esMoveEventAnalyzer).analyze(moveEvents);
+			verify(esScrollEventAnalyzer).analyze(scrollEvents);
 			verify(session).markAsVerified();
-			verify(solutionRepo).saveAll(solutionDocs);
+			verify(solutionEventDocumentService).saveAllSolutionEvents(solutionDocs);
 		}
 	}
 }
