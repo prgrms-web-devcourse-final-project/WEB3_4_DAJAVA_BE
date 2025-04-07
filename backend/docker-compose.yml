@@ -1,19 +1,4 @@
-version: '3.7'
-
 services:
-  app:
-    build: .
-    container_name: my-spring-app
-    ports:
-      - "8080:8080"
-    depends_on:
-      - redis
-    environment:
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-    networks:
-      - elastic
-
   redis:
     image: redis:7
     container_name: my-redis
@@ -24,22 +9,22 @@ services:
     restart: always
     networks:
       - elastic
-
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.14
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    ports:
-      - "9200:9200"
-    networks:
-      - elastic
+   image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+   container_name: elasticsearch
+   platform: linux/amd64
+   environment:
+     - discovery.type=single-node
+     - bootstrap.memory_lock=true
+     - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+   ulimits:
+     memlock:
+       soft: -1
+       hard: -1
+   ports:
+     - "9200:9200"
+   networks:
+     - elastic
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.14
@@ -52,7 +37,6 @@ services:
       - elasticsearch
     networks:
       - elastic
-
 volumes:
   redis_data:
 

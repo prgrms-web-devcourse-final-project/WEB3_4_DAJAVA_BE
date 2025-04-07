@@ -48,10 +48,6 @@ dependencies {
 
     // env
     implementation 'me.paulschwarz:spring-dotenv:3.0.0'
-    // redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-
 
     //ES
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
@@ -62,6 +58,8 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
 
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 test {
