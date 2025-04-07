@@ -3,6 +3,7 @@ package com.dajava.backend.global.utils;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 
 public class TimeUtils {
@@ -18,12 +19,32 @@ public class TimeUtils {
 	}
 
 	/**
-	 * 타임스탬프를 localDateTime으로 변환
+	 * Epoch millisecond (Long) 값을 LocalDateTime으로 변환
 	 *
-	 * @param timestamp long 형태 타임스탬프
-	 * @return localDateTime 형식
+	 * @param epochMillis 밀리초 단위의 timestamp
+	 * @return LocalDateTime (UTC 기준)
 	 */
-	public static LocalDateTime convertLongToLocalDateTime(long timestamp) {
-		return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+	public static LocalDateTime toLocalDateTime(Long epochMillis) {
+		if (epochMillis == null) {
+			return null;
+		}
+		return LocalDateTime.ofEpochSecond(
+			epochMillis / 1000,
+			(int) (epochMillis % 1000) * 1_000_000,
+			ZoneOffset.UTC
+		);
+	}
+
+	/**
+	 * LocalDateTime을 epoch milliseconds(Long)로 변환
+	 *
+	 * @param localDateTime 변환할 LocalDateTime
+	 * @return epoch millisecond
+	 */
+	public static Long toEpochMillis(LocalDateTime localDateTime) {
+		if (localDateTime == null) {
+			return null;
+		}
+		return localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
 	}
 }

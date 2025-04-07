@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.event.es.entity;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
@@ -41,8 +42,7 @@ public class SessionDataDocument {
 
 	private boolean isMissingValue;
 
-	@Field(type = FieldType.Date, format = DateFormat.date_time)
-	private LocalDateTime timestamp;
+	private Long timestamp;
 
 	private boolean isSessionEnded;
 
@@ -70,11 +70,15 @@ public class SessionDataDocument {
 			.sessionId(sessionId)
 			.memberSerialNumber(memberSerialNumber)
 			.pageUrl(pageUrl)
-			.timestamp(TimeUtils.convertLongToLocalDateTime(timestamp))
+			.timestamp(timestamp)
 			.isOutlier(false)
 			.isMissingValue(false)
 			.isSessionEnded(false)
 			.isVerified(false)
 			.build();
+	}
+
+	public LocalDateTime getTimestamp() {
+		return TimeUtils.toLocalDateTime(this.timestamp);
 	}
 }

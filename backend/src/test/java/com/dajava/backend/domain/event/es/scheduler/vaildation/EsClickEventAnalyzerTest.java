@@ -3,6 +3,7 @@ package com.dajava.backend.domain.event.es.scheduler.vaildation;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ class EsClickEventAnalyzerTest {
 
 	private EsClickEventAnalyzer analyzer;
 
+
 	@BeforeEach
 	void setUp() {
 		ClickAnalyzerProperties props = new ClickAnalyzerProperties();
@@ -34,7 +36,7 @@ class EsClickEventAnalyzerTest {
 		analyzer = new EsClickEventAnalyzer(props);
 	}
 
-	private PointerClickEventDocument createEvent(LocalDateTime time, int clientX, int clientY, String tag) {
+	private PointerClickEventDocument createEvent(Long time, int clientX, int clientY, String tag) {
 		return PointerClickEventDocument.builder()
 			.timestamp(time)
 			.clientX(clientX)
@@ -48,7 +50,7 @@ class EsClickEventAnalyzerTest {
 			.build();
 	}
 
-	private PointerMoveEventDocument createMoveEvent(LocalDateTime timestamp, int clientX, int clientY) {
+	private PointerMoveEventDocument createMoveEvent(Long timestamp, int clientX, int clientY) {
 		return PointerMoveEventDocument.builder()
 			.timestamp(timestamp)
 			.clientX(clientX)
@@ -65,10 +67,11 @@ class EsClickEventAnalyzerTest {
 	@DisplayName("Rage Click이 감지되어 isOutlier로 마킹되는지 확인")
 	void testRageClickDetection() {
 		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		List<PointerClickEventDocument> docs = List.of(
-			createEvent(now, 100, 100, "button"),
-			createEvent(now.plusSeconds(1), 102, 101, "button"),
-			createEvent(now.plusSeconds(2), 103, 99, "button")
+			createEvent(timestamp, 100, 100, "button"),
+			createEvent(timestamp + 1, 102, 101, "button"),
+			createEvent(timestamp + 2 , 103, 99, "button")
 		);
 
 		analyzer.analyze(docs);
@@ -80,7 +83,10 @@ class EsClickEventAnalyzerTest {
 	@Test
 	@DisplayName("의심 클릭이 감지되어 isOutlier로 마킹되는지 확인")
 	void testSuspiciousClickDetection() {
-		PointerClickEventDocument suspicious = createEvent(LocalDateTime.now(), 100, 200, "div");
+
+		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+		PointerClickEventDocument suspicious = createEvent(timestamp, 100, 200, "div");
 		List<PointerClickEventDocument> docs = List.of(suspicious);
 
 		analyzer.analyze(docs);
@@ -91,11 +97,14 @@ class EsClickEventAnalyzerTest {
 	@Test
 	@DisplayName("조건에 부합하지 않으면 이상치로 마킹되지 않음")
 	void testNonOutlier() {
+
 		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
 		List<PointerClickEventDocument> docs = List.of(
-			createEvent(now, 100, 100, "button"),
-			createEvent(now.plusSeconds(6), 102, 101, "button"),
-			createEvent(now.plusSeconds(12), 103, 99, "button")
+			createEvent(timestamp, 100, 100, "button"),
+			createEvent(timestamp + 6000, 102, 101, "button"),
+			createEvent(timestamp + 12000, 103, 99, "button")
 		);
 
 		analyzer.analyze(docs);

@@ -10,6 +10,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.exception.ErrorCode;
+import com.dajava.backend.global.utils.TimeUtils;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,8 +38,7 @@ public class PointerMoveEventDocument {
 
 	private String memberSerialNumber;
 
-	@Field(type = FieldType.Date, format = DateFormat.date_time)
-	private LocalDateTime timestamp;
+	private Long timestamp;
 
 	private Integer browserWidth;
 
@@ -59,5 +59,9 @@ public class PointerMoveEventDocument {
 			throw new PointerEventException(ErrorCode.ALREADY_OUTLIER_DOCUMENT);
 		}
 		this.isOutlier = true;
+	}
+
+	public LocalDateTime getTimestamp() {
+		return TimeUtils.toLocalDateTime(this.timestamp);
 	}
 }
