@@ -9,4 +9,9 @@ import lombok.Data;
 @Data
 @Component
 public class ValidateSchedulerProperties {
+
+	private long validateEndSessionMs;
+
+	private int batchSize ;
+
 }

@@ -8,6 +8,8 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import com.dajava.backend.global.utils.TimeUtils;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,8 +47,7 @@ public class SolutionEventDocument {
 	@Field(type = FieldType.Integer)
 	private Integer browserWidth;
 
-	@Field(type = FieldType.Date, format = DateFormat.date_time)
-	private LocalDateTime timestamp;
+	private Long timestamp;
 
 	@Field(type = FieldType.Integer)
 	private Integer clientX;
@@ -62,4 +63,8 @@ public class SolutionEventDocument {
 
 	@Field(type = FieldType.Boolean)
 	private Boolean isOutlier;
+
+	public LocalDateTime getTimestamp() {
+		return TimeUtils.toLocalDateTime(this.timestamp);
+	}
 }

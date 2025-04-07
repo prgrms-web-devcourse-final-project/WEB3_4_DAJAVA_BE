@@ -3,6 +3,7 @@ package com.dajava.backend.domain.event.es.scheduler.vaildation;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ class EsScrollEventAnalyzerTest {
 		analyzer = new EsScrollEventAnalyzer(props);
 	}
 
-	private PointerScrollEventDocument createScrollEvent(LocalDateTime time, int scrollY, int scrollHeight, int viewportHeight) {
+	private PointerScrollEventDocument createScrollEvent(Long time, int scrollY, int scrollHeight, int viewportHeight) {
 		return PointerScrollEventDocument.builder()
 			.timestamp(time)
 			.scrollY(scrollY)
@@ -53,11 +54,14 @@ class EsScrollEventAnalyzerTest {
 	@Test
 	@DisplayName("rage scroll이 감지되는 경우")
 	void testRageScrollDetected() {
+
 		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
 		List<PointerScrollEventDocument> events = List.of(
-			createScrollEvent(now, 100, 2000, 600),
-			createScrollEvent(now.plusNanos(100_000_000), 500, 2000, 600),
-			createScrollEvent(now.plusNanos(200_000_000), 900, 2000, 600)
+			createScrollEvent(timestamp, 100, 2000, 600),
+			createScrollEvent(timestamp + 100, 500, 2000, 600),
+			createScrollEvent(timestamp + 200, 900, 2000, 600)
 		);
 
 		analyzer.analyze(events);
@@ -68,13 +72,16 @@ class EsScrollEventAnalyzerTest {
 	@Test
 	@DisplayName("왕복 스크롤이 감지되는 경우")
 	void testBackAndForthScrollDetected() {
+
 		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
 		List<PointerScrollEventDocument> events = List.of(
-			createScrollEvent(now, 100, 2000, 600),
-			createScrollEvent(now.plusNanos(100_000_000), 150, 2000, 600),
-			createScrollEvent(now.plusNanos(200_000_000), 100, 2000, 600),
-			createScrollEvent(now.plusNanos(300_000_000), 160, 2000, 600),
-			createScrollEvent(now.plusNanos(400_000_000), 110, 2000, 600)
+			createScrollEvent(timestamp, 100, 2000, 600),
+			createScrollEvent(timestamp + 100, 150, 2000, 600),
+			createScrollEvent(timestamp + 200, 100, 2000, 600),
+			createScrollEvent(timestamp + 300, 160, 2000, 600),
+			createScrollEvent(timestamp + 400, 110, 2000, 600)
 		);
 
 		analyzer.analyze(events);
@@ -85,11 +92,14 @@ class EsScrollEventAnalyzerTest {
 	@Test
 	@DisplayName("컨텐츠 소모가 부족한 경우")
 	void testTopRepeatScrollDetected() {
+
 		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
 		List<PointerScrollEventDocument> events = List.of(
-			createScrollEvent(now, 100, 3000, 600),
-			createScrollEvent(now.plusNanos(100_000_000), 300, 3000, 600),
-			createScrollEvent(now.plusNanos(200_000_000), 500, 3000, 600)
+			createScrollEvent(timestamp, 100, 3000, 600),
+			createScrollEvent(timestamp + 100, 300, 3000, 600),
+			createScrollEvent(timestamp + 200, 500, 3000, 600)
 		);
 
 		analyzer.analyze(events);
@@ -100,11 +110,14 @@ class EsScrollEventAnalyzerTest {
 	@Test
 	@DisplayName("모든 조건을 만족하지 않으면 outlier 마킹되지 않음")
 	void testNoOutliersDetected() {
+
 		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
 		List<PointerScrollEventDocument> events = List.of(
-			createScrollEvent(now, 100, 2000, 600),
-			createScrollEvent(now.plusSeconds(5), 120, 2000, 600), // 시간 초과
-			createScrollEvent(now.plusSeconds(10), 1400, 2000, 600)
+			createScrollEvent(timestamp, 100, 2000, 600),
+			createScrollEvent(timestamp + 5000, 120, 2000, 600), // 시간 초과
+			createScrollEvent(timestamp + 10000, 1400, 2000, 600)
 		);
 
 		analyzer.analyze(events);

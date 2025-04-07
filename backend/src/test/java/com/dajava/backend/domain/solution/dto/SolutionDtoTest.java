@@ -3,6 +3,7 @@ package com.dajava.backend.domain.solution.dto;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,9 @@ public class SolutionDtoTest {
 	@BeforeEach
 	@DisplayName("테스트 실행 전, mockSolutionEvent mockSolutionData 초기화")
 	void setUp() {
+
+		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		// SolutionEvent 객체 생성
 		SolutionEventDocument mockSolutionEvent = SolutionEventDocument.builder()
 			.sessionId("session1")
@@ -36,7 +40,7 @@ public class SolutionDtoTest {
 			.clientX(100)
 			.clientY(200)
 			.element("button")
-			.timestamp(LocalDateTime.now())
+			.timestamp(timestamp)
 			.browserWidth(1024)
 			.build();
 
