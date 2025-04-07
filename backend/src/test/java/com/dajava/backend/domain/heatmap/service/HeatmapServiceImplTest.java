@@ -24,7 +24,6 @@ import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
-import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.global.utils.PasswordUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -207,7 +206,7 @@ class HeatmapServiceImplTest {
 			.thenReturn(Optional.empty());
 
 		// When & Then
-		assertThrows(SolutionException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
+		assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
 		verify(registerRepository).findBySerialNumber(serialNumber);
 		verify(solutionDataRepository, never()).findBySerialNumber(any());
 	}
@@ -228,7 +227,7 @@ class HeatmapServiceImplTest {
 				.thenReturn(false);
 
 			// When & Then
-			assertThrows(SolutionException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
+			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
 			verify(registerRepository).findBySerialNumber(serialNumber);
 			// 비밀번호 검증 실패 시, solutionDataRepository 는 호출되지 않아야 함
 			verify(solutionDataRepository, never()).findBySerialNumber(any());
@@ -254,7 +253,7 @@ class HeatmapServiceImplTest {
 				.thenReturn(Optional.empty());
 
 			// When & Then
-			assertThrows(SolutionException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
+			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
 			verify(solutionDataRepository).findBySerialNumber(serialNumber);
 		}
 	}
@@ -283,7 +282,7 @@ class HeatmapServiceImplTest {
 				.thenReturn(Optional.of(emptyData));
 
 			// When & Then
-			assertThrows(SolutionException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
+			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
 			verify(solutionDataRepository).findBySerialNumber(serialNumber);
 		}
 	}
