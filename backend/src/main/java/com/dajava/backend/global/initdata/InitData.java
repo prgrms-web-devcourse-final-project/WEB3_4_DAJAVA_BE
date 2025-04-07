@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class InitData {
 
-	@Value("${init.flag:0}")
+	@Value("${init.flag:1}")
 	private int initFlag;
 
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
@@ -97,7 +97,7 @@ public class InitData {
 	public ApplicationRunner baseInitDataApplicationRunner() {
 		return args -> {
 			self.work1();
-			self.work2();
+			// self.work2();
 		};
 	}
 
