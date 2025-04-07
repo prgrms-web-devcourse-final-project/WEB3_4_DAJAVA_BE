@@ -123,7 +123,7 @@ class RegisterServiceTest {
 		when(fileStorageService.storeFile(any(MultipartFile.class))).thenReturn(dynamicFilePath);
 
 		// When: 페이지 캡쳐 데이터 업데이트 메서드를 호출
-		String result = service.modifyPageCapture(serialNumber, imageFile);
+		String result = service.createPageCapture(serialNumber, imageFile);
 
 		// Then: Repository 에서 해당 Register 객체를 조회하여 업데이트가 반영되었는지 확인
 		Optional<Register> modifiedSolution = repository.findBySerialNumber(serialNumber);
@@ -160,7 +160,7 @@ class RegisterServiceTest {
 
 		// When: 페이지 캡쳐 데이터 업데이트 메서드를 호출하면,
 		// 이미 pageCapture 가 존재하므로 파일 저장을 시도하지 않고 실패 메시지를 반환해야 함
-		String result = service.modifyPageCapture(serialNumber, imageFile);
+		String result = service.createPageCapture(serialNumber, imageFile);
 
 		// Then
 		Assertions.assertEquals("이미 페이지 캡쳐 데이터가 존재합니다.", result);

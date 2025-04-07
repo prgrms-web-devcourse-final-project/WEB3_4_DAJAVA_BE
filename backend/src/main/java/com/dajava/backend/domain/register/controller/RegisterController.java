@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
+import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
@@ -164,12 +165,11 @@ public class RegisterController {
 	@Operation(
 		summary = "솔루션 전체 페이지 캡쳐 데이터 삽입",
 		description = "멀티파트 파일로 전송된 이미지를 저장하고, pageCapture 컬럼에 이미지 접근 경로를 삽입합니다.")
-	@PostMapping(value = "/v1/register/{serialNumber}/page-capture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/v1/register/page-capture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public String updatePageCapture(
-		@PathVariable String serialNumber,
-		@RequestParam("imageFile") MultipartFile imageFile
+	public PageCaptureResponse updatePageCapture(
+		@ModelAttribute PageCaptureRequest request
 	) {
-		return registerService.modifyPageCapture(serialNumber, imageFile);
+		return registerService.createPageCapture(request);
 	}
 }
