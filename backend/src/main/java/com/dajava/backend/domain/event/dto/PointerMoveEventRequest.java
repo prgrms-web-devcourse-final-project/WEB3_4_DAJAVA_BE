@@ -21,7 +21,7 @@ public record PointerMoveEventRequest(
 	@Schema(description = "행동 솔루션 신청시 생성된 UUID 식별자", example = "a07cb1fc-e5db-4578-89a6-34d7a31f9389", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull String memberSerialNumber,
 
-	@Schema(description = "로그 데이터의 생성 시각", example = "2025-04-01T12:00:00", requiredMode = Schema.RequiredMode.REQUIRED)
+	@Schema(description = "로그 데이터의 생성 시각", example = "1711963200000", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull Long timestamp,
 
 	@Schema(description = "현재 브라우저 창의 가로 길이", example = "1280", requiredMode = Schema.RequiredMode.REQUIRED)
