@@ -29,6 +29,7 @@ public enum ErrorCode {
 	SOLUTION_PARSING_ERROR(HttpStatus.BAD_REQUEST, "JSON 파싱에 오류가 발생했습니다."),
 	SOLUTION_RESPONSE_ERROR(HttpStatus.BAD_REQUEST, "응답 처리 중 오류가 발생했습니다."),
 	SOLUTION_EXPIRED_ERROR(HttpStatus.BAD_REQUEST, "솔루션이 이미 종료되었습니다."),
+	INVALID_EVENT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 이벤트 타입입니다."),
 
 	// Admin
 	INVALID_ADMIN_CODE(HttpStatus.UNAUTHORIZED, "관리자 코드가 올바르지 않습니다."),
@@ -40,10 +41,7 @@ public enum ErrorCode {
 
 	EVENT_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 이벤트 데이터가 없습니다"),
 	SESSION_DATA_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 세션 데이터가 없습니다"),
-	ALREADY_OUTLIER_DOCUMENT(HttpStatus.BAD_REQUEST, "이미 이상치로 판별된 ES 이벤트 데이터 입니다."),
-
-	// Heatmap
-	INVALID_EVENT_TYPE(HttpStatus.BAD_REQUEST, "유효하지 않은 이벤트 타입입니다.");
+	ALREADY_OUTLIER_DOCUMENT(HttpStatus.BAD_REQUEST, "이미 이상치로 판별된 ES 이벤트 데이터 입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String description;
