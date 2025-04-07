@@ -3,7 +3,7 @@ server:
 
 spring:
   elasticsearch:
-    uris: http://127.0.0.1:9200
+    uris: http://127.0.0.1:9200/
   profiles:
     default: dev
     include: secret
