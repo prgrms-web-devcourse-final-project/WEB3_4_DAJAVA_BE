@@ -18,6 +18,11 @@ import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
+import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
 import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
 import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;
@@ -50,6 +55,18 @@ public class EventBatchServiceTest {
 
 	private ActivityHandleService activityHandleService;
 
+	@Mock
+	private PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
+
+	@Mock
+	private PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
+
+	@Mock
+	private PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
+
+	@Mock
+	private SessionDataDocumentRepository sessionDataDocumentRepository;
+
 	@BeforeEach
 	void setUp() {
 		eventBatchService = new EventBatchService(
@@ -58,7 +75,12 @@ public class EventBatchServiceTest {
 			clickRepository,
 			moveRepository,
 			scrollRepository,
-			sessionDataRepository
+			sessionDataRepository,
+			pointerClickEventDocumentRepository,
+			pointerMoveEventDocumentRepository,
+			pointerScrollEventDocumentRepository,
+			sessionDataDocumentRepository
+
 		);
 
 		activityHandleService = new ActivityHandleService(eventBatchService);
@@ -70,9 +92,10 @@ public class EventBatchServiceTest {
 		// given
 		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
+		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1", "https://example.com", System.currentTimeMillis());
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
-			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerClickEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 100, 200, 0, 1500, 500, "div")
 		);
 
@@ -81,15 +104,21 @@ public class EventBatchServiceTest {
 		when(eventBuffer.getScrollEvents(key)).thenReturn(Collections.emptyList());
 		when(eventBuffer.flushClickEvents(key)).thenReturn(clickEvents);
 		when(sessionDataService.createOrFindSessionData(key)).thenReturn(sessionData);
+		when(sessionDataService.createOrFindSessionDataDocument(key)).thenReturn(sessionDataDocument);
 
 		// when
 		activityHandleService.processActiveBatchForSession(key);
 
 		// then
 		verify(sessionDataService, times(1)).createOrFindSessionData(key);
+		verify(sessionDataService, times(1)).createOrFindSessionDataDocument(key);
 		verify(clickRepository, times(1)).saveAll(anyList());
+		verify(pointerClickEventDocumentRepository, times(1)).saveAll(anyList());
 		verify(sessionDataRepository, times(1)).save(sessionData);
 		verify(sessionDataService, never()).removeFromCache(key);
+		verify(sessionDataService, never()).removeFromEsCache(key);
+		verify(sessionDataDocumentRepository, times(1)).save(sessionDataDocument);
+
 	}
 
 	@Test
@@ -98,10 +127,11 @@ public class EventBatchServiceTest {
 		// given
 		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
+		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1", "https://example.com", System.currentTimeMillis());
 
 		List<PointerClickEventRequest> clickEvents = Collections.emptyList();
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
-			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerMoveEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 300, 400, 0, 1500, 500)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.emptyList();
@@ -113,15 +143,20 @@ public class EventBatchServiceTest {
 		when(eventBuffer.flushMoveEvents(key)).thenReturn(moveEvents);
 		when(eventBuffer.flushScrollEvents(key)).thenReturn(scrollEvents);
 		when(sessionDataService.createOrFindSessionData(key)).thenReturn(sessionData);
+		when(sessionDataService.createOrFindSessionDataDocument(key)).thenReturn(sessionDataDocument);
 
 		// when
 		activityHandleService.processInactiveBatchForSession(key);
 
 		// then
+		verify(sessionDataService, times(1)).createOrFindSessionDataDocument(key);
 		verify(sessionDataService, times(1)).createOrFindSessionData(key);
 		verify(moveRepository, times(1)).saveAll(anyList());
+		verify(pointerMoveEventDocumentRepository, times(1)).saveAll(anyList());
 		verify(sessionDataRepository, times(1)).save(sessionData);
+		verify(sessionDataDocumentRepository, times(1)).save(sessionDataDocument);
 		verify(sessionDataService, times(1)).removeFromCache(key);
+		verify(sessionDataService, times(1)).removeFromEsCache(key);
 	}
 
 	@Test
@@ -143,6 +178,9 @@ public class EventBatchServiceTest {
 		verify(moveRepository, never()).saveAll(anyList());
 		verify(scrollRepository, never()).saveAll(anyList());
 		verify(sessionDataRepository, never()).save(any());
+		verify(pointerClickEventDocumentRepository, never()).saveAll(anyList());
+		verify(pointerMoveEventDocumentRepository, never()).saveAll(anyList());
+		verify(pointerScrollEventDocumentRepository, never()).saveAll(anyList());
 	}
 
 	@Test
@@ -151,17 +189,18 @@ public class EventBatchServiceTest {
 		// given
 		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
+		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1", "https://example.com", System.currentTimeMillis());
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
-			new PointerClickEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerClickEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 100, 200, 0, 1500, 500, "div")
 		);
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
-			new PointerMoveEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerMoveEventRequest("user2", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 300, 400, 0, 1500, 500)
 		);
 		List<PointerScrollEventRequest> scrollEvents = Collections.singletonList(
-			new PointerScrollEventRequest("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
+			new PointerScrollEventRequest("user3", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
 				System.currentTimeMillis(), 1920, 0, 1500, 500)
 		);
 
@@ -172,17 +211,22 @@ public class EventBatchServiceTest {
 		when(eventBuffer.flushMoveEvents(key)).thenReturn(moveEvents);
 		when(eventBuffer.flushScrollEvents(key)).thenReturn(scrollEvents);
 		when(sessionDataService.createOrFindSessionData(key)).thenReturn(sessionData);
+		when(sessionDataService.createOrFindSessionDataDocument(key)).thenReturn(sessionDataDocument);
 
 		// when
 		eventBatchService.processBatchForSession(key, false);
 
 		// then
 		verify(sessionDataService, times(1)).createOrFindSessionData(key);
+		verify(sessionDataService, times(1)).createOrFindSessionDataDocument(key);
 		verify(clickRepository, times(1)).saveAll(anyList());
 		verify(moveRepository, times(1)).saveAll(anyList());
 		verify(scrollRepository, times(1)).saveAll(anyList());
 		verify(sessionDataRepository, times(1)).save(sessionData);
+		verify(pointerClickEventDocumentRepository, times(1)).saveAll(anyList());
+		verify(pointerMoveEventDocumentRepository, times(1)).saveAll(anyList());
+		verify(pointerScrollEventDocumentRepository, times(1)).saveAll(anyList());
+		verify(sessionDataDocumentRepository, times(1)).save(sessionDataDocument);
+
 	}
 }
-
-

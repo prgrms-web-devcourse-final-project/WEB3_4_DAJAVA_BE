@@ -23,6 +23,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/*
+ * 이벤트 를 분석하는 검증 스케줄러
+ *
+ * @author NohDongHui
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

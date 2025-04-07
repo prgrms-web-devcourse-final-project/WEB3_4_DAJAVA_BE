@@ -1,13 +1,23 @@
 package com.dajava.backend.domain.event.converter;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
+import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
+import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.entity.PointerClickEvent;
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.entity.SolutionEvent;
+import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
+import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
+import com.dajava.backend.global.utils.TimeUtils;
 
 public class PointerEventConverter {
 
@@ -86,5 +96,143 @@ public class PointerEventConverter {
 
 		return result;
 	}
+
+	public static PointerClickEventDocument toClickEventDocument(PointerClickEventRequest request) {
+		return PointerClickEventDocument.builder()
+			.id(request.eventId() + request.timestamp())
+			.sessionId(request.sessionId())
+			.pageUrl(request.pageUrl())
+			.memberSerialNumber(request.memberSerialNumber())
+			.timestamp(TimeUtils.convertLongToLocalDateTime(request.timestamp()))
+			.browserWidth(request.browserWidth())
+			.clientX(request.clientX())
+			.clientY(request.clientY())
+			.scrollY(request.scrollY())
+			.scrollHeight(request.scrollHeight())
+			.viewportHeight(request.viewportHeight())
+			.element(request.element())
+			.isOutlier(false)
+			.build();
+	}
+
+	public static PointerMoveEventDocument toMoveEventDocument(PointerMoveEventRequest request) {
+		return PointerMoveEventDocument.builder()
+			.id(request.eventId() + request.timestamp())
+			.sessionId(request.sessionId())
+			.pageUrl(request.pageUrl())
+			.memberSerialNumber(request.memberSerialNumber())
+			.timestamp(TimeUtils.convertLongToLocalDateTime(request.timestamp()))
+			.browserWidth(request.browserWidth())
+			.clientX(request.clientX())
+			.clientY(request.clientY())
+			.scrollY(request.scrollY())
+			.scrollHeight(request.scrollHeight())
+			.viewportHeight(request.viewportHeight())
+			.isOutlier(false)
+			.build();
+	}
+
+	public static PointerScrollEventDocument toScrollEventDocument(PointerScrollEventRequest request) {
+		return PointerScrollEventDocument.builder()
+			.id(request.eventId() + request.timestamp())
+			.sessionId(request.sessionId())
+			.pageUrl(request.pageUrl())
+			.memberSerialNumber(request.memberSerialNumber())
+			.timestamp(TimeUtils.convertLongToLocalDateTime(request.timestamp()))
+			.browserWidth(request.browserWidth())
+			.scrollY(request.scrollY())
+			.scrollHeight(request.scrollHeight())
+			.viewportHeight(request.viewportHeight())
+			.isOutlier(false)
+			.build();
+	}
+
+	public static SolutionEventDocument fromClickDocument(PointerClickEventDocument event) {
+
+		String raw = event.getSessionId() + "|" + event.getPageUrl() +  "|" + event.getTimestamp();
+		String id = UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8)).toString();
+
+		return SolutionEventDocument.builder()
+			.id(id)
+			.sessionId(event.getSessionId())
+			.pageUrl(event.getPageUrl())
+			.serialNumber(event.getMemberSerialNumber())
+			.type("click")
+			.clientX(event.getClientX())
+			.clientY(event.getClientY())
+			.timestamp(event.getTimestamp())
+			.browserWidth(event.getBrowserWidth())
+			.scrollY(event.getScrollY())
+			.scrollHeight(event.getScrollHeight())
+			.viewportHeight(event.getViewportHeight())
+			.element(event.getElement()) // element를 tag로 쓸 경우
+			.build();
+	}
+
+	public static SolutionEventDocument fromMoveDocument(PointerMoveEventDocument event) {
+
+		String raw = event.getSessionId() + "|" + event.getPageUrl() + "|" + event.getTimestamp();
+		String id = UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8)).toString();
+
+		return SolutionEventDocument.builder()
+			.id(id)
+			.sessionId(event.getSessionId())
+			.pageUrl(event.getPageUrl())
+			.serialNumber(event.getMemberSerialNumber())
+			.type("move")
+			.clientX(event.getClientX())
+			.clientY(event.getClientY())
+			.timestamp(event.getTimestamp())
+			.browserWidth(event.getBrowserWidth())
+			.scrollY(event.getScrollY())
+			.scrollHeight(event.getScrollHeight())
+			.viewportHeight(event.getViewportHeight())
+			.isOutlier(event.getIsOutlier())
+			.build();
+	}
+
+	public static SolutionEventDocument fromScrollDocument(PointerScrollEventDocument event) {
+
+		String raw = event.getSessionId() + "|" + event.getPageUrl() + "|" + event.getTimestamp();
+		String id = UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8)).toString();
+		return SolutionEventDocument.builder()
+			.id(id)
+			.sessionId(event.getSessionId())
+			.pageUrl(event.getPageUrl())
+			.serialNumber(event.getMemberSerialNumber())
+			.type("scroll")
+			.clientX(null) // scroll 이벤트에는 X/Y 좌표가 없을 수도 있음
+			.clientY(null)
+			.timestamp(event.getTimestamp())
+			.browserWidth(event.getBrowserWidth())
+			.scrollY(event.getScrollY())
+			.scrollHeight(event.getScrollHeight())
+			.viewportHeight(event.getViewportHeight())
+			.isOutlier(event.getIsOutlier())
+			.build();
+	}
+
+	public static List<SolutionEventDocument> toSolutionEventDocuments(
+		List<PointerClickEventDocument> clicks,
+		List<PointerMoveEventDocument> moves,
+		List<PointerScrollEventDocument> scrolls
+	) {
+		List<SolutionEventDocument> result = new ArrayList<>();
+
+		result.addAll(clicks.stream()
+			.map(PointerEventConverter::fromClickDocument)
+			.toList());
+
+		result.addAll(moves.stream()
+			.map(PointerEventConverter::fromMoveDocument)
+			.toList());
+
+		result.addAll(scrolls.stream()
+			.map(PointerEventConverter::fromScrollDocument)
+			.toList());
+
+		return result;
+	}
 }
+
 

@@ -24,7 +24,9 @@ public class RegisterConverter {
 			.solutionDate(solution.getCreateDate())
 			.solutionStartDate(solution.getStartDate())
 			.solutionEndDate(solution.getEndDate())
-			.eventState(EventState.IN_PROGRESS.getState()) // 아직 엔티티에 추가하지 않았으므로 기본 값으로 넣어놓음
+			.eventState(solution.isServiceExpired()
+				? EventState.COMPLETED.getState()
+				: EventState.IN_PROGRESS.getState())
 			.build();
 	}
 

@@ -2,8 +2,9 @@ server:
   port: 8080
 
 spring:
+  elasticsearch:
+    uris: http://127.0.0.1:9200/
   profiles:
-    default: dev
     include: secret
   application:
     name: dajava_server

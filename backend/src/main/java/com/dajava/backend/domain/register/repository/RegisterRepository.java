@@ -1,8 +1,8 @@
 package com.dajava.backend.domain.register.repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,16 +28,16 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	 * @return 존재 여부
 	 */
 	@Query("""
-      SELECT CASE 
-             WHEN COUNT(s) = 0 THEN true
-             WHEN (SELECT s2.endDate FROM Register s2 
-                  WHERE s2.url = :url 
-                  ORDER BY s2.createDate DESC LIMIT 1) < :pastDate THEN true
-             ELSE false
-             END
-      FROM Register s
-      WHERE s.url = :url
-    """)
+		  SELECT CASE 
+		         WHEN COUNT(s) = 0 THEN true
+		         WHEN (SELECT s2.endDate FROM Register s2 
+		              WHERE s2.url = :url 
+		              ORDER BY s2.createDate DESC LIMIT 1) < :pastDate THEN true
+		         ELSE false
+		         END
+		  FROM Register s
+		  WHERE s.url = :url
+		""")
 	boolean checkUrlAvailability(
 		@Param("url") String url,
 		@Param("pastDate") LocalDateTime pastDate);
@@ -52,14 +52,13 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 		LocalDateTime currentTime1,
 		LocalDateTime currentTime2);
 
-	Register findBySerialNumber(String serialNumber);
+	Optional<Register> findBySerialNumber(String serialNumber);
 
 	/**
 	 * Register 엔티티의 isServiceExpired 값이 true 인 데이터 조회
 	 * @return List<Register>
 	 */
 	List<Register> findByIsServiceExpiredTrue();
-
 
 }
 

@@ -8,6 +8,8 @@ import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.entity.SessionData;
+import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
+import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 
@@ -30,6 +32,7 @@ public class EventLogServiceImpl implements EventLogService {
 	private final SessionDataService sessionDataService;
 	private final EventBuffer eventBuffer;
 	private final ActivityHandleService activityHandleService;
+	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
 	/**
 	 * 클릭 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
@@ -45,6 +48,8 @@ public class EventLogServiceImpl implements EventLogService {
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		sessionDataService.createOrFindSessionData(sessionDataKey);
+		// es 용
+		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		// 클릭 이벤트 버퍼링
 		eventBuffer.addClickEvent(request, sessionDataKey);
@@ -64,6 +69,8 @@ public class EventLogServiceImpl implements EventLogService {
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		sessionDataService.createOrFindSessionData(sessionDataKey);
+		// es 용
+		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		// 이동 이벤트 버퍼링
 		eventBuffer.addMoveEvent(request, sessionDataKey);
@@ -83,6 +90,8 @@ public class EventLogServiceImpl implements EventLogService {
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		sessionDataService.createOrFindSessionData(sessionDataKey);
+		// es 용
+		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		// 스크롤 이벤트 버퍼링
 		eventBuffer.addScrollEvent(request, sessionDataKey);
@@ -94,6 +103,8 @@ public class EventLogServiceImpl implements EventLogService {
 		log.info("세션 종료");
 
 		SessionData data = sessionDataRepository.findBySessionId(sessionId)
+			.orElseThrow();
+		SessionDataDocument esData = sessionDataDocumentRepository.findBySessionId(sessionId)
 			.orElseThrow();
 
 		SessionDataKey sessionDataKey = new SessionDataKey(

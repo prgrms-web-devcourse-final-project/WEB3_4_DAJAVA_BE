@@ -6,4 +6,5 @@ import com.dajava.backend.domain.event.entity.SessionData;
 
 public interface Analyzer<T> {
 	List<T> analyze(SessionData sessionData);
+
 }
