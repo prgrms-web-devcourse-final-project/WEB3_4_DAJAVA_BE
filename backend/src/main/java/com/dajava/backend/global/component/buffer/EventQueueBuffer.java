@@ -22,7 +22,6 @@ import lombok.Getter;
  */
 @Getter
 public class EventQueueBuffer<T> {
-	// Todo.. redis로 저장
 	private final Map<String, Queue<T>> bufferMap = new ConcurrentHashMap<>();
 	private final Map<String, Long> lastUpdatedMap = new ConcurrentHashMap<>();
 

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.service.ActivityHandleService;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
-import com.dajava.backend.global.component.buffer.EventBuffer;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
+import com.dajava.backend.redis.utill.RedisEventBuffer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EventRedisBufferScheduler {
 
 	private final ActivityHandleService activityHandleService;
-	private final EventBuffer eventBuffer;
+	private final RedisEventBuffer redisEventBuffer;
 
 	private final BufferSchedulerProperties properties;
 
@@ -41,16 +41,15 @@ public class EventRedisBufferScheduler {
 	public void flushInactiveEventBuffers() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
-		// Todo... redis 바꿔야함
-		Set<SessionDataKey> activeKeys = eventBuffer.getAllActiveSessionKeys();
+		Set<SessionDataKey> activeKeys = redisEventBuffer.getAllActiveSessionKeys();
 		int inactiveCount = 0;
 		for (SessionDataKey sessionKey : activeKeys) {
 			String key = SessionDataKeyUtils.toKey(sessionKey);
 
 			// 세션의 마지막 활동 시간 확인
-			Long lastClickUpdate = eventBuffer.getClickBuffer().getLastUpdatedMap().get(key);
-			Long lastMoveUpdate = eventBuffer.getMoveBuffer().getLastUpdatedMap().get(key);
-			Long lastScrollUpdate = eventBuffer.getScrollBuffer().getLastUpdatedMap().get(key);
+			Long lastClickUpdate = redisEventBuffer.getClickBuffer().getLastUpdatedMap().get(key);
+			Long lastMoveUpdate = redisEventBuffer.getMoveBuffer().getLastUpdatedMap().get(key);
+			Long lastScrollUpdate = redisEventBuffer.getScrollBuffer().getLastUpdatedMap().get(key);
 
 			// 가장 최근 업데이트 시간 계산
 			Long latestUpdate = getLatestUpdate(lastClickUpdate, lastMoveUpdate, lastScrollUpdate);
@@ -78,7 +77,7 @@ public class EventRedisBufferScheduler {
 	public void flushAllEventBuffers() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 
-		Set<SessionDataKey> activeKeys = eventBuffer.getAllActiveSessionKeys();
+		Set<SessionDataKey> activeKeys = redisEventBuffer.getAllActiveSessionKeys();
 		log.info("처리할 활성 세션 수: {}", activeKeys.size());
 
 		for (SessionDataKey sessionKey : activeKeys) {
