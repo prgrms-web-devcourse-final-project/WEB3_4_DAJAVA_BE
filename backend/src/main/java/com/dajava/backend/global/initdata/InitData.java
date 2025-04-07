@@ -2,6 +2,7 @@ package com.dajava.backend.global.initdata;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,10 +23,8 @@ import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRep
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
-import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
-import com.dajava.backend.domain.register.service.RegisterService;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
@@ -42,7 +41,7 @@ public class InitData {
 
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
- 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
+	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
 	private final RegisterRepository registerRepository;
 	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
@@ -55,7 +54,7 @@ public class InitData {
 			.sessionId("AiSolutionTestSessionNumber")
 			.pageUrl("localhost:3000/test123")
 			.browserWidth(1920)
-			.memberSerialNumber("AiSolutionTestSerialNumber")
+			.memberSerialNumber("5_team_testSerial")
 			.element(tag)
 			.isOutlier(false)
 			.build();
@@ -70,7 +69,7 @@ public class InitData {
 			.sessionId("AiSolutionTestSessionNumber")
 			.pageUrl("localhost:3000/test123")
 			.browserWidth(1920)
-			.memberSerialNumber("AiSolutionTestSerialNumber")
+			.memberSerialNumber("5_team_testSerial")
 			.isOutlier(false)
 			.build();
 	}
@@ -84,7 +83,7 @@ public class InitData {
 			.viewportHeight(viewportHeight)
 			.pageUrl("localhost:3000/test123")
 			.sessionId("AiSolutionTestSessionNumber")
-			.memberSerialNumber("AiSolutionTestSerialNumber")
+			.memberSerialNumber("5_team_testSerial")
 			.browserWidth(1920)
 			.isOutlier(false)
 			.build();
@@ -117,7 +116,7 @@ public class InitData {
 		);
 
 		Register register = Register.builder()
-			.serialNumber("AiSolutionTestSerialNumber")
+			.serialNumber("5_team_testSerial")
 			.email(request.email())
 			.password(PasswordUtils.hashPassword(request.password()))
 			.url(request.url())
@@ -126,7 +125,7 @@ public class InitData {
 			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
 			.isServiceExpired(false)
 			.isSolutionComplete(false)
-			.pageCapture("")
+			.captureData(new ArrayList<>())
 			.build();
 
 		Register newRegister = registerRepository.save(register);
@@ -144,9 +143,9 @@ public class InitData {
 
 		SessionDataDocument sessionData = SessionDataDocument.create(
 			"AiSolutionTestSessionNumber",              // sessionId
-			"AiSolutionTestSerialNumber",                                 // memberSerialNumber
-			"localhost:3000/test123",                      // pageUrl
-			timestamp                                       // timestamp (2025-04-07T12:00:00Z 기준 millis)
+			"5_team_testSerial",                                 // memberSerialNumber
+			"localhost:3000/test123",                           // pageUrl
+			timestamp                                          // timestamp (2025-04-07T12:00:00Z 기준 millis)
 		);
 
 		sessionDataDocumentRepository.save(sessionData);
@@ -154,7 +153,7 @@ public class InitData {
 		List<PointerClickEventDocument> clickEvents = List.of(
 			createEvent(timestamp, 100, 100, "button"),
 			createEvent(timestamp + 1, 102, 101, "button"),
-			createEvent(timestamp + 2 , 103, 99, "button"),
+			createEvent(timestamp + 2, 103, 99, "button"),
 			createEvent(timestamp, 100, 200, "div"),
 			createEvent(timestamp, 200, 100, "button"),
 			createEvent(timestamp + 6000, 102, 101, "button"),
@@ -200,8 +199,5 @@ public class InitData {
 
 		log.info("baseInit pointerEventDocument, sessionDataDocument 등록 완료");
 	}
-
-
-
 
 }
