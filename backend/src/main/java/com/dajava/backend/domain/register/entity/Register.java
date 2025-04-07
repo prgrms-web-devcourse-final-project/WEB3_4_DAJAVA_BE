@@ -92,6 +92,24 @@ public class Register extends BaseTimeEntity {
 			.build();
 	}
 
+	/**
+	 * 테스트용 static factory - serialNumber 를 고정값으로 설정.
+	 */
+	public static Register createTest(final RegisterCreateRequest request) {
+		return Register.builder()
+			.serialNumber("5_team_testSerial") // 테스트용 고정 serialNumber
+			.email(request.email())
+			.password(PasswordUtils.hashPassword(request.password()))
+			.url(request.url())
+			.startDate(request.startDate())
+			.endDate(request.endDate())
+			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
+			.isServiceExpired(false)
+			.isSolutionComplete(false)
+			.pageCapture("")
+			.build();
+	}
+
 	public void setSolutionComplete(boolean solutionComplete) {
 		isSolutionComplete = solutionComplete;
 	}

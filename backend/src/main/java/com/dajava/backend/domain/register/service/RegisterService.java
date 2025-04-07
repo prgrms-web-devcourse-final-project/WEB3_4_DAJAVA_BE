@@ -68,6 +68,23 @@ public class RegisterService {
 	}
 
 	/**
+	 * 서비스 테스트용 Register 생성 메서드
+	 *
+	 * @param request RegisterCreateRequest (DTO)
+	 * @return RegisterCreateResponse (DTO)
+	 */
+	@Transactional
+	public RegisterCreateResponse createTestRegister(final RegisterCreateRequest request) {
+		Register newRegister = registerRepository.save(Register.createTest(request));
+		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
+
+		log.info("Register 엔티티 생성 : {} ", newRegister);
+		log.info("Order 엔티티 생성 : {} ", newOrder);
+
+		return toRegisterCreateResponse(newRegister);
+	}
+
+	/**
 	 * Register 수정 메서드
 	 * Register 수정 가능 여부를 파악한 후, 수정한다.
 	 *
