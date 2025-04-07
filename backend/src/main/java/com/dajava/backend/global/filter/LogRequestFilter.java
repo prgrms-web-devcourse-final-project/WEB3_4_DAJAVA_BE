@@ -108,19 +108,21 @@ public class LogRequestFilter implements Filter {
 			}
 		}
 		// pageCapture API 엔드포인트에 대한 필터
-		else if (path.matches("^/v1/register/[^/]+/page-capture$")) {
-			int prefixLength = "/v1/register/".length();
-			int suffixIndex = path.indexOf("/page-capture");
-			String serialNumber = path.substring(prefixLength, suffixIndex);
+		else if ("/v1/register/page-capture".equals(path)) {
+			CachedBodyHttpServletRequest cachedBodyRequest = new CachedBodyHttpServletRequest(httpRequest);
 
-			if (!registerCacheService.isValidSerialNumber(serialNumber)) {
+			// multipart/form-data인 경우, form 필드는 getParameter로 추출할 수 있습니다.
+			String serialNumber = cachedBodyRequest.getParameter("serialNumber");
+
+			if (serialNumber == null || !registerCacheService.isValidSerialNumber(serialNumber)) {
 				log.warn("유효하지 않은 serialNumber: {}", serialNumber);
 				httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				httpResponse.getWriter().write("유효하지 않은 일련번호 입니다.");
 				return;
 			}
+
 			log.debug("유효한 serialNumber: {}", serialNumber);
-			chain.doFilter(request, response);
+			chain.doFilter(cachedBodyRequest, response);
 		} else {
 			// 다른 요청은 필터 통과
 			chain.doFilter(request, response);

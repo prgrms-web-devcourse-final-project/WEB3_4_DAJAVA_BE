@@ -159,8 +159,8 @@ public class RegisterController {
 	 * 사용자가 세션 생성시 캡쳐하게 되는 페이지 캡쳐 데이터(멀티파트 파일)를 존재하지 않는 경우, 로컬에 저장합니다.
 	 * 이후 반환된 로컬 이미지 경로를 register 의 pageCapture 에 POST 합니다.
 	 *
-	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
-	 * @param imageFile 멀티파트 파일 형식으로 들어오는 전체 페이지 캡쳐 파일입니다.
+	 * @param request serialNumber, pageUrl, imagefile 을 가진 요청 DTO 입니다.
+	 * @return PageCaptureResponse 성공 여부, 메시지, 저장된 파일 경로를 반환합니다.
 	 */
 	@Operation(
 		summary = "솔루션 전체 페이지 캡쳐 데이터 삽입",
