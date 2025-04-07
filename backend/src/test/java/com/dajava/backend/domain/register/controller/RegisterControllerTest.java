@@ -1,7 +1,5 @@
 package com.dajava.backend.domain.register.controller;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -10,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,12 +24,9 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
-import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
 import com.dajava.backend.domain.register.entity.Register;
@@ -38,7 +34,7 @@ import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.RegisterCacheService;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.dajava.backend.global.utils.PasswordUtils;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.dajava.backend.global.utils.TimeUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.Cookie;
@@ -205,21 +201,27 @@ class RegisterControllerTest {
 			"test@example.com",
 			"password123",
 			"localhost:3000/test",
-			now.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
-			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
+			now.minusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0),
+			now.plusDays(6).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
-		// When & Then
-		MvcResult result = mockMvc.perform(post("/v1/register")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andReturn();
+		Register register = Register.builder()
+			.serialNumber("correct_testSerial")
+			.email(request.email())
+			.password(PasswordUtils.hashPassword(request.password()))
+			.url(request.url())
+			.startDate(request.startDate())
+			.endDate(request.endDate())
+			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
+			.isServiceExpired(false)
+			.isSolutionComplete(false)
+			.captureData(new ArrayList<>())
+			.build();
 
-		// Given Second
-		String createResponse = result.getResponse().getContentAsString();
-		JsonNode createJson = objectMapper.readTree(createResponse);
-		String serialNumber = createJson.get("serialNumber").asText();
-		String pageUrl = createJson.get("pageUrl").asText();
+		Register newRegister = registerRepository.save(register);
+
+		String serialNumber = newRegister.getSerialNumber();
+		String pageUrl = newRegister.getUrl();
 
 		// 테스트용 이미지 파일 생성
 		MockMultipartFile imageFile = new MockMultipartFile(
@@ -229,17 +231,10 @@ class RegisterControllerTest {
 			"테스트 이미지 데이터".getBytes()
 		);
 
-		registerCacheService.refreshCacheAll();
-		PageCaptureResponse dummyResponse = new PageCaptureResponse(
-			true,
-			"페이지 캡쳐 데이터가 성공적으로 저장되었습니다.",
-			"/page-capture/example.png"
-		);
+		// 캐시 리프레시
+		registerCacheService.refreshCache();
 
-		given(registerService.createPageCapture(org.mockito.ArgumentMatchers.any(PageCaptureRequest.class)))
-			.willReturn(dummyResponse);
-
-		// When & Then Second
+		// When & Then Second - 실제 서비스를 사용하여 테스트
 		mockMvc.perform(multipart("/v1/register/page-capture")
 				.file(imageFile)
 				.param("serialNumber", serialNumber)
@@ -247,8 +242,9 @@ class RegisterControllerTest {
 				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			// 반환되는 JSON 의 특정 필드를 검증 (필드 이름은 실제 PageCaptureResponse 구조에 맞게 변경)
-			.andExpect(jsonPath("$.someField", notNullValue()));
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.message").isString())
+			.andExpect(jsonPath("$.filePath").isString());
 	}
 
 	@Test
@@ -260,21 +256,27 @@ class RegisterControllerTest {
 			"test@example.com",
 			"password123",
 			"localhost:3000/test",
-			now.withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(1L),
+			now.withHour(0).withMinute(0).withSecond(0).withNano(0),
 			now.plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
-		// When & Then
-		MvcResult result = mockMvc.perform(post("/v1/register")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andReturn();
+		Register register = Register.builder()
+			.serialNumber("correct_testSerial")
+			.email(request.email())
+			.password(PasswordUtils.hashPassword(request.password()))
+			.url(request.url())
+			.startDate(request.startDate())
+			.endDate(request.endDate())
+			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
+			.isServiceExpired(false)
+			.isSolutionComplete(false)
+			.captureData(new ArrayList<>())
+			.build();
 
-		// Given Second
-		String createResponse = result.getResponse().getContentAsString();
-		JsonNode createJson = objectMapper.readTree(createResponse);
-		String wrongSerialNumber = "wrongSerialNumber";
-		String pageUrl = createJson.get("pageUrl").asText();
+		Register newRegister = registerRepository.save(register);
+
+		String serialNumber = "wrong_testSerial";
+		String pageUrl = newRegister.getUrl();
 
 		// 테스트용 이미지 파일 생성
 		MockMultipartFile imageFile = new MockMultipartFile(
@@ -284,20 +286,13 @@ class RegisterControllerTest {
 			"테스트 이미지 데이터".getBytes()
 		);
 
-		registerCacheService.refreshCacheAll();
-		PageCaptureResponse dummyResponse = new PageCaptureResponse(
-			false,
-			"페이지 캡쳐 데이터가 성공적으로 저장되었습니다.",
-			"/page-capture/example.png"
-		);
+		// 캐시 리프레시
+		registerCacheService.refreshCache();
 
-		given(registerService.createPageCapture(org.mockito.ArgumentMatchers.any(PageCaptureRequest.class)))
-			.willReturn(dummyResponse);
-
-		// When & Then Second
+		// When & Then Second - 실제 호출에서 401 예상
 		mockMvc.perform(multipart("/v1/register/page-capture")
 				.file(imageFile)
-				.param("serialNumber", wrongSerialNumber)
+				.param("serialNumber", serialNumber)
 				.param("pageUrl", pageUrl)
 				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 			.andExpect(status().isUnauthorized());

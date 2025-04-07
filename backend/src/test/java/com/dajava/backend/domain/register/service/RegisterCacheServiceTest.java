@@ -3,6 +3,7 @@ package com.dajava.backend.domain.register.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +14,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
+import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.global.utils.PasswordUtils;
+import com.dajava.backend.global.utils.TimeUtils;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -33,12 +37,11 @@ public class RegisterCacheServiceTest {
 		registerRepository.deleteAll();
 	}
 
-	/*
 	@Test
 	@DisplayName("1. 진행중인 서비스가 Cache 에 담기는지 테스트")
 	void t001() {
 		// Given
-		LocalDateTime start = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+		LocalDateTime start = LocalDateTime.now().minusDays(1).withMinute(0).withSecond(0).withNano(0);
 
 		RegisterCreateRequest request = new RegisterCreateRequest(
 			"testEmail@gmail.com",
@@ -48,8 +51,22 @@ public class RegisterCacheServiceTest {
 			start.plusDays(7)
 		);
 
-		RegisterCreateResponse response = registerService.createRegister(request);
-		String progressSerialNumber = response.serialNumber();
+		Register register = Register.builder()
+			.serialNumber("cache_test_serial")
+			.email(request.email())
+			.password(PasswordUtils.hashPassword(request.password()))
+			.url(request.url())
+			.startDate(request.startDate())
+			.endDate(request.endDate())
+			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
+			.isServiceExpired(false)
+			.isSolutionComplete(false)
+			.captureData(new ArrayList<>())
+			.build();
+
+		registerRepository.save(register);
+
+		String progressSerialNumber = register.getSerialNumber();
 
 		// When
 		registerCacheService.refreshCache();
@@ -58,7 +75,6 @@ public class RegisterCacheServiceTest {
 		assertEquals(2, registerCacheService.getSerialNumberCache().size());
 		assertTrue(registerCacheService.isValidSerialNumber(progressSerialNumber));
 	}
-	*/
 
 	@Test
 	@DisplayName("2. 진행중이지 않은 테스트는 Cache 에 담기지 않음")

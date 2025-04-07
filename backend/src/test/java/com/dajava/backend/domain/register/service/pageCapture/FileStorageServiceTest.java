@@ -3,6 +3,7 @@ package com.dajava.backend.domain.register.service.pageCapture;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,12 +17,12 @@ import org.springframework.mock.web.MockMultipartFile;
 
 @SpringBootTest
 public class FileStorageServiceTest {
-	// 테스트가 끝난 후 생성된 파일 및 디렉토리를 삭제
+
+	// 테스트 종료 후 "C:/page-capture" 하위 모든 파일/디렉터리 삭제
 	@AfterAll
 	static void cleanup() throws IOException {
 		Path baseDir = Paths.get("C:/page-capture");
 		if (Files.exists(baseDir)) {
-			// 디렉토리 내 모든 파일 및 하위 디렉토리를 역순(파일부터 지워야 디렉토리 지울 수 있음)으로 삭제
 			Files.walk(baseDir)
 				.sorted(Comparator.reverseOrder())
 				.forEach(path -> {
@@ -35,28 +36,75 @@ public class FileStorageServiceTest {
 	}
 
 	@Test
-	@DisplayName("FileStorageService 파일 저장 테스트")
+	@DisplayName("1. 신규 파일 업로드 시 파일 생성 테스트")
 	void t001() throws Exception {
-		// given
+		// Given
 		FileStorageService fileStorageService = new FileStorageService();
-
+		String pageUrl = "http://localhost:3000/myPage";
 		MockMultipartFile imageFile = new MockMultipartFile(
 			"imageFile",
 			"test-image.png",
 			"image/png",
-			"테스트 이미지 데이터".getBytes()
+			"테스트 이미지 데이터".getBytes(StandardCharsets.UTF_8)
 		);
 
 		// when
-		String fileUrl = fileStorageService.storeFile(imageFile);
+		String fileUrl = fileStorageService.storeFile(pageUrl, imageFile);
 
 		// then
 		assertNotNull(fileUrl);
 		assertTrue(fileUrl.startsWith("/page-capture/"));
 		assertTrue(fileUrl.endsWith(".png"));
 
-		// 실제 파일이 존재하는지 확인
-		Path filePath = Paths.get("C:/page-capture").resolve(fileUrl.substring("/page-capture/".length()));
+		// 실제 파일이 저장되었는지 확인
+		String storedFileName = fileUrl.substring("/page-capture/".length());
+		Path filePath = Paths.get("C:/page-capture").resolve(storedFileName);
 		assertTrue(Files.exists(filePath));
+
+		// 저장된 파일의 내용이 일치하는지 확인
+		byte[] storedContent = Files.readAllBytes(filePath);
+		assertArrayEquals("테스트 이미지 데이터".getBytes(StandardCharsets.UTF_8), storedContent);
+	}
+
+	@Test
+	@DisplayName("2. 기존 파일 덮어쓰기(Override) 테스트")
+	void t002() throws Exception {
+		// given
+		FileStorageService fileStorageService = new FileStorageService();
+		String pageUrl = "http://localhost:3000/myPage";
+
+		// 먼저 신규 업로드로 파일을 생성
+		MockMultipartFile imageFileOriginal = new MockMultipartFile(
+			"imageFile",
+			"test-image.png",
+			"image/png",
+			"원본 파일 데이터".getBytes(StandardCharsets.UTF_8)
+		);
+		String originalFileUrl = fileStorageService.storeFile(pageUrl, imageFileOriginal);
+		String originalFileName = originalFileUrl.substring("/page-capture/".length());
+		Path filePath = Paths.get("C:/page-capture").resolve(originalFileName);
+
+		assertTrue(Files.exists(filePath));
+		byte[] originalContent = Files.readAllBytes(filePath);
+		assertArrayEquals("원본 파일 데이터".getBytes(StandardCharsets.UTF_8), originalContent);
+
+		// when: 기존 파일 URL 을 이용하여 새로운 파일 업로드(덮어쓰기) 수행
+		MockMultipartFile imageFileUpdated = new MockMultipartFile(
+			"imageFile",
+			"test-image-updated.png", // 확장자 png
+			"image/png",
+			"업데이트된 파일 데이터".getBytes(StandardCharsets.UTF_8)
+		);
+		String updatedFileUrl = fileStorageService.storeFile(pageUrl, imageFileUpdated, originalFileUrl);
+
+		// then
+		assertNotNull(updatedFileUrl);
+		String updatedFileName = updatedFileUrl.substring("/page-capture/".length());
+		// 기존 파일명과 새로운 파일명이 동일해야함
+		assertEquals(originalFileName, updatedFileName);
+
+		// 실제 파일 내용이 변경되었는지 확인
+		byte[] updatedContent = Files.readAllBytes(filePath);
+		assertArrayEquals("업데이트된 파일 데이터".getBytes(StandardCharsets.UTF_8), updatedContent);
 	}
 }
