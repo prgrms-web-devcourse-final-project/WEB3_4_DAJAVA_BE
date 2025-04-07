@@ -41,7 +41,6 @@ public class EventRedisBufferScheduler {
 	public void flushInactiveEventBuffers() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
-		// Todo... redis 바꿔야함
 		Set<SessionDataKey> activeKeys = eventRedisBuffer.getAllActiveSessionKeys();
 		int inactiveCount = 0;
 		for (SessionDataKey sessionKey : activeKeys) {

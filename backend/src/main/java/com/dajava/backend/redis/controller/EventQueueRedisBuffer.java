@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
 @RequiredArgsConstructor
 public class EventQueueRedisBuffer<T> {
 	private static final String EVENT_CACHE_PREFIX = "event:";
