@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.7'
 
 services:
   app:
@@ -11,6 +11,8 @@ services:
     environment:
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
+    networks:
+      - elastic
 
   redis:
     image: redis:7
@@ -20,6 +22,40 @@ services:
     volumes:
       - redis_data:/data
     restart: always
+    networks:
+      - elastic
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.14
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    networks:
+      - elastic
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.14
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
 
 volumes:
   redis_data:
+
+networks:
+  elastic:
+    driver: bridge
