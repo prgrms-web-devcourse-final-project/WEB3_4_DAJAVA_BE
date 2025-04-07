@@ -47,7 +47,7 @@ public class EventLogServiceImpl implements EventLogService {
 		);
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
-		sessionDataService.createOrFindSessionData(sessionDataKey);
+		//sessionDataService.createOrFindSessionData(sessionDataKey);
 		// es 용
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
@@ -68,7 +68,7 @@ public class EventLogServiceImpl implements EventLogService {
 		);
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
-		sessionDataService.createOrFindSessionData(sessionDataKey);
+		//sessionDataService.createOrFindSessionData(sessionDataKey);
 		// es 용
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
@@ -89,7 +89,7 @@ public class EventLogServiceImpl implements EventLogService {
 		);
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
-		sessionDataService.createOrFindSessionData(sessionDataKey);
+		//sessionDataService.createOrFindSessionData(sessionDataKey);
 		// es 용
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
@@ -102,13 +102,13 @@ public class EventLogServiceImpl implements EventLogService {
 	public void expireSession(String sessionId) {
 		log.info("세션 종료");
 
-		SessionData data = sessionDataRepository.findBySessionId(sessionId)
-			.orElseThrow();
+		//SessionData data = sessionDataRepository.findBySessionId(sessionId)
+		//	.orElseThrow();
 		SessionDataDocument esData = sessionDataDocumentRepository.findBySessionId(sessionId)
 			.orElseThrow();
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
-			data.getSessionId(), data.getPageUrl(), data.getMemberSerialNumber()
+			esData.getSessionId(), esData.getPageUrl(), esData.getMemberSerialNumber()
 		);
 
 		activityHandleService.processInactiveBatchForSession(sessionDataKey);
