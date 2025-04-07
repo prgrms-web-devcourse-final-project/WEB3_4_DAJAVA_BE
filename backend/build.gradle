@@ -51,11 +51,13 @@ dependencies {
 
     //ES
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-    
+
     // Caffeine Cache
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework:spring-context-support")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 }
 
 test {

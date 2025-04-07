@@ -22,6 +22,12 @@ spring:
         highlight_sql: true
         use_sql_comments: true
 
+springdoc:
+  swagger-ui:
+    urls:
+      - name: production
+        url: https://dajava.pg.chsan626.co.kr/swagger-ui/index.html
+
 gemini:
   api:
     key: ${DAJAVA_AI_API_KEY}

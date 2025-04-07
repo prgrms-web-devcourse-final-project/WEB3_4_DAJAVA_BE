@@ -41,6 +41,25 @@ public class LogRequestFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
 		HttpServletResponse httpResponse = (HttpServletResponse)response;
 
+		// ✅ preflight 요청은 필터 무시
+		if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
+			chain.doFilter(request, response);
+			return;
+		}
+
+		// 요청의 Origin 헤더 가져오기
+		String origin = httpRequest.getHeader("Origin");
+		if (origin != null) {
+			// 요청의 실제 origin으로 CORS 헤더 설정
+			httpResponse.setHeader("Access-Control-Allow-Origin", origin);
+		} else {
+			// Origin 헤더가 없는 경우 기본값 설정 (선택적)
+			httpResponse.setHeader("Access-Control-Allow-Origin", "*");
+		}
+		httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
+		httpResponse.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+		httpResponse.setHeader("Access-Control-Allow-Headers", "*");
+
 		String path = httpRequest.getRequestURI();
 
 		// 클릭, 이동, 스크롤 관련 로그 요청에 대해서만 필터 적용
@@ -74,6 +93,7 @@ public class LogRequestFilter implements Filter {
 				} else {
 					log.warn("memberSerialNumber가 요청에 없습니다");
 					httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
 					httpResponse.getWriter().write("일련번호(member_serial_number) 가 존재하지 않습니다.");
 					return;
 				}
@@ -82,6 +102,7 @@ public class LogRequestFilter implements Filter {
 				chain.doFilter(cachedBodyRequest, response);
 			} catch (Exception e) {
 				log.error("로그 요청 처리 중 오류 발생", e);
+
 				httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				httpResponse.getWriter().write("로그 데이터 요청 중 오류가 발생했습니다.");
 			}
