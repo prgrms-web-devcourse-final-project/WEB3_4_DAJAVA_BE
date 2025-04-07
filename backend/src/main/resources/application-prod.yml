@@ -13,7 +13,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create # 테스트 시에 새롭게 나오도록 수정
+      ddl-auto: update # 테스트 시에 새롭게 나오도록 수정
       dialect: org.hibernate.dialect.MySQL8Dialect
     properties:
       hibernate:
