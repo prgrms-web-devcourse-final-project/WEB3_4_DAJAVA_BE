@@ -3,6 +3,7 @@ package com.dajava.backend.global.initdata;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +30,9 @@ import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class InitData {
@@ -37,14 +40,15 @@ public class InitData {
 	@Value("${init.flag:0}")
 	private int initFlag;
 
-	PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
-	PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
-	PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
-	RegisterRepository registerRepository;
-	SessionDataDocumentRepository sessionDataDocumentRepository;
+	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
+	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
+ 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
+	private final RegisterRepository registerRepository;
+	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
 	private PointerClickEventDocument createEvent(Long time, int clientX, int clientY, String tag) {
 		return PointerClickEventDocument.builder()
+			.id(UUID.randomUUID().toString())
 			.timestamp(time)
 			.clientX(clientX)
 			.clientY(clientY)
@@ -59,6 +63,7 @@ public class InitData {
 
 	private PointerMoveEventDocument createMoveEvent(Long timestamp, int clientX, int clientY) {
 		return PointerMoveEventDocument.builder()
+			.id(UUID.randomUUID().toString())
 			.timestamp(timestamp)
 			.clientX(clientX)
 			.clientY(clientY)
@@ -72,6 +77,7 @@ public class InitData {
 
 	private PointerScrollEventDocument createScrollEvent(Long time, int scrollY, int scrollHeight, int viewportHeight) {
 		return PointerScrollEventDocument.builder()
+			.id(UUID.randomUUID().toString())
 			.timestamp(time)
 			.scrollY(scrollY)
 			.scrollHeight(scrollHeight)
@@ -124,6 +130,7 @@ public class InitData {
 			.build();
 
 		Register newRegister = registerRepository.save(register);
+		log.info("baseInit register 등록 완료");
 	}
 
 	public void work2() {
@@ -190,6 +197,8 @@ public class InitData {
 		);
 
 		pointerScrollEventDocumentRepository.saveAll(scrollEvents);
+
+		log.info("baseInit pointerEventDocument, sessionDataDocument 등록 완료");
 	}
 
 
