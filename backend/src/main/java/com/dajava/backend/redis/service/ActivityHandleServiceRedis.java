@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ActivityHandleServiceRedis {
-	private final EventBatchService eventBatchServiceRedis;
+	private final EventBatchServiceRedis eventBatchServiceRedis;
 	private final EventRedisBuffer eventRedisBuffer;
 
 	/**
