@@ -10,7 +10,6 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.redis.controller.EventQueueRedisBuffer;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.dajava.backend.redis.controller;
+package com.dajava.backend.redis.buffer;
 
 import java.util.Collections;
 import java.util.List;
@@ -7,9 +7,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
