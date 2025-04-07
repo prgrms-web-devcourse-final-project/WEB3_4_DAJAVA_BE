@@ -3,6 +3,7 @@ package com.dajava.backend.domain.event.es.scheduler;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Sort;
 
 import com.dajava.backend.domain.event.converter.PointerEventConverter;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
@@ -21,11 +21,6 @@ import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
-import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsClickEventAnalyzer;
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsEventValidateScheduler;
 import com.dajava.backend.domain.event.es.scheduler.vaildation.EsMoveEventAnalyzer;
@@ -68,16 +63,18 @@ class EsEventValidateSchedulerTest {
 		// given
 		String sessionId = "test-session";
 		SessionDataDocument session = mock(SessionDataDocument.class);
+		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 		when(session.getSessionId()).thenReturn(sessionId);
 
 		List<PointerClickEventDocument> clickEvents = List.of(
-			PointerClickEventDocument.builder().isOutlier(false).timestamp(LocalDateTime.now()).build()
+			PointerClickEventDocument.builder().isOutlier(false).timestamp(timestamp).build()
 		);
 		List<PointerMoveEventDocument> moveEvents = List.of(
-			PointerMoveEventDocument.builder().isOutlier(false).timestamp(LocalDateTime.now()).build()
+			PointerMoveEventDocument.builder().isOutlier(false).timestamp(timestamp).build()
 		);
 		List<PointerScrollEventDocument> scrollEvents = List.of(
-			PointerScrollEventDocument.builder().isOutlier(false).timestamp(LocalDateTime.now()).build()
+			PointerScrollEventDocument.builder().isOutlier(false).timestamp(timestamp).build()
 		);
 
 		when(pointerEventDocumentService.fetchAllClickEventDocumentsBySessionId(eq(sessionId), anyInt())).thenReturn(clickEvents);
