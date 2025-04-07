@@ -1,4 +1,4 @@
-package com.dajava.backend.domain.event.scheduler;
+package com.dajava.backend.redis.scheduler;
 
 import java.util.Set;
 
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class EventBufferScheduler {
+public class EventRedisBufferScheduler {
 
 	private final ActivityHandleService activityHandleService;
 	private final EventBuffer eventBuffer;

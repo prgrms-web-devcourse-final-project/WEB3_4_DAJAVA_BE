@@ -19,7 +19,6 @@ import lombok.Getter;
 @Getter
 @Component
 public class EventBuffer {
-
 	private final EventQueueBuffer<PointerClickEventRequest> clickBuffer = new EventQueueBuffer<>();
 	private final EventQueueBuffer<PointerMoveEventRequest> moveBuffer = new EventQueueBuffer<>();
 	private final EventQueueBuffer<PointerScrollEventRequest> scrollBuffer = new EventQueueBuffer<>();
