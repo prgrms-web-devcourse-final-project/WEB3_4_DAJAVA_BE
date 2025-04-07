@@ -151,6 +151,8 @@ public class LogRequestFilter implements Filter {
 
 			log.debug("유효한 serialNumber: {}", serialNumber);
 			chain.doFilter(httpRequest, response);
+		} else {
+			chain.doFilter(request, response);
 		}
 	}
 }
