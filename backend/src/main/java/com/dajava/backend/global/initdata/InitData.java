@@ -18,10 +18,12 @@ import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
+import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
+import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -44,6 +46,7 @@ public class InitData {
 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
 	private final RegisterRepository registerRepository;
 	private final SessionDataDocumentRepository sessionDataDocumentRepository;
+	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
 
 	private PointerClickEventDocument createEvent(Long time, int clientX, int clientY, String tag) {
 		return PointerClickEventDocument.builder()
@@ -97,7 +100,8 @@ public class InitData {
 	public ApplicationRunner baseInitDataApplicationRunner() {
 		return args -> {
 			self.work1();
-			// self.work2();
+			//self.work2();
+			//self.work3();
 		};
 	}
 
@@ -107,6 +111,7 @@ public class InitData {
 		if (initFlag != 1) {
 			return;
 		}
+
 		RegisterCreateRequest request = new RegisterCreateRequest(
 			"chsan626@gmail.com",
 			"password123!",
@@ -200,6 +205,51 @@ public class InitData {
 		pointerScrollEventDocumentRepository.saveAll(scrollEvents);
 
 		log.info("baseInit pointerEventDocument, sessionDataDocument 등록 완료");
+	}
+
+	/**
+	 * Gemini 솔루션 용 데이터 생성
+	 * @author jhon S, sungkibum
+	 * @since 2025-03-24
+	 */
+	public void work3() {
+
+		LocalDateTime now = LocalDateTime.now();
+		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+		SessionDataDocument sessionData = SessionDataDocument.create(
+			"AiSolutionTestSessionNumber",              // sessionId
+			"5_team_testSerial",                                 // memberSerialNumber
+			"localhost:3000/test123",                           // pageUrl
+			timestamp                                          // timestamp (2025-04-07T12:00:00Z 기준 millis)
+		);
+
+		sessionDataDocumentRepository.save(sessionData);
+
+
+		List<SolutionEventDocument> docs = new ArrayList<>();
+
+
+		for (int i = 0; i < 10; i++) {
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				"AiSolutionTestSessionNumber",
+				"/home",
+				"click",               // 이벤트 타입: click, scroll, move 등
+				120,                   // scrollY
+				2200,                  // scrollHeight
+				900,                   // viewportHeight
+				1280,                  // browserWidth
+				timestamp + i, // timestamp (밀리초 단위)
+				300 + (10 * i),                   // clientX
+				200 + (10 * i),                   // clientY
+				"<div>", // element
+				"5_team_testSerial",          // serialNumber
+				true                  // isOutlier
+			);
+			docs.add(doc);
+		}
+
+		solutionEventDocumentRepository.saveAll(docs);
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.event.es.entity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
@@ -66,5 +67,38 @@ public class SolutionEventDocument {
 
 	public LocalDateTime getTimestamp() {
 		return TimeUtils.toLocalDateTime(this.timestamp);
+	}
+
+	public static SolutionEventDocument create(
+		String sessionId,
+		String pageUrl,
+		String type,
+		Integer scrollY,
+		Integer scrollHeight,
+		Integer viewportHeight,
+		Integer browserWidth,
+		Long timestamp,
+		Integer clientX,
+		Integer clientY,
+		String element,
+		String serialNumber,
+		Boolean isOutlier
+	) {
+		return SolutionEventDocument.builder()
+			.id(UUID.randomUUID().toString())
+			.sessionId(sessionId)
+			.pageUrl(pageUrl)
+			.type(type)
+			.scrollY(scrollY)
+			.scrollHeight(scrollHeight)
+			.viewportHeight(viewportHeight)
+			.browserWidth(browserWidth)
+			.timestamp(timestamp)
+			.clientX(clientX)
+			.clientY(clientY)
+			.element(element)
+			.serialNumber(serialNumber)
+			.isOutlier(isOutlier)
+			.build();
 	}
 }
