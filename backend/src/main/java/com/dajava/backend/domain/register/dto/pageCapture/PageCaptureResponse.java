@@ -10,7 +10,7 @@ public record PageCaptureResponse(
 	@Schema(description = "결과 메시지", example = "페이지 캡쳐 데이터가 성공적으로 업데이트되었습니다.")
 	String message,
 
-	@Schema(description = "저장된 캡쳐 이미지의 URL", example = "/page-capture/d4fcb5a1-5cb6-4a95-902c-d2baacf6e9c8")
-	String pageCaptureUrl
+	@Schema(description = "저장된 캡쳐 이미지의 파일명", example = "d4fcb5a1-5cb6-4a95-902c-d2baacf6e9c8.png")
+	String captureFileName
 ) {
 }

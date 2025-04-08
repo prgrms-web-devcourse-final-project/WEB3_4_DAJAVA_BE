@@ -150,16 +150,16 @@ public class RegisterService {
 			.filter(data -> data.getPageUrl().equals(pageUrl))
 			.findFirst();
 
-		String filePath;
+		String fileName;
 		if (optionalData.isPresent()) {
 			PageCaptureData existingData = optionalData.get();
-			filePath = fileStorageService.storeFile(imageFile, existingData.getPageCapturePath());
-			existingData.updatePageCapturePath(filePath);
+			fileName = fileStorageService.storeFile(imageFile, existingData.getPageCapturePath());
+			existingData.updatePageCapturePath(fileName);
 		} else {
-			filePath = fileStorageService.storeFile(imageFile);
+			fileName = fileStorageService.storeFile(imageFile);
 			PageCaptureData newData = PageCaptureData.builder()
 				.pageUrl(pageUrl)
-				.pageCapturePath(filePath)
+				.pageCapturePath(fileName)
 				.register(register)
 				.build();
 			captureDataList.add(newData);
@@ -170,7 +170,7 @@ public class RegisterService {
 		return new PageCaptureResponse(
 			true,
 			"페이지 캡쳐 데이터가 성공적으로 저장되었습니다.",
-			filePath
+			fileName
 		);
 	}
 }

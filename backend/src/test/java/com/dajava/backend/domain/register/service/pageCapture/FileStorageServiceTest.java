@@ -39,7 +39,7 @@ public class FileStorageServiceTest {
 	@DisplayName("1. 신규 파일 업로드 시 파일 생성 테스트")
 	void t001() throws Exception {
 		// Given
-		FileStorageService fileStorageService = new FileStorageService();
+		FileStorageService fileStorageService = new FileStorageService("C:/page-capture");
 		String pageUrl = "http://localhost:3000/myPage";
 		MockMultipartFile imageFile = new MockMultipartFile(
 			"imageFile",
@@ -53,7 +53,6 @@ public class FileStorageServiceTest {
 
 		// then
 		assertNotNull(fileUrl);
-		assertTrue(fileUrl.startsWith("/page-capture/"));
 		assertTrue(fileUrl.endsWith(".png"));
 
 		// 실제 파일이 저장되었는지 확인
@@ -70,7 +69,7 @@ public class FileStorageServiceTest {
 	@DisplayName("2. 기존 파일 덮어쓰기(Override) 테스트")
 	void t002() throws Exception {
 		// given
-		FileStorageService fileStorageService = new FileStorageService();
+		FileStorageService fileStorageService = new FileStorageService("C:/page-capture");
 		String pageUrl = "http://localhost:3000/myPage";
 
 		// 먼저 신규 업로드로 파일을 생성
