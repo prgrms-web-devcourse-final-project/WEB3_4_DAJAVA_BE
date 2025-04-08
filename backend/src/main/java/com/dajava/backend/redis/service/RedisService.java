@@ -23,4 +23,5 @@ public interface RedisService {
 	 * @return result // 처리된 응답 데이터
 	 */
 	void createScrollEvent(PointerScrollEventRequest pointerScrollEventRequest);
+	void expireSession(String sessionId);
 }

@@ -43,10 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EventBatchService {
 	private final EventBuffer eventBuffer;
 	private final SessionDataService sessionDataService;
-	private final PointerClickEventRepository clickRepository;
 	private final PointerMoveEventRepository moveRepository;
-	private final PointerScrollEventRepository scrollRepository;
-	private final SessionDataRepository sessionDataRepository;
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
@@ -66,7 +63,6 @@ public class EventBatchService {
 			return;
 		}
 
-		//SessionData sessionData = sessionDataService.createOrFindSessionData(sessionDataKey);
 		SessionDataDocument sessionDataDocument = sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		processClickEvents(sessionDataKey);

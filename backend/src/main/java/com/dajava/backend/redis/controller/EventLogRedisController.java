@@ -71,6 +71,16 @@ public class EventLogRedisController {
 		return "스크롤 이벤트 수신 완료";
 	}
 
+	@Operation(summary = "세션 종료 요청", description = "세션 종료 요청이 들어오면 해당 세션을 종료합니다.")
+	@PostMapping("/end/{sessionId}")
+	@ResponseStatus(HttpStatus.OK)
+	public void logEnd(
+		@PathVariable String sessionId
+	) {
+		redisService.expireSession(sessionId);
+	}
+
+
 	private final EventRedisBufferScheduler eventRedisBufferScheduler;
 
 	@GetMapping("/flush")
@@ -78,5 +88,4 @@ public class EventLogRedisController {
 		eventRedisBufferScheduler.flushAllEventBuffers();
 		return "성공";
 	}
-
 }

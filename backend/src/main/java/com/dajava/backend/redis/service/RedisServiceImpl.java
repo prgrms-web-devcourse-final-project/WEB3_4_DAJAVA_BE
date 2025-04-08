@@ -7,6 +7,7 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.domain.event.service.ActivityHandleService;
@@ -23,6 +24,9 @@ public class RedisServiceImpl implements RedisService {
 	private final EventRedisBuffer eventRedisBuffer;
 	// private final RedisSessionDataService redisSessionDataService;
 	private final SessionDataService sessionDataService;
+	private final SessionDataDocumentRepository sessionDataDocumentRepository;
+	private final RedisActivityHandleService redisActivityHandleService;
+
 	@Override
 	@Transactional
 	public void createClickEvent(PointerClickEventRequest request) {
@@ -56,5 +60,21 @@ public class RedisServiceImpl implements RedisService {
 		);
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 		eventRedisBuffer.addScrollEvent(request, sessionDataKey);
+	}
+	@Override
+	@Transactional
+	public void expireSession(String sessionId) {
+		log.info("세션 종료");
+
+		//SessionData data = sessionDataRepository.findBySessionId(sessionId)
+		//	.orElseThrow();
+		SessionDataDocument esData = sessionDataDocumentRepository.findBySessionId(sessionId)
+			.orElseThrow();
+
+		SessionDataKey sessionDataKey = new SessionDataKey(
+			esData.getSessionId(), esData.getPageUrl(), esData.getMemberSerialNumber()
+		);
+
+		redisActivityHandleService.processInactiveBatchForSession(sessionDataKey);
 	}
 }
