@@ -25,4 +25,10 @@ public class SessionDataDocumentServiceImpl implements SessionDataDocumentServic
 		PageRequest pageRequest = PageRequest.of(page, size);
 		return sessionDataDocumentRepository.findByIsSessionEndedTrue(pageRequest);
 	}
+
+	@Override
+	public void save(SessionDataDocument sessionDataDocument) {
+		sessionDataDocumentRepository.save(sessionDataDocument);
+	}
+
 }

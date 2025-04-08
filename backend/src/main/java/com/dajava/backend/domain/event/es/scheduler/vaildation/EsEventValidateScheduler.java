@@ -63,6 +63,8 @@ public class EsEventValidateScheduler {
 	@Scheduled(fixedRateString = "#{@validateSchedulerProperties.validateEndSessionMs}")
 	public void endedSessionValidate() {
 
+		log.info("검증 스케줄러 시작");
+
 		int batchSize = validateSchedulerProperties.getBatchSize();
 		int page = 0;
 
@@ -103,6 +105,11 @@ public class EsEventValidateScheduler {
 	 *
 	 */
 	public void processSession(SessionDataDocument sessionDataDocument) {
+
+		if (sessionDataDocument.isVerified()) {
+			return;
+		}
+
 		String sessionId = sessionDataDocument.getSessionId();
 
 		int batchSize = validateSchedulerProperties.getBatchSize();
@@ -120,6 +127,7 @@ public class EsEventValidateScheduler {
 			clickEvents, moveEvents, scrollEvents);
 
 		solutionEventDocumentService.saveAllSolutionEvents(solutionEvents);
+		sessionDataDocumentService.save(sessionDataDocument);
 	}
 
 }

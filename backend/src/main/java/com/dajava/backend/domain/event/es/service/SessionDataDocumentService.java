@@ -19,4 +19,12 @@ public interface SessionDataDocumentService {
 	 * @return SessionDataDocuments 일부를 가진 페이징 객체
 	 */
 	public Page<SessionDataDocument> getEndedSessions(int page, int size);
+
+	/**
+	 * 세션데이터 저장 메서드
+	 *  현재 검증 스케줄러에서 세션 검증 후 isverify 변경사항 저장하려고 사용
+	 * @param sessionDataDocument
+	 * @return
+	 */
+	public void save(SessionDataDocument sessionDataDocument);
 }

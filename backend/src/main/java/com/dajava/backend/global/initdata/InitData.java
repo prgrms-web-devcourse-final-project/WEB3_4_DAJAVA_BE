@@ -123,7 +123,7 @@ public class InitData {
 			.startDate(request.startDate())
 			.endDate(request.endDate())
 			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
-			.isServiceExpired(false)
+			.isServiceExpired(true)
 			.isSolutionComplete(false)
 			.captureData(new ArrayList<>())
 			.build();
