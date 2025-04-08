@@ -1,5 +1,6 @@
 package com.dajava.backend.redis.controller;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +12,7 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.service.EventLogService;
+import com.dajava.backend.redis.scheduler.EventRedisBufferScheduler;
 import com.dajava.backend.redis.service.RedisService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -67,6 +69,14 @@ public class EventLogRedisController {
 	) {
 		redisService.createScrollEvent(scrollEventRequest);
 		return "스크롤 이벤트 수신 완료";
+	}
+
+	private final EventRedisBufferScheduler eventRedisBufferScheduler;
+
+	@GetMapping("/flush")
+	public String triggerFlushManually() {
+		eventRedisBufferScheduler.flushAllEventBuffers();
+		return "성공";
 	}
 
 }
