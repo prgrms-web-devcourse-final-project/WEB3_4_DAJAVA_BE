@@ -46,6 +46,11 @@ public class LogRequestFilter implements Filter {
 		HttpServletRequest httpRequest = (HttpServletRequest)request;
 		HttpServletResponse httpResponse = (HttpServletResponse)response;
 
+		// UTF-8 인코딩 설정 추가
+		httpRequest.setCharacterEncoding("UTF-8");
+		httpResponse.setCharacterEncoding("UTF-8");
+		httpResponse.setContentType("application/json;charset=UTF-8");
+
 		// ✅ preflight 요청은 필터 무시
 		if ("OPTIONS".equalsIgnoreCase(httpRequest.getMethod())) {
 			chain.doFilter(request, response);
@@ -90,6 +95,7 @@ public class LogRequestFilter implements Filter {
 					if (!registerCacheService.isValidSerialNumber(memberSerialNumber)) {
 						log.warn("유효하지 않은 memberSerialNumber: {}", memberSerialNumber);
 						httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+						httpResponse.setContentType("text/plain;charset=UTF-8");
 						httpResponse.getWriter().write("유효하지 않은 일련번호(member_serial_number) 입니다.");
 						return;
 					}
@@ -98,7 +104,7 @@ public class LogRequestFilter implements Filter {
 				} else {
 					log.warn("memberSerialNumber가 요청에 없습니다");
 					httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
+					httpResponse.setContentType("text/plain;charset=UTF-8");
 					httpResponse.getWriter().write("일련번호(member_serial_number) 가 존재하지 않습니다.");
 					return;
 				}
@@ -109,6 +115,7 @@ public class LogRequestFilter implements Filter {
 				log.error("로그 요청 처리 중 오류 발생", e);
 
 				httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				httpResponse.setContentType("text/plain;charset=UTF-8");
 				httpResponse.getWriter().write("로그 데이터 요청 중 오류가 발생했습니다.");
 			}
 		}
@@ -132,6 +139,7 @@ public class LogRequestFilter implements Filter {
 				} catch (ServletException e) {
 					log.error("Multipart 요청의 파트 정보를 가져오는데 실패", e);
 					httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					httpResponse.setContentType("text/plain;charset=UTF-8");
 					httpResponse.getWriter().write("요청 파싱 중 오류가 발생했습니다.");
 					return;
 				}
@@ -145,10 +153,10 @@ public class LogRequestFilter implements Filter {
 			if (serialNumber == null || !registerCacheService.isValidSerialNumber(serialNumber)) {
 				log.warn("유효하지 않은 serialNumber: {}", serialNumber);
 				httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				httpResponse.setContentType("text/plain;charset=UTF-8");
 				httpResponse.getWriter().write("유효하지 않은 일련번호 입니다.");
 				return;
 			}
-
 			log.debug("유효한 serialNumber: {}", serialNumber);
 			chain.doFilter(httpRequest, response);
 		} else {
