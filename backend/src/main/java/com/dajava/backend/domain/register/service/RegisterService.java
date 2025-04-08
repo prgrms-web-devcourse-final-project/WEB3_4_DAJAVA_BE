@@ -51,6 +51,7 @@ public class RegisterService {
 	private final OrderRepository orderRepository;
 	private final RegisterValidator registerValidator;
 	private final FileStorageService fileStorageService;
+	private final RegisterCacheService registerCacheService;
 
 	/**
 	 * 서비스 Register 생성 메서드
@@ -66,7 +67,9 @@ public class RegisterService {
 		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
 
 		log.info("Register 엔티티 생성 : {} ", newRegister);
-		log.info("Order 엔티티 생성 : {} ", newOrder);
+		// log.info("Order 엔티티 생성 : {} ", newOrder);
+
+		registerCacheService.refreshCacheAll();
 
 		return toRegisterCreateResponse(newRegister);
 	}
