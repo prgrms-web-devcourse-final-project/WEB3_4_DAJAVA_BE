@@ -1,7 +1,11 @@
 package com.dajava.backend.global.filter;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONObject;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -16,6 +20,7 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -108,21 +113,45 @@ public class LogRequestFilter implements Filter {
 			}
 		}
 		// pageCapture API 엔드포인트에 대한 필터
-		else if (path.matches("^/v1/register/[^/]+/page-capture$")) {
-			int prefixLength = "/v1/register/".length();
-			int suffixIndex = path.indexOf("/page-capture");
-			String serialNumber = path.substring(prefixLength, suffixIndex);
+		else if ("/v1/register/page-capture".equals(path)) {
+			String serialNumber = null;
+			String contentType = httpRequest.getContentType();
 
-			if (!registerCacheService.isValidSerialNumber(serialNumber)) {
+			// multipart 요청인 경우, 파트 내에서 "serialNumber" 값을 직접 추출
+			if (contentType != null && contentType.toLowerCase().contains("multipart/form-data")) {
+				try {
+					Collection<Part> parts = httpRequest.getParts();
+					for (Part part : parts) {
+						if ("serialNumber".equals(part.getName())) {
+							try (InputStream is = part.getInputStream()) {
+								serialNumber = IOUtils.toString(is, StandardCharsets.UTF_8).trim();
+							}
+							break;
+						}
+					}
+				} catch (ServletException e) {
+					log.error("Multipart 요청의 파트 정보를 가져오는데 실패", e);
+					httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					httpResponse.getWriter().write("요청 파싱 중 오류가 발생했습니다.");
+					return;
+				}
+			} else {
+				// multipart 가 아닌 요청은 그대로 CachedBodyHttpServletRequest 사용
+				CachedBodyHttpServletRequest cachedBodyRequest = new CachedBodyHttpServletRequest(httpRequest);
+				serialNumber = cachedBodyRequest.getParameter("serialNumber");
+			}
+
+			// 유효성 검사 후 처리
+			if (serialNumber == null || !registerCacheService.isValidSerialNumber(serialNumber)) {
 				log.warn("유효하지 않은 serialNumber: {}", serialNumber);
 				httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				httpResponse.getWriter().write("유효하지 않은 일련번호 입니다.");
 				return;
 			}
+
 			log.debug("유효한 serialNumber: {}", serialNumber);
-			chain.doFilter(request, response);
+			chain.doFilter(httpRequest, response);
 		} else {
-			// 다른 요청은 필터 통과
 			chain.doFilter(request, response);
 		}
 	}

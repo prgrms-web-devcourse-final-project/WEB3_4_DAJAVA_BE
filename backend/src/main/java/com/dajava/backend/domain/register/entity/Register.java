@@ -4,6 +4,8 @@ import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
@@ -13,7 +15,6 @@ import com.dajava.backend.global.common.BaseTimeEntity;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
-import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,7 +22,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -70,10 +71,8 @@ public class Register extends BaseTimeEntity {
 	@OneToOne(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Solution solution;
 
-	@Lob
-	@Basic(fetch = FetchType.LAZY)
-	@Column(name = "page_capture", columnDefinition = "TEXT")
-	private String pageCapture;
+	@OneToMany(mappedBy = "register", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<PageCaptureData> captureData = new ArrayList<>();
 
 	public static Register create(
 		final RegisterCreateRequest request
@@ -88,7 +87,7 @@ public class Register extends BaseTimeEntity {
 			.duration(TimeUtils.getDuration(request.startDate(), request.endDate()))
 			.isServiceExpired(false)
 			.isSolutionComplete(false)
-			.pageCapture("")
+			.captureData(new ArrayList<>())
 			.build();
 	}
 
@@ -109,10 +108,6 @@ public class Register extends BaseTimeEntity {
 		// endDateTime & duration 갱신
 		this.duration += TimeUtils.getDuration(endDate, newEndDate);
 		this.endDate = newEndDate;
-	}
-
-	public void updatePageCapture(String pageCapture) {
-		this.pageCapture = pageCapture;
 	}
 
 	@Override

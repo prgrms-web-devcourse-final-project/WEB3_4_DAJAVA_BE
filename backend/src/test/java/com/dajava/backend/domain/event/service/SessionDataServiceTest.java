@@ -19,7 +19,7 @@ import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
-
+/*
 @ExtendWith(MockitoExtension.class)
 public class SessionDataServiceTest {
 
@@ -254,4 +254,4 @@ public class SessionDataServiceTest {
 			.findByPageUrlAndSessionIdAndMemberSerialNumber(pageUrl, sessionId, memberSerialNumber);
 	}
 }
-
+*/

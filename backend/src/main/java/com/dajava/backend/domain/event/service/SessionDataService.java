@@ -25,12 +25,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class SessionDataService {
-	private final SessionDataRepository sessionDataRepository;
+	//private final SessionDataRepository sessionDataRepository;
 	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
-	private final Map<SessionDataKey, SessionData> sessionCache = new ConcurrentHashMap<>();
+	//private final Map<SessionDataKey, SessionData> sessionCache = new ConcurrentHashMap<>();
 	private final Map<SessionDataKey, SessionDataDocument> sessionEsCache = new ConcurrentHashMap<>();
 
+	/*
 	@Transactional
 	public SessionData createOrFindSessionData(SessionDataKey key) {
 		return sessionCache.computeIfAbsent(key, k ->
@@ -56,6 +57,7 @@ public class SessionDataService {
 	public void removeFromCache(SessionDataKey key) {
 		sessionCache.remove(key);
 	}
+	 */
 
 	//session 엔티티 일련번호는 sessionId+url+serialNum으로 한다.
 	//트랜잭션이 보장 되지 않기 때문에 중복된 데이터가 들어간 경우 원래 있던 데이터에 덮어쓰기 형태가 되어야함.

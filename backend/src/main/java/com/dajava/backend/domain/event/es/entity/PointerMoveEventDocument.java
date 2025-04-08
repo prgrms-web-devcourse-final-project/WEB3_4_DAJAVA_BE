@@ -3,10 +3,7 @@ package com.dajava.backend.domain.event.es.entity;
 import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.exception.ErrorCode;
