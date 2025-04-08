@@ -8,6 +8,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,11 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileStorageService {
 
-	private static final String STORAGE_PATH = "C:/page-capture";
 	private final Path fileStorageLocation;
 
-	public FileStorageService() {
-		this.fileStorageLocation = Paths.get(STORAGE_PATH).toAbsolutePath().normalize();
+	public FileStorageService(@Value("${image.path}") String storagePath) {
+		this.fileStorageLocation = Paths.get(storagePath).toAbsolutePath().normalize();
 		try {
 			Files.createDirectories(this.fileStorageLocation);
 		} catch (IOException ex) {
