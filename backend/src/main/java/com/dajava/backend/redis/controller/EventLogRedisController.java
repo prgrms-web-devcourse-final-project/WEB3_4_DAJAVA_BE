@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventLogRedisController {
 	private final RedisService redisService;
-
 	/**
 	 * Click(Touch) 이벤트 로깅
 	 * type 이 "click" 인 이벤트를 로깅합니다.
@@ -42,4 +41,32 @@ public class EventLogRedisController {
 		redisService.createClickEvent(clickEventRequest);
 		return "클릭 이벤트 수신 완료";
 	}
+	/**
+	 * mousemove 이벤트 로깅
+	 * type 이 "mousemove"인 이벤트를 로깅합니다.
+	 */
+	@Operation(summary = "이동 이벤트 로깅", description = "마우스 이벤트 이동 타입의 이벤트를 로깅합니다.")
+	@PostMapping("/movement")
+	@ResponseStatus(HttpStatus.OK)
+	public String logMovement(
+		@RequestBody PointerMoveEventRequest moveEventRequest
+	) {
+		redisService.createMoveEvent(moveEventRequest);
+		return "이동 이벤트 수신 완료";
+	}
+
+	/**
+	 * scroll 이벤트 로깅
+	 * type 이 "scroll"인 이벤트를 로깅합니다.
+	 */
+	@Operation(summary = "스크롤 이벤트 로깅", description = "마우스 이벤트 스크롤 타입의 이벤트를 로깅합니다.")
+	@PostMapping("/scroll")
+	@ResponseStatus(HttpStatus.OK)
+	public String logScroll(
+		@RequestBody PointerScrollEventRequest scrollEventRequest
+	) {
+		redisService.createScrollEvent(scrollEventRequest);
+		return "스크롤 이벤트 수신 완료";
+	}
+
 }
