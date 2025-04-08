@@ -107,15 +107,21 @@ public class EsEventValidateScheduler {
 	public void processSession(SessionDataDocument sessionDataDocument) {
 
 		if (sessionDataDocument.isVerified()) {
+			log.info("이미 검증된 세션 데이터 입니다 sessionId : {}", sessionDataDocument.getSessionId());
 			return;
 		}
 
 		String sessionId = sessionDataDocument.getSessionId();
+		log.info("검증 되는 세션 아이디 : {}", sessionId);
 
 		int batchSize = validateSchedulerProperties.getBatchSize();
 		List<PointerClickEventDocument> clickEvents = pointerEventDocumentService.fetchAllClickEventDocumentsBySessionId(sessionId, batchSize);
 		List<PointerMoveEventDocument> moveEvents = pointerEventDocumentService.fetchAllMoveEventDocumentsBySessionId(sessionId, batchSize);
 		List<PointerScrollEventDocument> scrollEvents = pointerEventDocumentService.fetchAllScrollEventDocumentsBySessionId(sessionId, batchSize);
+
+		log.info("검증 되는 clickEventsDocument 개수 : {}", clickEvents.size());
+		log.info("검증 되는 moveEventsDocument 개수 : {}", moveEvents.size());
+		log.info("검증 되는 scrollEventsDocument 개수 : {}", scrollEvents.size());
 
 		esClickEventAnalyzer.analyze(clickEvents);
 		esMoveEventAnalyzer.analyze(moveEvents);
@@ -123,10 +129,13 @@ public class EsEventValidateScheduler {
 
 		sessionDataDocument.markAsVerified();
 
+		log.info("검증 완료");
+
 		List<SolutionEventDocument> solutionEvents = PointerEventConverter.toSolutionEventDocuments(
 			clickEvents, moveEvents, scrollEvents);
 
 		solutionEventDocumentService.saveAllSolutionEvents(solutionEvents);
+		log.info("저장된 SolutionEventDocument 개수 : {}", solutionEvents.size());
 		sessionDataDocumentService.save(sessionDataDocument);
 	}
 
