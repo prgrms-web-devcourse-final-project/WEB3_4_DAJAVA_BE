@@ -23,9 +23,6 @@ public class RedisServiceImpl implements RedisService {
 	private final SessionDataService sessionDataService;
 	private final EventRedisBuffer eventRedisBuffer;
 
-	/**
-	 * 클릭 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
-	 */
 	@Override
 	@Transactional
 	public void createClickEvent(PointerClickEventRequest request) {
@@ -33,15 +30,10 @@ public class RedisServiceImpl implements RedisService {
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
 		);
-		// es 용 // 틀 구조
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
-		// 클릭 이벤트 버퍼링
 		eventRedisBuffer.addClickEvent(request, sessionDataKey);
 	}
 
-	/**
-	 * 무브 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
-	 */
 	@Override
 	@Transactional
 	public void createMoveEvent(PointerMoveEventRequest request) {
@@ -54,9 +46,6 @@ public class RedisServiceImpl implements RedisService {
 		eventRedisBuffer.addMoveEvent(request, sessionDataKey);
 	}
 
-	/**
-	 * 스크롤 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
-	 */
 	@Override
 	@Transactional
 	public void createScrollEvent(PointerScrollEventRequest request) {
