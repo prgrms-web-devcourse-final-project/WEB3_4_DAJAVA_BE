@@ -14,10 +14,8 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  cache:
+    type: redis
   jpa:
     hibernate:
       ddl-auto: create
@@ -28,6 +26,10 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
 logging:
   level:
