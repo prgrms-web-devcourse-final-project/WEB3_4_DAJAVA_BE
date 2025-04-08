@@ -88,4 +88,9 @@ public class EventLogRedisController {
 		eventRedisBufferScheduler.flushAllEventBuffers();
 		return "성공";
 	}
+	@GetMapping("/flush/inactive")
+	public String triggerFlushInactive() {
+		eventRedisBufferScheduler.flushInactiveEventBuffers();
+		return "성공";
+	}
 }
