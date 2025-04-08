@@ -4,9 +4,12 @@ import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import reactor.core.scheduler.Schedulers;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
@@ -49,8 +52,10 @@ public class SolutionServiceImpl implements SolutionService {
 	 * @param serialNumber // 신청자에게 제공된 시리얼 넘버
 	 * @return Mono<SolutionResponse>
 	 */
+	@Autowired
+	private PlatformTransactionManager transactionManager;
+
 	@Override
-	@Transactional
 	public Mono<SolutionResponse> getAISolution(String refineData, String serialNumber) {
 		return geminiApiConfig.geminiWebClient().post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
@@ -62,23 +67,26 @@ public class SolutionServiceImpl implements SolutionService {
 				try {
 					JsonNode rootNode = objectMapper.readTree(result);
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();
-					Register register = registerRepository.findBySerialNumber(serialNumber)
-						.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
-					if (text != null) {
 
-						Solution solution = Solution.builder()
-							.text(text)
-							.register(register)
-							.build();
-						solutionRepository.save(solution);
-						SolutionResponse solutionResponseDto = new SolutionResponse(text);
-						solution.getRegister().setSolutionComplete(true);
-						registerRepository.save(register);
+					return Mono.fromCallable(() -> {
+						TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
+						return txTemplate.execute(status -> {
+							Register register = registerRepository.findBySerialNumber(serialNumber)
+								.orElseThrow(() -> new SolutionException(SOLUTION_SERIAL_NUMBER_NOT_FOUND));
 
-						return Mono.just(solutionResponseDto);
-					} else {
-						return Mono.error(new SolutionException(SOLUTION_EVENT_DATA_NOT_FOUND));
-					}
+							Solution solution = Solution.builder()
+								.text(text)
+								.register(register)
+								.build();
+
+							solutionRepository.save(solution);
+							register.setSolutionComplete(true);
+							registerRepository.save(register);
+
+							return new SolutionResponse(text);
+						});
+					}).subscribeOn(Schedulers.boundedElastic());
+
 				} catch (IOException e) {
 					return Mono.error(new SolutionException(SOLUTION_PARSING_ERROR));
 				} catch (Exception e) {
@@ -86,6 +94,7 @@ public class SolutionServiceImpl implements SolutionService {
 				}
 			});
 	}
+
 
 	/**
 	 * 솔루션 정보 조회 메서드

@@ -23,11 +23,13 @@ import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRe
 import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
+import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
 import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
 import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.global.component.buffer.EventBuffer;
+import com.dajava.backend.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +64,9 @@ public class EventBatchService {
 
 		int totalPendingEvents = countPendingEvents(sessionDataKey);
 
+		//initData로 테스트시 throw 주석처리 후 사용
 		if (totalPendingEvents == 0) {
-			return;
+			throw new PointerEventException(ErrorCode.EVENT_DTO_NOT_FOUND);
 		}
 
 		//SessionData sessionData = sessionDataService.createOrFindSessionData(sessionDataKey);

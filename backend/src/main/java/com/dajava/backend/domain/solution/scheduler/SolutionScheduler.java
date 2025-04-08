@@ -31,19 +31,35 @@ public class SolutionScheduler {
 
 	@Scheduled(cron = "0 0 0 * * *")    //매일 자정(00:00)에 실행
 	public void processExpiredRegisters() {
+		//추후 등록된 레지스터 정리하는 기능 필요
 		List<Register> expiredRegisters = registerRepository.findByIsServiceExpiredTrue();
 
 		for (Register register : expiredRegisters) {
 			try {
+				// 이미 솔루션이 완료된 상태면 무시함.
+				if (register.isSolutionComplete()) {
+					continue;
+				}
+
 				List<SolutionEventDocument> solutionEventDocumentList = solutionEventDocumentRepository
 					.findBySerialNumberAndIsOutlier(register.getSerialNumber(), true);
 
 				if (solutionEventDocumentList.isEmpty()) {
 					log.info("No session data for register: {}", register.getSerialNumber());
+					continue;
 				}
 				SolutionRequest solutionRequest = SolutionRequest.from(register.getSerialNumber(),
 					solutionEventDocumentList);
-				solutionController.getUXSolution(solutionRequest);
+				
+				// Mono를 구독하여 실제 실행되도록 함
+				solutionController.getUXSolution(solutionRequest)
+					.subscribe(
+						response -> log.info("Successfully processed register: {}, response: {}",
+							register.getSerialNumber(), response),
+						error -> log.error("Error in reactive processing for register: {}",
+							register.getSerialNumber(), error)
+					);
+
 				log.info("Processed expired register: {}", register.getSerialNumber());
 
 			} catch (Exception e) {
