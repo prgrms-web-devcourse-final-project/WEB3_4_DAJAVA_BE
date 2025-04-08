@@ -1,8 +1,19 @@
 version: '3.7'
 services:
+  redis:
+    image: redis:7
+    container_name: my-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    networks:
+      - elastic
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.14
     container_name: elasticsearch
+    platform: linux/amd64
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
@@ -27,6 +38,8 @@ services:
       - elasticsearch
     networks:
       - elastic
+volumes:
+  redis_data:
 
 networks:
   elastic:
