@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -232,19 +234,19 @@ class RegisterControllerTest {
 		);
 
 		// 캐시 리프레시
-		registerCacheService.refreshCache();
+		registerCacheService.refreshCacheAll();
 
 		// When & Then Second - 실제 서비스를 사용하여 테스트
 		mockMvc.perform(multipart("/v1/register/page-capture")
 				.file(imageFile)
-				.param("serialNumber", serialNumber)
-				.param("pageUrl", pageUrl)
+				.part(new MockPart("serialNumber", serialNumber.getBytes(StandardCharsets.UTF_8)))
+				.part(new MockPart("pageUrl", pageUrl.getBytes(StandardCharsets.UTF_8)))
 				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.message").isString())
-			.andExpect(jsonPath("$.filePath").isString());
+			.andExpect(jsonPath("$.pageCaptureUrl").isString());
 	}
 
 	@Test
@@ -292,8 +294,8 @@ class RegisterControllerTest {
 		// When & Then Second - 실제 호출에서 401 예상
 		mockMvc.perform(multipart("/v1/register/page-capture")
 				.file(imageFile)
-				.param("serialNumber", serialNumber)
-				.param("pageUrl", pageUrl)
+				.part(new MockPart("serialNumber", serialNumber.getBytes(StandardCharsets.UTF_8)))
+				.part(new MockPart("pageUrl", pageUrl.getBytes(StandardCharsets.UTF_8)))
 				.contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
 			.andExpect(status().isUnauthorized());
 	}
