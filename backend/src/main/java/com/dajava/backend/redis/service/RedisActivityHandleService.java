@@ -36,5 +36,3 @@ public class RedisActivityHandleService {
 		redisEventBatchService.processBatchForSession(key, true);
 	}
 }
-
-}

@@ -10,6 +10,7 @@ import com.dajava.backend.domain.event.service.ActivityHandleService;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.component.buffer.EventBuffer;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
+import com.dajava.backend.redis.service.RedisActivityHandleService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class EventBufferScheduler {
-
-	private final ActivityHandleService activityHandleService;
 	private final EventBuffer eventBuffer;
-
+	private final RedisActivityHandleService redisActivityHandleService;
 	private final BufferSchedulerProperties properties;
 
 	/**
@@ -60,7 +59,7 @@ public class EventBufferScheduler {
 				inactiveCount++;
 
 				// 배치 처리를 통해 데이터 저장 및 캐시 제거
-				activityHandleService.processInactiveBatchForSession(sessionKey);
+				redisActivityHandleService.processInactiveBatchForSession(sessionKey);
 			}
 		}
 
@@ -83,7 +82,7 @@ public class EventBufferScheduler {
 
 		for (SessionDataKey sessionKey : activeKeys) {
 			try {
-				activityHandleService.processActiveBatchForSession(sessionKey);
+				redisActivityHandleService.processActiveBatchForSession(sessionKey);
 			} catch (Exception e) {
 				log.error("세션 {} 처리 중 오류 발생: {}", sessionKey, e.getMessage(), e);
 			}
