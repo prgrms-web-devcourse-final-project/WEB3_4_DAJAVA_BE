@@ -40,10 +40,20 @@ public class SolutionScheduler {
 
 				if (solutionEventDocumentList.isEmpty()) {
 					log.info("No session data for register: {}", register.getSerialNumber());
+					continue;
 				}
 				SolutionRequest solutionRequest = SolutionRequest.from(register.getSerialNumber(),
 					solutionEventDocumentList);
-				solutionController.getUXSolution(solutionRequest);
+				
+				// Mono를 구독하여 실제 실행되도록 함
+				solutionController.getUXSolution(solutionRequest)
+					.subscribe(
+						response -> log.info("Successfully processed register: {}, response: {}",
+							register.getSerialNumber(), response),
+						error -> log.error("Error in reactive processing for register: {}",
+							register.getSerialNumber(), error)
+					);
+
 				log.info("Processed expired register: {}", register.getSerialNumber());
 
 			} catch (Exception e) {
