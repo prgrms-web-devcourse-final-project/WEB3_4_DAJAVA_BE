@@ -3,6 +3,7 @@ package com.dajava.backend.domain.register.service;
 import static com.dajava.backend.domain.register.converter.RegisterConverter.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.dajava.backend.domain.register.RegisterInfo;
 import com.dajava.backend.domain.register.converter.RegisterConverter;
+import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
+import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
@@ -20,6 +23,7 @@ import com.dajava.backend.domain.register.dto.register.RegisterModifyResponse;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.Order;
+import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
@@ -47,6 +51,7 @@ public class RegisterService {
 	private final OrderRepository orderRepository;
 	private final RegisterValidator registerValidator;
 	private final FileStorageService fileStorageService;
+	private final RegisterCacheService registerCacheService;
 
 	/**
 	 * 서비스 Register 생성 메서드
@@ -62,7 +67,9 @@ public class RegisterService {
 		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
 
 		log.info("Register 엔티티 생성 : {} ", newRegister);
-		log.info("Order 엔티티 생성 : {} ", newOrder);
+		// log.info("Order 엔티티 생성 : {} ", newOrder);
+
+		registerCacheService.refreshCacheAll();
 
 		return toRegisterCreateResponse(newRegister);
 	}
@@ -125,25 +132,45 @@ public class RegisterService {
 	/**
 	 * 페이지 캡쳐 데이터를 업데이트합니다.
 	 *
-	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
-	 * @param imageFile 멀티파트 파일 형식으로 들어오는 전체 페이지 캡쳐 파일입니다.
+	 * @param request serialNumber, pageUrl, imagefile 을 가진 요청 DTO 입니다.
 	 * @return 처리 결과 메시지
 	 */
-	public String modifyPageCapture(String serialNumber, MultipartFile imageFile) {
+	@Transactional
+	public PageCaptureResponse createPageCapture(PageCaptureRequest request) {
+		String serialNumber = request.serialNumber();
+		String pageUrl = request.pageUrl();
+		MultipartFile imageFile = request.imageFile();
+
 		Register register = registerRepository.findBySerialNumber(serialNumber)
 			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
 
-		// 페이지 저장 경로가 존재한다면 이미지 저장 작업을 진행하지 않음
-		if (register.getPageCapture() != null && !register.getPageCapture().isEmpty()) {
-			return "이미 페이지 캡쳐 데이터가 존재합니다.";
+		List<PageCaptureData> captureDataList = register.getCaptureData();
+
+		Optional<PageCaptureData> optionalData = captureDataList.stream()
+			.filter(data -> data.getPageUrl().equals(pageUrl))
+			.findFirst();
+
+		String filePath;
+		if (optionalData.isPresent()) {
+			PageCaptureData existingData = optionalData.get();
+			filePath = fileStorageService.storeFile(pageUrl, imageFile, existingData.getPageCapturePath());
+			existingData.updatePageCapturePath(filePath);
+		} else {
+			filePath = fileStorageService.storeFile(pageUrl, imageFile);
+			PageCaptureData newData = PageCaptureData.builder()
+				.pageUrl(pageUrl)
+				.pageCapturePath(filePath)
+				.register(register)
+				.build();
+			captureDataList.add(newData);
 		}
 
-		// 파일 저장 서비스에 접근해 이미지 파일을 로컬에 저장, 경로 문자열을 반환받습니다.
-		String fileUrl = fileStorageService.storeFile(imageFile);
-
-		register.updatePageCapture(fileUrl);
 		registerRepository.save(register);
 
-		return "페이지 캡쳐 데이터가 성공적으로 업데이트되었습니다.";
+		return new PageCaptureResponse(
+			true,
+			"페이지 캡쳐 데이터가 성공적으로 저장되었습니다.",
+			filePath
+		);
 	}
 }

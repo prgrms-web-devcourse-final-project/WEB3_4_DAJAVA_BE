@@ -11,14 +11,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * 캡쳐 이미지를 생성하거나, 기존에 있는 이미지에 덮어쓰는 로직입니다.
+ * 기존에 있는 이미지에 덮어쓰는 경우, 동일한 파일명으로 REPLACE 됩니다.
+ * @author Metronon
+ */
 @Service
 public class FileStorageService {
 
 	private static final String STORAGE_PATH = "C:/page-capture";
-
 	private final Path fileStorageLocation;
 
-	// 해당 경로에 디렉토리가 없다면 생성
 	public FileStorageService() {
 		this.fileStorageLocation = Paths.get(STORAGE_PATH).toAbsolutePath().normalize();
 		try {
@@ -29,30 +32,53 @@ public class FileStorageService {
 	}
 
 	/**
-	 *
-	 * @param file 전송받는 멀티파트 파일
-	 * @return String UUID 형식으로 로컬에 저장된 이미지의 경로값을 반환
+	 * 기존 파일 URL 이 없는 경우, 새로운 UUID 기반 파일명 생성 로직
 	 */
-	public String storeFile(MultipartFile file) {
+	public String storeFile(String pageUrl, MultipartFile file) {
 		// 파일의 확장자 추출
-		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-		if (extension != null && !extension.isEmpty()) {
-			extension = "." + extension;
-		} else {
-			extension = "";
-		}
-
-		// UUID + 확장자명으로 새로운 고유 파일명 생성
+		String originalExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+		String extension = (originalExtension != null && !originalExtension.isEmpty())
+			? "." + originalExtension : "";
+		// 새 UUID 기반 파일명 생성
 		String fileName = UUID.randomUUID().toString() + extension;
 
-		try {
-			// 정의한 파일 경로로 멀티파트 파일 복사
-			Path targetLocation = this.fileStorageLocation.resolve(fileName);
-			Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+		return saveFile(fileName, file);
+	}
 
+	/**
+	 * 기존 파일 URL이 있을 경우, 기존 파일명을 그대로 사용하여 덮어쓰는 로직
+	 */
+	public String storeFile(String pageUrl, MultipartFile file, String existingFileUrl) {
+		// 파일명 추출
+		String fileName = existingFileUrl.substring(existingFileUrl.lastIndexOf("/") + 1);
+		// 파일의 확장자 추출 (기존 파일명에 이미 확장자가 없는 경우에는 추가)
+		String originalExtension = FilenameUtils.getExtension(file.getOriginalFilename());
+		String extension = (originalExtension != null && !originalExtension.isEmpty())
+			? "." + originalExtension : "";
+		if (!fileName.endsWith(extension)) {
+			fileName = fileName + extension;
+		}
+
+		return saveFile(fileName, file);
+	}
+
+	/**
+	 * UUID 로 구성된 파일명 (확장자 포함) 과 파일로 저장 후, 경로를 반환하는 로직
+	 *
+	 * @param fileName UUID 로 생성 혹은 가져온 기존 이름입니다.
+	 * @param file 멀티파트 이미지 파일입니다.
+	 * @return String pageCapturePath 로 저장될 경로입니다.
+	 */
+	private String saveFile(String fileName, MultipartFile file) {
+		try {
+			Path targetLocation = this.fileStorageLocation.resolve(fileName);
+			// 기존 파일이 있더라도 덮어씁니다.
+			Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 			return "/page-capture/" + fileName;
 		} catch (IOException ex) {
-			throw new RuntimeException("파일 저장에 실패했습니다: ", ex);
+			throw new RuntimeException("파일 저장에 실패했습니다.", ex);
 		}
 	}
 }
+
+

@@ -66,21 +66,21 @@ public class EventBatchService {
 			return;
 		}
 
-		SessionData sessionData = sessionDataService.createOrFindSessionData(sessionDataKey);
+		//SessionData sessionData = sessionDataService.createOrFindSessionData(sessionDataKey);
 		SessionDataDocument sessionDataDocument = sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
-		processClickEvents(sessionDataKey, sessionData);
-		processMoveEvents(sessionDataKey, sessionData);
-		processScrollEvents(sessionDataKey, sessionData);
+		processClickEvents(sessionDataKey);
+		processMoveEvents(sessionDataKey);
+		processScrollEvents(sessionDataKey);
 
 		if (isInactive) {
-			sessionDataService.removeFromCache(sessionDataKey);
+			//sessionDataService.removeFromCache(sessionDataKey);
 			sessionDataService.removeFromEsCache(sessionDataKey);
 			// 세션 종료 flag 값 true 로 변경
-			sessionData.endSession();
+			//sessionData.endSession();
 			sessionDataDocument.endSession();
 		}
-		sessionDataRepository.save(sessionData);
+		//sessionDataRepository.save(sessionData);
 		sessionDataDocumentRepository.save(sessionDataDocument);
 	}
 
@@ -99,9 +99,8 @@ public class EventBatchService {
 	 * 클릭 이벤트의 버퍼에 접근 후, sessionData 에 데이터를 저장합니다.
 	 * 현재 es에도 같이 저장합니다.
 	 * @param sessionDataKey sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
-	 * @param sessionData sessionData 를 통해 클릭 이벤트 전체를 리스트화 해 저장합니다.
 	 */
-	private void processClickEvents(SessionDataKey sessionDataKey, SessionData sessionData) {
+	private void processClickEvents(SessionDataKey sessionDataKey) {
 		List<PointerClickEventRequest> clickEvents = eventBuffer.flushClickEvents(sessionDataKey);
 		log.info("세션 {}: 클릭 이벤트 {} 개 처리", sessionDataKey, clickEvents.size());
 
@@ -109,6 +108,7 @@ public class EventBatchService {
 		//es에 저장할 형태
 		List<PointerClickEventDocument> documents = new ArrayList<>();
 		for (PointerClickEventRequest request : clickEvents) {
+			/*
 			PointerClickEvent event = PointerClickEvent.create(
 				request.clientX(),
 				request.clientY(),
@@ -123,13 +123,13 @@ public class EventBatchService {
 				sessionData
 			);
 			entities.add(event);
-
+			*/
 			PointerClickEventDocument doc = PointerEventConverter.toClickEventDocument(request);
 			documents.add(doc);
 		}
 
-		if (!entities.isEmpty()) {
-			clickRepository.saveAll(entities);
+		if (!documents.isEmpty()) {
+			//clickRepository.saveAll(entities);
 			pointerClickEventDocumentRepository.saveAll(documents); // Elasticsearch 저장
 		}
 	}
@@ -137,9 +137,8 @@ public class EventBatchService {
 	/**
 	 * 무브 이벤트의 버퍼에 접근 후, sessionData 에 데이터를 저장합니다.
 	 * @param sessionDataKey sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
-	 * @param sessionData sessionData 를 통해 클릭 이벤트 전체를 리스트화 해 저장합니다.
 	 */
-	private void processMoveEvents(SessionDataKey sessionDataKey, SessionData sessionData) {
+	private void processMoveEvents(SessionDataKey sessionDataKey) {
 		List<PointerMoveEventRequest> moveEvents = eventBuffer.flushMoveEvents(sessionDataKey);
 		log.info("세션 {}: 이동 이벤트 {} 개 처리", sessionDataKey, moveEvents.size());
 
@@ -147,6 +146,7 @@ public class EventBatchService {
 		//es에 저장할 형태
 		List<PointerMoveEventDocument> documents = new ArrayList<>();
 		for (PointerMoveEventRequest request : moveEvents) {
+			/*
 			PointerMoveEvent event = PointerMoveEvent.create(
 				request.clientX(),
 				request.clientY(),
@@ -160,12 +160,13 @@ public class EventBatchService {
 				sessionData
 			);
 			entities.add(event);
+			 */
 
 			PointerMoveEventDocument doc = PointerEventConverter.toMoveEventDocument(request);
 			documents.add(doc);
 		}
 
-		if (!entities.isEmpty()) {
+		if (!documents.isEmpty()) {
 			moveRepository.saveAll(entities);
 			pointerMoveEventDocumentRepository.saveAll(documents);
 		}
@@ -174,9 +175,8 @@ public class EventBatchService {
 	/**
 	 * 스크롤 이벤트의 버퍼에 접근 후, sessionData 에 데이터를 저장합니다.
 	 * @param sessionDataKey sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
-	 * @param sessionData sessionData 를 통해 클릭 이벤트 전체를 리스트화 해 저장합니다.
 	 */
-	private void processScrollEvents(SessionDataKey sessionDataKey, SessionData sessionData) {
+	private void processScrollEvents(SessionDataKey sessionDataKey) {
 		List<PointerScrollEventRequest> scrollEvents = eventBuffer.flushScrollEvents(sessionDataKey);
 		log.info("세션 {}: 스크롤 이벤트 {} 개 처리", sessionDataKey, scrollEvents.size());
 
@@ -184,6 +184,7 @@ public class EventBatchService {
 		//es에 저장할 형태
 		List<PointerScrollEventDocument> documents = new ArrayList<>();
 		for (PointerScrollEventRequest request : scrollEvents) {
+			/*
 			PointerScrollEvent event = PointerScrollEvent.create(
 				request.scrollY(),
 				request.scrollHeight(),
@@ -195,13 +196,14 @@ public class EventBatchService {
 				sessionData
 			);
 			entities.add(event);
+			 */
 
 			PointerScrollEventDocument doc = PointerEventConverter.toScrollEventDocument(request);
 			documents.add(doc);
 		}
 
-		if (!entities.isEmpty()) {
-			scrollRepository.saveAll(entities);
+		if (!documents.isEmpty()) {
+			//scrollRepository.saveAll(entities);
 			pointerScrollEventDocumentRepository.saveAll(documents);
 		}
 	}

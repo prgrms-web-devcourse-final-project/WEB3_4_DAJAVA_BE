@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author NohDongHui
  */
 @Slf4j
-@Component
+//@Component
 @RequiredArgsConstructor
 public class EventValidateScheduler {
 

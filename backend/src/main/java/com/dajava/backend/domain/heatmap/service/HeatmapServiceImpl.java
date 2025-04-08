@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -24,6 +25,7 @@ import com.dajava.backend.domain.heatmap.dto.GridCell;
 import com.dajava.backend.domain.heatmap.dto.HeatmapMetadata;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
+import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.exception.SolutionException;
@@ -92,9 +94,20 @@ public class HeatmapServiceImpl implements HeatmapService {
 			}
 
 			// toBuilder 를 통해 pageCapture 경로값 추가
-			response = response.toBuilder()
-				.pageCapture(findRegister.getPageCapture())
-				.build();
+			String targetUrl = findRegister.getUrl();
+
+			List<PageCaptureData> captureDataList = findRegister.getCaptureData();
+
+			Optional<PageCaptureData> optionalData = captureDataList.stream()
+				.filter(data -> data.getPageUrl().equals(targetUrl))
+				.findFirst();
+
+			if (optionalData.isPresent()) {
+				String capturePagePath = optionalData.get().getPageCapturePath();
+				response = response.toBuilder()
+					.pageCapture(capturePagePath)
+					.build();
+			}
 
 			// 소요 시간 측정
 			long endTime = System.currentTimeMillis();

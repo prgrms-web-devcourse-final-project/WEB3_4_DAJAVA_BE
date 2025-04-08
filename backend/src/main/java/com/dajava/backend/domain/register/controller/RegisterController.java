@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
+import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
@@ -158,18 +159,17 @@ public class RegisterController {
 	 * 사용자가 세션 생성시 캡쳐하게 되는 페이지 캡쳐 데이터(멀티파트 파일)를 존재하지 않는 경우, 로컬에 저장합니다.
 	 * 이후 반환된 로컬 이미지 경로를 register 의 pageCapture 에 POST 합니다.
 	 *
-	 * @param serialNumber 각 세션에서 가지고 있는 솔루션 식별자 입니다.
-	 * @param imageFile 멀티파트 파일 형식으로 들어오는 전체 페이지 캡쳐 파일입니다.
+	 * @param request serialNumber, pageUrl, imagefile 을 가진 요청 DTO 입니다.
+	 * @return PageCaptureResponse 성공 여부, 메시지, 저장된 파일 경로를 반환합니다.
 	 */
 	@Operation(
 		summary = "솔루션 전체 페이지 캡쳐 데이터 삽입",
 		description = "멀티파트 파일로 전송된 이미지를 저장하고, pageCapture 컬럼에 이미지 접근 경로를 삽입합니다.")
-	@PostMapping(value = "/v1/register/{serialNumber}/page-capture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/v1/register/page-capture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public String updatePageCapture(
-		@PathVariable String serialNumber,
-		@RequestParam("imageFile") MultipartFile imageFile
+	public PageCaptureResponse updatePageCapture(
+		@ModelAttribute PageCaptureRequest request
 	) {
-		return registerService.modifyPageCapture(serialNumber, imageFile);
+		return registerService.createPageCapture(request);
 	}
 }
