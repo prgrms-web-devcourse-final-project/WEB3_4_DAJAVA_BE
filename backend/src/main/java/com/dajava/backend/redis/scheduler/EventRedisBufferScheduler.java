@@ -9,6 +9,7 @@ import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
 import com.dajava.backend.redis.buffer.EventRedisBuffer;
+import com.dajava.backend.redis.service.RedisActivityHandleService;
 import com.dajava.backend.redis.service.RedisEventBatchService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class EventRedisBufferScheduler {
 	private final RedisEventBatchService redisEventBatchService;
 	private final EventRedisBuffer eventRedisBuffer;
 	private final BufferSchedulerProperties properties;
+	private final RedisActivityHandleService redisActivityHandleService;
 
 	/**
 	 * 1분마다 실행되어 비활성 세션을 감지하고 처리합니다.
@@ -59,7 +61,7 @@ public class EventRedisBufferScheduler {
 				inactiveCount++;
 
 				// 배치 처리를 통해 데이터 저장 및 캐시 제거
-				redisEventBatchService.processBatchForSession(sessionKey, false);
+				redisActivityHandleService.processInactiveBatchForSession(sessionKey);
 			}
 		}
 
@@ -81,7 +83,7 @@ public class EventRedisBufferScheduler {
 
 		for (SessionDataKey sessionKey : activeKeys) {
 			try {
-				redisEventBatchService.processBatchForSession(sessionKey, true);
+				redisActivityHandleService.processActiveBatchForSession(sessionKey);
 			} catch (Exception e) {
 				log.error("세션 {} 처리 중 오류 발생: {}", sessionKey, e.getMessage(), e);
 			}
