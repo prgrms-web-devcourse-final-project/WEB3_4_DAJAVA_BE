@@ -57,6 +57,9 @@ public class InitData {
 			.sessionId("AiSolutionTestSessionNumber")
 			.pageUrl("localhost:3000/test123")
 			.browserWidth(1920)
+			.scrollHeight(2000)
+			.viewportHeight(300)
+			.scrollY(500)
 			.memberSerialNumber("5_team_testSerial")
 			.element(tag)
 			.isOutlier(false)
@@ -73,6 +76,9 @@ public class InitData {
 			.pageUrl("localhost:3000/test123")
 			.browserWidth(1920)
 			.memberSerialNumber("5_team_testSerial")
+			.scrollHeight(2000)
+			.viewportHeight(300)
+			.scrollY(500)
 			.isOutlier(false)
 			.build();
 	}
@@ -204,7 +210,7 @@ public class InitData {
 
 		pointerScrollEventDocumentRepository.saveAll(scrollEvents);
 
-		log.info("baseInit pointerEventDocument, sessionDataDocument 등록 완료");
+		log.info("baseInit 검증 로직용 테스트 데이터 등록 완료");
 	}
 
 	/**
@@ -250,6 +256,8 @@ public class InitData {
 		}
 
 		solutionEventDocumentRepository.saveAll(docs);
+
+		log.info("baseInit ai 솔루션용 테스트 데이터 등록 완료");
 	}
 
 }

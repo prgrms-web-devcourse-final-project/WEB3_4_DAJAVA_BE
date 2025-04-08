@@ -23,7 +23,7 @@ public class SessionDataDocumentServiceImpl implements SessionDataDocumentServic
 	@Override
 	public Page<SessionDataDocument> getEndedSessions(int page, int size) {
 		PageRequest pageRequest = PageRequest.of(page, size);
-		return sessionDataDocumentRepository.findByIsSessionEndedTrue(pageRequest);
+		return sessionDataDocumentRepository.findByIsSessionEndedTrueAndIsVerifiedFalse(pageRequest);
 	}
 
 	@Override

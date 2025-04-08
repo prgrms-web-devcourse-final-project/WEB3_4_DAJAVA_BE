@@ -31,10 +31,16 @@ public class SolutionScheduler {
 
 	@Scheduled(cron = "0 0 0 * * *")    //매일 자정(00:00)에 실행
 	public void processExpiredRegisters() {
+		//추후 등록된 레지스터 정리하는 기능 필요
 		List<Register> expiredRegisters = registerRepository.findByIsServiceExpiredTrue();
 
 		for (Register register : expiredRegisters) {
 			try {
+				// 이미 솔루션이 완료된 상태면 무시함.
+				if (register.isSolutionComplete()) {
+					continue;
+				}
+
 				List<SolutionEventDocument> solutionEventDocumentList = solutionEventDocumentRepository
 					.findBySerialNumberAndIsOutlier(register.getSerialNumber(), true);
 

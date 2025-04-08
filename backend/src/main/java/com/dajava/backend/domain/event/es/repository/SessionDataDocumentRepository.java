@@ -41,10 +41,10 @@ public interface SessionDataDocumentRepository
 	Optional<SessionDataDocument> findBySessionId(String sessionId);
 
 	/**
-	 * IsSessionEnded가 true인 sessionDataDocument를 조회
+	 * IsSessionEnded가 true이미 isVerified가 false인 sessionDataDocument를 조회
 	 * 한번에 가져오지 않고 페이징해 가져옴
 	 * @param pageable
 	 * @return Page<SessionDataDocument>
 	 */
-	Page<SessionDataDocument> findByIsSessionEndedTrue(Pageable pageable);
+	Page<SessionDataDocument> findByIsSessionEndedTrueAndIsVerifiedFalse(Pageable pageable);
 }

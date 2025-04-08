@@ -149,11 +149,8 @@ public class PointerEventConverter {
 
 	public static SolutionEventDocument fromClickDocument(PointerClickEventDocument event) {
 
-		String raw = event.getSessionId() + "|" + event.getPageUrl() +  "|" + event.getTimestamp();
-		String id = UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8)).toString();
-
 		return SolutionEventDocument.builder()
-			.id(id)
+			.id(event.getId())
 			.sessionId(event.getSessionId())
 			.pageUrl(event.getPageUrl())
 			.serialNumber(event.getMemberSerialNumber())
@@ -166,16 +163,14 @@ public class PointerEventConverter {
 			.scrollHeight(event.getScrollHeight())
 			.viewportHeight(event.getViewportHeight())
 			.element(event.getElement()) // element를 tag로 쓸 경우
+			.isOutlier(event.getIsOutlier())
 			.build();
 	}
 
 	public static SolutionEventDocument fromMoveDocument(PointerMoveEventDocument event) {
 
-		String raw = event.getSessionId() + "|" + event.getPageUrl() + "|" + event.getTimestamp();
-		String id = UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8)).toString();
-
 		return SolutionEventDocument.builder()
-			.id(id)
+			.id(event.getId())
 			.sessionId(event.getSessionId())
 			.pageUrl(event.getPageUrl())
 			.serialNumber(event.getMemberSerialNumber())
@@ -193,10 +188,8 @@ public class PointerEventConverter {
 
 	public static SolutionEventDocument fromScrollDocument(PointerScrollEventDocument event) {
 
-		String raw = event.getSessionId() + "|" + event.getPageUrl() + "|" + event.getTimestamp();
-		String id = UUID.nameUUIDFromBytes(raw.getBytes(StandardCharsets.UTF_8)).toString();
 		return SolutionEventDocument.builder()
-			.id(id)
+			.id(event.getId())
 			.sessionId(event.getSessionId())
 			.pageUrl(event.getPageUrl())
 			.serialNumber(event.getMemberSerialNumber())
