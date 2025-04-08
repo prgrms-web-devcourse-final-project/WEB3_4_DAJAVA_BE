@@ -20,8 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class RedisServiceImpl implements RedisService {
-	private final SessionDataService sessionDataService;
 	private final EventRedisBuffer eventRedisBuffer;
+	private final RedisSessionDataService redisSessionDataService;
 
 	@Override
 	@Transactional
@@ -30,7 +30,7 @@ public class RedisServiceImpl implements RedisService {
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
 		);
-		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
+		redisSessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 		eventRedisBuffer.addClickEvent(request, sessionDataKey);
 	}
 
@@ -42,7 +42,7 @@ public class RedisServiceImpl implements RedisService {
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
 		);
-		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
+		redisSessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 		eventRedisBuffer.addMoveEvent(request, sessionDataKey);
 	}
 
@@ -54,7 +54,7 @@ public class RedisServiceImpl implements RedisService {
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
 		);
-		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
+		redisSessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 		eventRedisBuffer.addScrollEvent(request, sessionDataKey);
 	}
 }

@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisEventBatchService {
 	private final EventRedisBuffer eventRedisBuffer;
-	private final SessionDataService sessionDataService;
+	private final RedisSessionDataService redisSessionDataService;
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
@@ -62,14 +62,14 @@ public class RedisEventBatchService {
 			return;
 		}
 
-		SessionDataDocument sessionDataDocument = sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
+		SessionDataDocument sessionDataDocument = redisSessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		processClickEvents(sessionDataKey);
 		processMoveEvents(sessionDataKey);
 		processScrollEvents(sessionDataKey);
 
 		if (isInactive) {
-			sessionDataService.removeFromEsCache(sessionDataKey);
+			redisSessionDataService.removeFromEsCache(sessionDataKey);
 			// 세션 종료 flag 값 true 로 변경
 			sessionDataDocument.endSession();
 		}
