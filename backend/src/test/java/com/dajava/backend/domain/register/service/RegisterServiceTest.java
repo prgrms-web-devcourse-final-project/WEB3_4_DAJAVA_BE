@@ -19,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
@@ -29,7 +30,6 @@ import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
-import com.dajava.backend.domain.register.service.pageCapture.FileStorageService;
 
 @SpringBootTest
 @Transactional
@@ -125,8 +125,8 @@ class RegisterServiceTest {
 		);
 
 		// fileStorageService.storeFile() 호출 시 경로 반환하도록 모킹
-		String dynamicFilePath = "/page-capture/" + UUID.randomUUID().toString() + ".png";
-		when(fileStorageService.storeFile(any(MultipartFile.class))).thenReturn(dynamicFilePath);
+		String dynamicFileName = UUID.randomUUID().toString() + ".png";
+		when(fileStorageService.storeFile(any(MultipartFile.class))).thenReturn(dynamicFileName);
 
 		// When: 페이지 캡쳐 데이터 업데이트 메서드 호출
 		PageCaptureRequest request = new PageCaptureRequest(serialNumber, pageUrl, imageFile);
@@ -135,7 +135,7 @@ class RegisterServiceTest {
 		// Then: 응답 확인
 		Assertions.assertTrue(response.success());
 		Assertions.assertEquals("페이지 캡쳐 데이터가 성공적으로 저장되었습니다.", response.message());
-		Assertions.assertEquals(dynamicFilePath, response.pageCaptureUrl());
+		Assertions.assertEquals(dynamicFileName, response.captureFileName());
 
 		// Repository 에서 해당 Register 및 캡쳐 데이터 확인
 		Optional<Register> updatedRegister = repository.findBySerialNumber(serialNumber);
@@ -144,7 +144,7 @@ class RegisterServiceTest {
 		Register modifiedRegister = updatedRegister.get();
 		Assertions.assertFalse(modifiedRegister.getCaptureData().isEmpty());
 		Assertions.assertEquals(pageUrl, modifiedRegister.getCaptureData().get(0).getPageUrl());
-		Assertions.assertEquals(dynamicFilePath, modifiedRegister.getCaptureData().get(0).getPageCapturePath());
+		Assertions.assertEquals(dynamicFileName, modifiedRegister.getCaptureData().get(0).getPageCapturePath());
 
 		// fileStorageService.storeFile() 호출 확인
 		verify(fileStorageService, times(1)).storeFile(any(MultipartFile.class));
@@ -178,9 +178,9 @@ class RegisterServiceTest {
 		);
 
 		// fileStorageService.storeFile() 호출 시 경로 반환하도록 모킹
-		String newFilePath = "/page-capture/updatedImage.png";
+		String newFileName = "updatedImage.png";
 		when(fileStorageService.storeFile(any(MultipartFile.class), eq(existingFilePath)))
-			.thenReturn(newFilePath);
+			.thenReturn(newFileName);
 
 		// When: 페이지 캡쳐 데이터 업데이트 메서드 호출
 		PageCaptureRequest request = new PageCaptureRequest(serialNumber, pageUrl, imageFile);
@@ -189,7 +189,7 @@ class RegisterServiceTest {
 		// Then: 응답 확인
 		Assertions.assertTrue(response.success());
 		Assertions.assertEquals("페이지 캡쳐 데이터가 성공적으로 저장되었습니다.", response.message());
-		Assertions.assertEquals(newFilePath, response.pageCaptureUrl());
+		Assertions.assertEquals(newFileName, response.captureFileName());
 
 		// Repository 에서 해당 Register 및 캡쳐 데이터 확인
 		Optional<Register> updatedRegister = repository.findBySerialNumber(serialNumber);
@@ -198,7 +198,7 @@ class RegisterServiceTest {
 		Register modifiedRegister = updatedRegister.get();
 		Assertions.assertFalse(modifiedRegister.getCaptureData().isEmpty());
 		Assertions.assertEquals(pageUrl, modifiedRegister.getCaptureData().get(0).getPageUrl());
-		Assertions.assertEquals(newFilePath, modifiedRegister.getCaptureData().get(0).getPageCapturePath());
+		Assertions.assertEquals(newFileName, modifiedRegister.getCaptureData().get(0).getPageCapturePath());
 
 		// fileStorageService.storeFile() 호출 확인 (기존 파일 경로로)
 		verify(fileStorageService, times(1)).storeFile(any(MultipartFile.class), eq(existingFilePath));

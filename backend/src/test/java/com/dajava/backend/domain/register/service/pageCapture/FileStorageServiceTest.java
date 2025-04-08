@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
+
 @SpringBootTest
 public class FileStorageServiceTest {
 
