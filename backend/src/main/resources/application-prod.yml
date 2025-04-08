@@ -46,3 +46,6 @@ logging:
 
 init:
   flag=1
+
+image:
+  path: /data/page-capture

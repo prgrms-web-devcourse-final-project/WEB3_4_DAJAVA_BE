@@ -103,9 +103,9 @@ public class HeatmapServiceImpl implements HeatmapService {
 				.findFirst();
 
 			if (optionalData.isPresent()) {
-				String capturePagePath = optionalData.get().getPageCapturePath();
+				String captureFileName = optionalData.get().getCaptureFileName();
 				response = response.toBuilder()
-					.pageCapture(capturePagePath)
+					.pageCapture(captureFileName)
 					.build();
 			}
 

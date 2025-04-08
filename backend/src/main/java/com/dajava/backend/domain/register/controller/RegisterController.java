@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
@@ -28,7 +29,6 @@ import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.AdminService;
 import com.dajava.backend.domain.register.service.RegisterService;
-import com.dajava.backend.domain.register.service.pageCapture.FileStorageService;
 import com.dajava.backend.global.exception.ErrorCode;
 
 import io.swagger.v3.oas.annotations.Operation;

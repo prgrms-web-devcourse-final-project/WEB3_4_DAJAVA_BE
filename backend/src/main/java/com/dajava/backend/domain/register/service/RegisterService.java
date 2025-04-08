@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.RegisterInfo;
 import com.dajava.backend.domain.register.converter.RegisterConverter;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
@@ -29,7 +30,6 @@ import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
 import com.dajava.backend.domain.register.repository.OrderRepository;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
-import com.dajava.backend.domain.register.service.pageCapture.FileStorageService;
 import com.dajava.backend.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
@@ -150,16 +150,15 @@ public class RegisterService {
 			.filter(data -> data.getPageUrl().equals(pageUrl))
 			.findFirst();
 
-		String filePath;
+		String fileName;
 		if (optionalData.isPresent()) {
 			PageCaptureData existingData = optionalData.get();
-			filePath = fileStorageService.storeFile(pageUrl, imageFile, existingData.getPageCapturePath());
-			existingData.updatePageCapturePath(filePath);
+			fileName = fileStorageService.updateFile(imageFile, existingData);
 		} else {
-			filePath = fileStorageService.storeFile(pageUrl, imageFile);
+			fileName = fileStorageService.storeFile(imageFile);
 			PageCaptureData newData = PageCaptureData.builder()
 				.pageUrl(pageUrl)
-				.pageCapturePath(filePath)
+				.captureFileName(fileName)
 				.register(register)
 				.build();
 			captureDataList.add(newData);
@@ -170,7 +169,7 @@ public class RegisterService {
 		return new PageCaptureResponse(
 			true,
 			"페이지 캡쳐 데이터가 성공적으로 저장되었습니다.",
-			filePath
+			fileName
 		);
 	}
 }

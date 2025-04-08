@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 
+import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
+import com.dajava.backend.domain.register.entity.PageCaptureData;
+
 @SpringBootTest
 public class FileStorageServiceTest {
 
@@ -39,8 +42,7 @@ public class FileStorageServiceTest {
 	@DisplayName("1. 신규 파일 업로드 시 파일 생성 테스트")
 	void t001() throws Exception {
 		// Given
-		FileStorageService fileStorageService = new FileStorageService();
-		String pageUrl = "http://localhost:3000/myPage";
+		FileStorageService fileStorageService = new FileStorageService("C:/page-capture");
 		MockMultipartFile imageFile = new MockMultipartFile(
 			"imageFile",
 			"test-image.png",
@@ -48,63 +50,68 @@ public class FileStorageServiceTest {
 			"테스트 이미지 데이터".getBytes(StandardCharsets.UTF_8)
 		);
 
-		// when
-		String fileUrl = fileStorageService.storeFile(pageUrl, imageFile);
+		// When: storeFile 메서드가 파일명(UUID + 확장자)만 반환하도록 변경됨
+		String fileName = fileStorageService.storeFile(imageFile);
 
-		// then
-		assertNotNull(fileUrl);
-		assertTrue(fileUrl.startsWith("/page-capture/"));
-		assertTrue(fileUrl.endsWith(".png"));
+		// Then
+		assertNotNull(fileName, "파일명이 null이어서는 안됩니다.");
+		assertTrue(fileName.endsWith(".png"), "파일명이 .png 확장자로 끝나야 합니다.");
 
 		// 실제 파일이 저장되었는지 확인
-		String storedFileName = fileUrl.substring("/page-capture/".length());
-		Path filePath = Paths.get("C:/page-capture").resolve(storedFileName);
-		assertTrue(Files.exists(filePath));
+		Path filePath = Paths.get("C:/page-capture").resolve(fileName);
+		assertTrue(Files.exists(filePath), "파일이 실제로 저장되어야 합니다.");
 
 		// 저장된 파일의 내용이 일치하는지 확인
 		byte[] storedContent = Files.readAllBytes(filePath);
-		assertArrayEquals("테스트 이미지 데이터".getBytes(StandardCharsets.UTF_8), storedContent);
+		assertArrayEquals("테스트 이미지 데이터".getBytes(StandardCharsets.UTF_8), storedContent,
+			"파일의 내용이 기대한 값과 일치해야 합니다.");
 	}
 
 	@Test
 	@DisplayName("2. 기존 파일 덮어쓰기(Override) 테스트")
 	void t002() throws Exception {
-		// given
-		FileStorageService fileStorageService = new FileStorageService();
-		String pageUrl = "http://localhost:3000/myPage";
+		// Given
+		FileStorageService fileStorageService = new FileStorageService("C:/page-capture");
 
-		// 먼저 신규 업로드로 파일을 생성
+		// 먼저 신규 업로드로 파일 생성
 		MockMultipartFile imageFileOriginal = new MockMultipartFile(
 			"imageFile",
 			"test-image.png",
 			"image/png",
 			"원본 파일 데이터".getBytes(StandardCharsets.UTF_8)
 		);
-		String originalFileUrl = fileStorageService.storeFile(pageUrl, imageFileOriginal);
-		String originalFileName = originalFileUrl.substring("/page-capture/".length());
-		Path filePath = Paths.get("C:/page-capture").resolve(originalFileName);
+		String initialFileName = fileStorageService.storeFile(imageFileOriginal);
+		Path filePath = Paths.get("C:/page-capture").resolve(initialFileName);
 
-		assertTrue(Files.exists(filePath));
+		assertTrue(Files.exists(filePath), "신규 업로드한 파일이 존재해야 합니다.");
 		byte[] originalContent = Files.readAllBytes(filePath);
-		assertArrayEquals("원본 파일 데이터".getBytes(StandardCharsets.UTF_8), originalContent);
+		assertArrayEquals("원본 파일 데이터".getBytes(StandardCharsets.UTF_8), originalContent,
+			"저장된 원본 파일의 내용이 일치해야 합니다.");
 
-		// when: 기존 파일 URL 을 이용하여 새로운 파일 업로드(덮어쓰기) 수행
+		// 기존 엔티티(PageCaptureData)에 원래 파일명이 설정되어 있는 상태 생성
+		PageCaptureData pageData = PageCaptureData.builder()
+			.captureFileName(initialFileName)
+			.pageUrl("http://localhost:3000/myPage")
+			// 필요한 경우 register 등 다른 필드 값을 추가합니다.
+			.build();
+
+		// When: PageCaptureData 객체를 전달하여 기존 파일 덮어쓰기 수행
 		MockMultipartFile imageFileUpdated = new MockMultipartFile(
 			"imageFile",
 			"test-image-updated.png", // 확장자 png
 			"image/png",
 			"업데이트된 파일 데이터".getBytes(StandardCharsets.UTF_8)
 		);
-		String updatedFileUrl = fileStorageService.storeFile(pageUrl, imageFileUpdated, originalFileUrl);
+		String updatedFileName = fileStorageService.updateFile(imageFileUpdated, pageData);
 
-		// then
-		assertNotNull(updatedFileUrl);
-		String updatedFileName = updatedFileUrl.substring("/page-capture/".length());
-		// 기존 파일명과 새로운 파일명이 동일해야함
-		assertEquals(originalFileName, updatedFileName);
+		// Then
+		assertNotNull(updatedFileName, "업데이트 후 파일명이 null이어서는 안 됩니다.");
+		// 기존 파일명(엔티티에 저장된 captureFileName)과 업데이트 후 파일명이 동일해야 함
+		assertEquals(initialFileName, updatedFileName, "기존 파일명과 업데이트 후 파일명이 동일해야 합니다.");
 
-		// 실제 파일 내용이 변경되었는지 확인
+		// 실제 파일 내용이 업데이트되었는지 확인
 		byte[] updatedContent = Files.readAllBytes(filePath);
-		assertArrayEquals("업데이트된 파일 데이터".getBytes(StandardCharsets.UTF_8), updatedContent);
+		assertArrayEquals("업데이트된 파일 데이터".getBytes(StandardCharsets.UTF_8), updatedContent,
+			"파일 내용이 업데이트된 데이터와 일치해야 합니다.");
 	}
 }
