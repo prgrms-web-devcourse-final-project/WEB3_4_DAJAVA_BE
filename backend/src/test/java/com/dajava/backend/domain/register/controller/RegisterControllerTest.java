@@ -246,7 +246,7 @@ class RegisterControllerTest {
 			.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.message").isString())
-			.andExpect(jsonPath("$.pageCaptureUrl").isString());
+			.andExpect(jsonPath("$.captureFileName").isString());
 	}
 
 	@Test
