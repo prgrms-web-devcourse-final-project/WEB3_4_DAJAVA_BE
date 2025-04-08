@@ -153,13 +153,12 @@ public class RegisterService {
 		String fileName;
 		if (optionalData.isPresent()) {
 			PageCaptureData existingData = optionalData.get();
-			fileName = fileStorageService.storeFile(imageFile, existingData.getPageCapturePath());
-			existingData.updatePageCapturePath(fileName);
+			fileName = fileStorageService.updateFile(imageFile, existingData);
 		} else {
 			fileName = fileStorageService.storeFile(imageFile);
 			PageCaptureData newData = PageCaptureData.builder()
 				.pageUrl(pageUrl)
-				.pageCapturePath(fileName)
+				.captureFileName(fileName)
 				.register(register)
 				.build();
 			captureDataList.add(newData);

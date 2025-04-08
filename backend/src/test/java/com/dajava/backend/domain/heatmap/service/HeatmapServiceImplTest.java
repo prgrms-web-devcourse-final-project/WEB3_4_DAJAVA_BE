@@ -60,14 +60,14 @@ class HeatmapServiceImplTest {
 		PageCaptureList.add(
 			PageCaptureData.builder()
 				.pageUrl("http://localhost:3000/myPage1")
-				.pageCapturePath("/page-capture/sample1.png")
+				.captureFileName("sample1.png")
 				.register(register)
 				.build()
 		);
 		PageCaptureList.add(
 			PageCaptureData.builder()
 				.pageUrl("http://localhost:3000/myPage2")
-				.pageCapturePath("/page-capture/sample2.png")
+				.captureFileName("sample2.png")
 				.register(register)
 				.build()
 		);
@@ -155,7 +155,7 @@ class HeatmapServiceImplTest {
 			assertEquals(10, response.gridSize());
 			assertEquals(1200, response.pageWidth());
 			assertEquals(3000, response.pageHeight());
-			assertEquals("/page-capture/sample1.png", response.pageCapture());
+			assertEquals("sample1.png", response.pageCapture());
 			assertNotNull(response.gridCells());
 			assertNotNull(response.metadata());
 		}
@@ -385,7 +385,7 @@ class HeatmapServiceImplTest {
 			assertNotNull(response.gridCells());
 			assertNotNull(response.metadata());
 			assertTrue(response.metadata().totalEvents() == 750); // 클릭은 2:1 샘플링 적용
-			assertEquals("/page-capture/sample1.png", response.pageCapture());
+			assertEquals("sample1.png", response.pageCapture());
 		}
 	}
 }

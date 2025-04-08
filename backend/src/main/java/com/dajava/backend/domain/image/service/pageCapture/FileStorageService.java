@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dajava.backend.domain.register.entity.PageCaptureData;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -51,14 +53,20 @@ public class FileStorageService {
 	}
 
 	/**
-	 * 기존 파일 URL이 있을 경우, 기존 파일명을 그대로 사용하여 파일을 덮어씌웁니다.
+	 * 전달받은 PageCaptureData 객체를 사용하여 파일을 저장합니다.
+	 * 기존 파일명이 있는 경우 해당 파일명으로 덮어쓰고, 없으면 새로 생성한 후 엔티티에 반영합니다.
 	 */
-	public String storeFile(MultipartFile file, String existingFileUrl) {
-		String fileName = extractFileName(existingFileUrl);
+	public String updateFile(MultipartFile file, PageCaptureData pageData) {
 		String fileExtension = getExtension(file.getOriginalFilename());
-		if (!fileName.endsWith(fileExtension) && !fileExtension.isEmpty()) {
+		String fileName = pageData.getCaptureFileName();
+
+		if (fileName == null || fileName.isEmpty()) {
+			fileName = generateUniqueFileName(file);
+		} else if (!fileName.endsWith(fileExtension) && !fileExtension.isEmpty()) {
 			fileName += fileExtension;
 		}
+
+		pageData.updateCaptureFileName(fileName);
 		saveFile(fileName, file);
 		return fileName;
 	}

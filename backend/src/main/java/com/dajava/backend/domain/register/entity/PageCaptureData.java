@@ -25,7 +25,7 @@ public class PageCaptureData {
 	private Long id;
 
 	@Column(nullable = false)
-	private String pageCapturePath;
+	private String captureFileName;
 
 	@Column(nullable = false)
 	private String pageUrl;
@@ -34,7 +34,7 @@ public class PageCaptureData {
 	@JoinColumn(name = "register_id", nullable = false)
 	private Register register;
 
-	public void updatePageCapturePath(String pageCapturePath) {
-		this.pageCapturePath = pageCapturePath;
+	public void updateCaptureFileName(String captureFileName) {
+		this.captureFileName = captureFileName;
 	}
 }
