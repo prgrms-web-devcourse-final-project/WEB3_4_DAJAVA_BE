@@ -18,11 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class RedisServiceImpl implements RedisService {
-	private final SessionDataRepository sessionDataRepository;
 	private final SessionDataService sessionDataService;
 	private final EventRedisBuffer eventRedisBuffer;
-	private final ActivityHandleService activityHandleService;
-	private final SessionDataDocumentRepository sessionDataDocumentRepository;
+
 	/**
 	 * 클릭 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
 	 */
@@ -30,14 +28,10 @@ public class RedisServiceImpl implements RedisService {
 	@Transactional
 	public void createClickEvent(PointerClickEventRequest request) {
 		log.info("클릭 이벤트 로깅: {}", request);
-
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
 		);
-
-		// SessionData 를 통해 Cache 확인, 없으면 생성
-		sessionDataService.createOrFindSessionData(sessionDataKey);
-		// es 용
+		// es 용 // 틀 구조
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 		// 클릭 이벤트 버퍼링
 		eventRedisBuffer.addClickEvent(request, sessionDataKey);

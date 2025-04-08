@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventLogRedisController {
-	private final EventLogService eventLogService;
 	private final RedisService redisService;
 
 	/**

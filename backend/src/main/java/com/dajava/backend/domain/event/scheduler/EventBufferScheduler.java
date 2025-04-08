@@ -41,7 +41,6 @@ public class EventBufferScheduler {
 	public void flushInactiveEventBuffers() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
-		// Todo... redis 바꿔야함
 		Set<SessionDataKey> activeKeys = eventBuffer.getAllActiveSessionKeys();
 		int inactiveCount = 0;
 		for (SessionDataKey sessionKey : activeKeys) {
@@ -74,6 +73,7 @@ public class EventBufferScheduler {
 	 * 처리하여 데이터 손실 위험을 줄입니다.
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
+	// 우선
 	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.activeSessionFlushIntervalMs}")
 	public void flushAllEventBuffers() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");

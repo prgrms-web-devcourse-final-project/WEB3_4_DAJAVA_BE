@@ -1,4 +1,4 @@
-package com.dajava.backend.redis.buffer;
+package com.dajava.backend.redis.utils;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,20 +24,25 @@ public class EventQueueRedisBuffer<T> {
 
 	private final Class<T> clazz;
 
+	// 초기 구조 생성
+	private String buildKey(SessionDataKey key) {
+		return EVENT_CACHE_PREFIX + SessionDataKeyUtils.toKey(key);
+	}
+
+	// 이벤트 저장
 	public void addEvent(SessionDataKey sessionDataKey, T event) {
 		String key = buildKey(sessionDataKey);
 		try {
 			String json = objectMapper.writeValueAsString(event);
 			redisTemplate.opsForList().leftPush(key, json);
 			redisTemplate.expire(key, 1, TimeUnit.HOURS); // 만료 시간 설정
-
 			// 마지막 업데이트 시간 기록
 			redisTemplate.opsForValue().set(LAST_UPDATED_PREFIX + key, String.valueOf(System.currentTimeMillis()));
 		} catch (Exception e) {
 			throw new RuntimeException("Redis에 이벤트 저장 실패", e);
 		}
 	}
-
+	// 이벤트 가져오기
 	public List<T> getEvents(SessionDataKey sessionDataKey) {
 		String key = buildKey(sessionDataKey);
 		List<String> jsonList = redisTemplate.opsForList().range(key, 0, -1);
@@ -55,7 +60,7 @@ public class EventQueueRedisBuffer<T> {
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
-
+	// 이벤트 삭제
 	public List<T> flushEvents(SessionDataKey sessionDataKey) {
 		List<T> events = getEvents(sessionDataKey);
 		String key = buildKey(sessionDataKey);
@@ -63,7 +68,7 @@ public class EventQueueRedisBuffer<T> {
 		redisTemplate.delete(LAST_UPDATED_PREFIX + key);
 		return events;
 	}
-
+	// 활동 즁안 세션 판단
 	public Set<SessionDataKey> getActiveSessionKeys() {
 		Set<String> keys = redisTemplate.keys(EVENT_CACHE_PREFIX + "*");
 		if (keys == null) return Collections.emptySet();
@@ -72,12 +77,12 @@ public class EventQueueRedisBuffer<T> {
 			.map(SessionDataKeyUtils::parseKey)
 			.collect(Collectors.toSet());
 	}
-
+ 	// 업데이트 수정
 	public Long getLastUpdated(String key) {
 		String value = redisTemplate.opsForValue().get(LAST_UPDATED_PREFIX + key);
 		return value != null ? Long.valueOf(value) : null;
 	}
-
+	// 전부 지우기
 	public void clearAll() {
 		Set<String> keys = redisTemplate.keys(EVENT_CACHE_PREFIX + "*");
 		Set<String> updatedKeys = redisTemplate.keys(LAST_UPDATED_PREFIX + "*");
@@ -86,7 +91,5 @@ public class EventQueueRedisBuffer<T> {
 		if (updatedKeys != null) redisTemplate.delete(updatedKeys);
 	}
 
-	private String buildKey(SessionDataKey key) {
-		return EVENT_CACHE_PREFIX + SessionDataKeyUtils.toKey(key);
-	}
+
 }
