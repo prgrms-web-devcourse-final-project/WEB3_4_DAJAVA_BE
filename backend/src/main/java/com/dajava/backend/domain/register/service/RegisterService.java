@@ -67,8 +67,10 @@ public class RegisterService {
 		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
 
 		log.info("Register 엔티티 생성 : {} ", newRegister);
-		log.info("Order 엔티티 생성 : {} ", newOrder);
+		// log.info("Order 엔티티 생성 : {} ", newOrder);
+
 		registerCacheService.refreshCacheAll();
+
 		return toRegisterCreateResponse(newRegister);
 	}
 

@@ -128,8 +128,10 @@ public class InitData {
 			.captureData(new ArrayList<>())
 			.build();
 
-		Register newRegister = registerRepository.save(register);
-		log.info("baseInit register 등록 완료");
+		if (registerRepository.findBySerialNumber(register.getSerialNumber()).isEmpty()) {
+			Register newRegister = registerRepository.save(register);
+			log.info("baseInit register 등록 완료");
+		}
 	}
 
 	public void work2() {
