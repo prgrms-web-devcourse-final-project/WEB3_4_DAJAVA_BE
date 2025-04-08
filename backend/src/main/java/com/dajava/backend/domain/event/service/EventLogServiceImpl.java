@@ -48,7 +48,7 @@ public class EventLogServiceImpl implements EventLogService {
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
 		//sessionDataService.createOrFindSessionData(sessionDataKey);
-		// es 용
+		// es 용 -> 저장을 틀 넣어놓고
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		// 클릭 이벤트 버퍼링

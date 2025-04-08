@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
@@ -16,9 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+
 public class EventQueueRedisBuffer<T> {
 	private static final String EVENT_CACHE_PREFIX = "event:";
 	private static final String LAST_UPDATED_PREFIX = "lastUpdated:";
+	@Qualifier("redisTemplate")
 	private final StringRedisTemplate redisTemplate;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
