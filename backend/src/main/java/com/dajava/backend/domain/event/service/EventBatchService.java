@@ -66,7 +66,7 @@ public class EventBatchService {
 
 		//initData로 테스트시 throw 주석처리 후 사용
 		if (totalPendingEvents == 0) {
-			//throw new PointerEventException(ErrorCode.EVENT_DTO_NOT_FOUND);
+			throw new PointerEventException(ErrorCode.EVENT_DTO_NOT_FOUND);
 		}
 
 		//SessionData sessionData = sessionDataService.createOrFindSessionData(sessionDataKey);

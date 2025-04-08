@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.event.service;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -23,6 +24,7 @@ import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRe
 import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
+import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
 import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
 import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;
@@ -169,18 +171,10 @@ public class EventBatchServiceTest {
 		when(eventBuffer.getMoveEvents(key)).thenReturn(Collections.emptyList());
 		when(eventBuffer.getScrollEvents(key)).thenReturn(Collections.emptyList());
 
-		// when
-		eventBatchService.processBatchForSession(key, true);
-
-		// then
-		//verify(sessionDataService, never()).createOrFindSessionData(any());
-		//verify(clickRepository, never()).saveAll(anyList());
-		//verify(moveRepository, never()).saveAll(anyList());
-		//verify(scrollRepository, never()).saveAll(anyList());
-		//verify(sessionDataRepository, never()).save(any());
-		verify(pointerClickEventDocumentRepository, never()).saveAll(anyList());
-		verify(pointerMoveEventDocumentRepository, never()).saveAll(anyList());
-		verify(pointerScrollEventDocumentRepository, never()).saveAll(anyList());
+		// when & then
+		PointerEventException exception = assertThrows(PointerEventException.class, () -> {
+			eventBatchService.processBatchForSession(key, true);
+		});
 	}
 
 	@Test
