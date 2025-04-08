@@ -49,7 +49,7 @@ public class FileStorageServiceTest {
 		);
 
 		// when
-		String fileUrl = fileStorageService.storeFile(pageUrl, imageFile);
+		String fileUrl = fileStorageService.storeFile(imageFile);
 
 		// then
 		assertNotNull(fileUrl);
@@ -80,7 +80,7 @@ public class FileStorageServiceTest {
 			"image/png",
 			"원본 파일 데이터".getBytes(StandardCharsets.UTF_8)
 		);
-		String originalFileUrl = fileStorageService.storeFile(pageUrl, imageFileOriginal);
+		String originalFileUrl = fileStorageService.storeFile(imageFileOriginal);
 		String originalFileName = originalFileUrl.substring("/page-capture/".length());
 		Path filePath = Paths.get("C:/page-capture").resolve(originalFileName);
 
@@ -95,7 +95,7 @@ public class FileStorageServiceTest {
 			"image/png",
 			"업데이트된 파일 데이터".getBytes(StandardCharsets.UTF_8)
 		);
-		String updatedFileUrl = fileStorageService.storeFile(pageUrl, imageFileUpdated, originalFileUrl);
+		String updatedFileUrl = fileStorageService.storeFile(imageFileUpdated, originalFileUrl);
 
 		// then
 		assertNotNull(updatedFileUrl);

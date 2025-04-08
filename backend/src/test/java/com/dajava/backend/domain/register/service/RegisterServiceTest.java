@@ -126,7 +126,7 @@ class RegisterServiceTest {
 
 		// fileStorageService.storeFile() 호출 시 경로 반환하도록 모킹
 		String dynamicFilePath = "/page-capture/" + UUID.randomUUID().toString() + ".png";
-		when(fileStorageService.storeFile(eq(pageUrl), any(MultipartFile.class))).thenReturn(dynamicFilePath);
+		when(fileStorageService.storeFile(any(MultipartFile.class))).thenReturn(dynamicFilePath);
 
 		// When: 페이지 캡쳐 데이터 업데이트 메서드 호출
 		PageCaptureRequest request = new PageCaptureRequest(serialNumber, pageUrl, imageFile);
@@ -147,7 +147,7 @@ class RegisterServiceTest {
 		Assertions.assertEquals(dynamicFilePath, modifiedRegister.getCaptureData().get(0).getPageCapturePath());
 
 		// fileStorageService.storeFile() 호출 확인
-		verify(fileStorageService, times(1)).storeFile(eq(pageUrl), any(MultipartFile.class));
+		verify(fileStorageService, times(1)).storeFile(any(MultipartFile.class));
 	}
 
 	@Test
@@ -179,7 +179,7 @@ class RegisterServiceTest {
 
 		// fileStorageService.storeFile() 호출 시 경로 반환하도록 모킹
 		String newFilePath = "/page-capture/updatedImage.png";
-		when(fileStorageService.storeFile(eq(pageUrl), any(MultipartFile.class), eq(existingFilePath)))
+		when(fileStorageService.storeFile(any(MultipartFile.class), eq(existingFilePath)))
 			.thenReturn(newFilePath);
 
 		// When: 페이지 캡쳐 데이터 업데이트 메서드 호출
@@ -201,6 +201,6 @@ class RegisterServiceTest {
 		Assertions.assertEquals(newFilePath, modifiedRegister.getCaptureData().get(0).getPageCapturePath());
 
 		// fileStorageService.storeFile() 호출 확인 (기존 파일 경로로)
-		verify(fileStorageService, times(1)).storeFile(eq(pageUrl), any(MultipartFile.class), eq(existingFilePath));
+		verify(fileStorageService, times(1)).storeFile(any(MultipartFile.class), eq(existingFilePath));
 	}
 }

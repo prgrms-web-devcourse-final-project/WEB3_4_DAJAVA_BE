@@ -34,7 +34,7 @@ public class FileStorageService {
 	/**
 	 * 기존 파일 URL 이 없는 경우, 새로운 UUID 기반 파일명 생성 로직
 	 */
-	public String storeFile(String pageUrl, MultipartFile file) {
+	public String storeFile(MultipartFile file) {
 		// 파일의 확장자 추출
 		String originalExtension = FilenameUtils.getExtension(file.getOriginalFilename());
 		String extension = (originalExtension != null && !originalExtension.isEmpty())
@@ -48,7 +48,7 @@ public class FileStorageService {
 	/**
 	 * 기존 파일 URL이 있을 경우, 기존 파일명을 그대로 사용하여 덮어쓰는 로직
 	 */
-	public String storeFile(String pageUrl, MultipartFile file, String existingFileUrl) {
+	public String storeFile(MultipartFile file, String existingFileUrl) {
 		// 파일명 추출
 		String fileName = existingFileUrl.substring(existingFileUrl.lastIndexOf("/") + 1);
 		// 파일의 확장자 추출 (기존 파일명에 이미 확장자가 없는 경우에는 추가)
