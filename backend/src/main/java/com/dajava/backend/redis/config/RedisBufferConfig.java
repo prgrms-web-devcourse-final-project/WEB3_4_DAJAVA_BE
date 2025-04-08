@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
-import com.dajava.backend.redis.controller.EventQueueRedisBuffer;
+import com.dajava.backend.redis.buffer.EventQueueRedisBuffer;
 
 @Configuration
 public class RedisBufferConfig {
