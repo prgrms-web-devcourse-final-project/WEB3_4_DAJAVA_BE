@@ -43,10 +43,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RedisEventBatchService {
 	private final EventRedisBuffer eventRedisBuffer;
 	private final SessionDataService sessionDataService;
-	private final PointerClickEventRepository clickRepository;
-	private final PointerMoveEventRepository moveRepository;
-	private final PointerScrollEventRepository scrollRepository;
-	private final SessionDataRepository sessionDataRepository;
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
@@ -66,7 +62,6 @@ public class RedisEventBatchService {
 			return;
 		}
 
-		//SessionData sessionData = sessionDataService.createOrFindSessionData(sessionDataKey);
 		SessionDataDocument sessionDataDocument = sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		processClickEvents(sessionDataKey);
@@ -74,13 +69,10 @@ public class RedisEventBatchService {
 		processScrollEvents(sessionDataKey);
 
 		if (isInactive) {
-			//sessionDataService.removeFromCache(sessionDataKey);
 			sessionDataService.removeFromEsCache(sessionDataKey);
 			// 세션 종료 flag 값 true 로 변경
-			//sessionData.endSession();
 			sessionDataDocument.endSession();
 		}
-		//sessionDataRepository.save(sessionData);
 		sessionDataDocumentRepository.save(sessionDataDocument);
 	}
 
@@ -104,32 +96,15 @@ public class RedisEventBatchService {
 		List<PointerClickEventRequest> clickEvents = eventRedisBuffer.flushClickEvents(sessionDataKey);
 		log.info("세션 {}: 클릭 이벤트 {} 개 처리", sessionDataKey, clickEvents.size());
 
-		List<PointerClickEvent> entities = new ArrayList<>();
 		//es에 저장할 형태
 		List<PointerClickEventDocument> documents = new ArrayList<>();
 		for (PointerClickEventRequest request : clickEvents) {
-			/*
-			PointerClickEvent event = PointerClickEvent.create(
-				request.clientX(),
-				request.clientY(),
-				request.scrollY(),
-				request.scrollHeight(),
-				request.viewportHeight(),
-				request.element(),
-				request.pageUrl(),
-				request.browserWidth(),
-				request.sessionId(),
-				request.memberSerialNumber(),
-				sessionData
-			);
-			entities.add(event);
-			*/
+
 			PointerClickEventDocument doc = PointerEventConverter.toClickEventDocument(request);
 			documents.add(doc);
 		}
 
 		if (!documents.isEmpty()) {
-			//clickRepository.saveAll(entities);
 			pointerClickEventDocumentRepository.saveAll(documents); // Elasticsearch 저장
 		}
 	}
@@ -142,32 +117,14 @@ public class RedisEventBatchService {
 		List<PointerMoveEventRequest> moveEvents = eventRedisBuffer.flushMoveEvents(sessionDataKey);
 		log.info("세션 {}: 이동 이벤트 {} 개 처리", sessionDataKey, moveEvents.size());
 
-		List<PointerMoveEvent> entities = new ArrayList<>();
 		//es에 저장할 형태
 		List<PointerMoveEventDocument> documents = new ArrayList<>();
 		for (PointerMoveEventRequest request : moveEvents) {
-			/*
-			PointerMoveEvent event = PointerMoveEvent.create(
-				request.clientX(),
-				request.clientY(),
-				request.scrollY(),
-				request.scrollHeight(),
-				request.viewportHeight(),
-				request.pageUrl(),
-				request.browserWidth(),
-				request.sessionId(),
-				request.memberSerialNumber(),
-				sessionData
-			);
-			entities.add(event);
-			 */
-
 			PointerMoveEventDocument doc = PointerEventConverter.toMoveEventDocument(request);
 			documents.add(doc);
 		}
 
 		if (!documents.isEmpty()) {
-			moveRepository.saveAll(entities);
 			pointerMoveEventDocumentRepository.saveAll(documents);
 		}
 	}
@@ -180,30 +137,15 @@ public class RedisEventBatchService {
 		List<PointerScrollEventRequest> scrollEvents = eventRedisBuffer.flushScrollEvents(sessionDataKey);
 		log.info("세션 {}: 스크롤 이벤트 {} 개 처리", sessionDataKey, scrollEvents.size());
 
-		List<PointerScrollEvent> entities = new ArrayList<>();
 		//es에 저장할 형태
 		List<PointerScrollEventDocument> documents = new ArrayList<>();
 		for (PointerScrollEventRequest request : scrollEvents) {
-			/*
-			PointerScrollEvent event = PointerScrollEvent.create(
-				request.scrollY(),
-				request.scrollHeight(),
-				request.viewportHeight(),
-				request.pageUrl(),
-				request.browserWidth(),
-				request.sessionId(),
-				request.memberSerialNumber(),
-				sessionData
-			);
-			entities.add(event);
-			 */
 
 			PointerScrollEventDocument doc = PointerEventConverter.toScrollEventDocument(request);
 			documents.add(doc);
 		}
 
 		if (!documents.isEmpty()) {
-			//scrollRepository.saveAll(entities);
 			pointerScrollEventDocumentRepository.saveAll(documents);
 		}
 	}
