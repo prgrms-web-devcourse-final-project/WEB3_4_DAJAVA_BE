@@ -72,6 +72,9 @@ public class HeatmapServiceImpl implements HeatmapService {
 			Register findRegister = registerRepository.findBySerialNumber(serialNumber)
 				.orElseThrow(() -> new HeatmapException(SOLUTION_SERIAL_NUMBER_INVALID));
 
+			// 현재 하나의 URL 만을 받기 때문에 이벤트 필터링을 위해 필요
+			String targetUrl = findRegister.getUrl();
+
 			// 해싱된 password 로 접근 권한 확인
 			if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
 				throw new HeatmapException(SOLUTION_PASSWORD_INVALID);
@@ -98,16 +101,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 			// 그리드 생성 로직으로 결과값 생성
 			HeatmapResponse response;
 			if ("scroll".equalsIgnoreCase(type)) {
-				response = createScrollDepthHeatmap(events);
+				response = createScrollDepthHeatmap(events, targetUrl);
 			} else if ("click".equalsIgnoreCase(type) || "mousemove".equalsIgnoreCase(type)) {
-				response = createCoordinateHeatmap(events, type);
+				response = createCoordinateHeatmap(events, type, targetUrl);
 			} else {
 				throw new HeatmapException(INVALID_EVENT_TYPE);
 			}
 
 			// toBuilder 를 통해 pageCapture 경로값 추가
-			String targetUrl = findRegister.getUrl();
-
 			List<PageCaptureData> captureDataList = findRegister.getCaptureData();
 
 			Optional<PageCaptureData> optionalData = captureDataList.stream()
@@ -222,9 +223,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 * @param type 세션 데이터에서 추출할 로그 데이터의 타입
 	 * @return HeatmapResponse 그리드 데이터와 메타 데이터를 포함한 히트맵 응답 DTO
 	 */
-	private HeatmapResponse createCoordinateHeatmap(List<SolutionEventDocument> events, String type) {
-		// 이벤트가 없을시 빈 히트맵 정보 반환
-		if (events.isEmpty()) {
+	private HeatmapResponse createCoordinateHeatmap(List<SolutionEventDocument> events, String type, String targetUrl) {
+		// targetUrl 과 일치하는 이벤트만 필터링
+		List<SolutionEventDocument> filteredEvents = events.stream()
+			.filter(event -> targetUrl.equals(event.getPageUrl()))
+			.toList();
+
+		// 필터링 결과가 없으면 빈 히트맵 리턴
+		if (filteredEvents.isEmpty()) {
 			return createEmptyHeatmapResponse();
 		}
 
@@ -235,17 +241,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 		// 그리드 맵 - 좌표를 키로 사용하는 HashMap
 		Map<String, Integer> gridMap = new HashMap<>();
 
-		int totalEvents = 0;
+		// 이벤트 시간 초기화
 		LocalDateTime firstEventTime = null;
 		LocalDateTime lastEventTime = null;
-
-		// 첫번째 이벤트에서 페이지 URL 설정
-		String pageUrl = events.getFirst().getPageUrl();
 
 		// 세션을 구분하기 위한 고유 식별자 저장 HashSet
 		Set<String> sessionIds = new HashSet<>();
 
-		for (SolutionEventDocument event : events) {
+		for (SolutionEventDocument event : filteredEvents) {
 			// 타입값이 null 이거나 목표 타입이 아니면 건너뜀
 			if (event.getType() == null || !event.getType().equalsIgnoreCase(type)) {
 				continue;
@@ -283,7 +286,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 			// 해당 그리드 셀 카운트 증가
 			gridMap.put(gridKey, gridMap.getOrDefault(gridKey, 0) + 1);
-			totalEvents++;
 		}
 
 		// 최대 카운트 값
@@ -313,8 +315,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 		// 메타데이터 생성
 		HeatmapMetadata metadata = HeatmapMetadata.builder()
 			.maxCount(maxCount)
-			.totalEvents(totalEvents)
-			.pageUrl(pageUrl != null ? pageUrl : "unknown")
+			.totalEvents(filteredEvents.size())
+			.pageUrl(targetUrl)
 			.totalSessions(totalSessions)
 			.firstEventTime(firstEventTime)
 			.lastEventTime(lastEventTime)
@@ -337,21 +339,23 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 * @param events serialNumber 를 통해 가져온 세션 데이터
 	 * @return HeatmapResponse 그리드 데이터와 메타 데이터를 포함한 히트맵 응답 DTO
 	 */
-	private HeatmapResponse createScrollDepthHeatmap(List<SolutionEventDocument> events) {
-		// 이벤트가 없을시 빈 히트맵 정보 반환
-		if (events.isEmpty()) {
+	private HeatmapResponse createScrollDepthHeatmap(List<SolutionEventDocument> events, String targetUrl) {
+		// targetUrl 과 일치하는 이벤트만 필터링
+		List<SolutionEventDocument> filteredEvents = events.stream()
+			.filter(event -> targetUrl.equals(event.getPageUrl()))
+			.toList();
+
+		// 필터링 결과가 없으면 빈 히트맵 리턴
+		if (filteredEvents.isEmpty()) {
 			return createEmptyHeatmapResponse();
 		}
 
 		int maxPageWidth = 0;
 		int maxPageHeight = 0;
 
-		// 첫번째 이벤트에서 페이지 URL 설정
-		String pageUrl = events.getFirst().getPageUrl();
-
 		// 시간순 정렬로 데이터를 가져오므로, 첫 데이터와 마지막 데이터로 시간 설정
-		LocalDateTime firstEventTime = events.getFirst().getTimestamp();
-		LocalDateTime lastEventTime = events.getLast().getTimestamp();
+		LocalDateTime firstEventTime = filteredEvents.getFirst().getTimestamp();
+		LocalDateTime lastEventTime = filteredEvents.getLast().getTimestamp();
 
 		// 화면 체류 시간 저장을 위한 HashMap
 		Map<Integer, Long> durationByGridY = new HashMap<>();
@@ -360,7 +364,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		Set<String> sessionIds = new HashSet<>();
 
 		// 시간 간격 비교를 위한 직전 이벤트
-		SolutionEventDocument prevEvent = events.getFirst();
+		SolutionEventDocument prevEvent = filteredEvents.getFirst();
 
 		// 첫번째 데이터 로그의 sessionId 를 HashSet 에 저장
 		sessionIds.add(prevEvent.getSessionId());
@@ -376,8 +380,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 		}
 
 		// event 리스트에서 전후 데이터의 타임스탬프를 비교해 grid 정보를 생성하는 로직
-		for (int i = 1; i < events.size(); i++) {
-			SolutionEventDocument cntEvent = events.get(i);
+		for (int i = 1; i < filteredEvents.size(); i++) {
+			SolutionEventDocument cntEvent = filteredEvents.get(i);
 
 			// 총 세션수를 count 하기 위해 HashSet 에 추가함
 			if (cntEvent.getSessionId() != null) {
@@ -450,8 +454,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 		// 메타데이터 생성
 		HeatmapMetadata metadata = HeatmapMetadata.builder()
 			.maxCount((int)(maxDuration / 100))
-			.totalEvents(events.size())
-			.pageUrl(pageUrl != null ? pageUrl : "unknown")
+			.totalEvents(filteredEvents.size())
+			.pageUrl(targetUrl)
 			.totalSessions(totalSessions)
 			.firstEventTime(firstEventTime)
 			.lastEventTime(lastEventTime)
