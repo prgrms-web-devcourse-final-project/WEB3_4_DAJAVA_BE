@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
  * api로 들어온 clickEvent를 저장하는 ES 인덱스 입니다.
  * @author NohDongHui
  */
-@Document(indexName = "pointer-click-events", createIndex = false)
+@Document(indexName = "pointer-click-events")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
