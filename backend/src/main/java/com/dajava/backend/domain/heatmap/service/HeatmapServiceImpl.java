@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -65,7 +64,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		long startTime = System.currentTimeMillis();
 		boolean sortByTimestamp = false;
 		// type 이 scroll 이면 정렬 플래그 변경
-		if (Objects.equals(type, "string")) {
+		if (type.equals("scroll")) {
 			sortByTimestamp = true;
 		}
 		try {
