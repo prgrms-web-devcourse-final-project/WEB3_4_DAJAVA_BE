@@ -45,7 +45,7 @@ logging:
     org.springframework.transaction.interceptor: INFO
 
 init:
-  flag=1
+  flag:1
 
 image:
   path: /data/page-capture
