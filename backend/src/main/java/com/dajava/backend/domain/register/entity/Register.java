@@ -71,7 +71,7 @@ public class Register extends BaseTimeEntity {
 	@OneToOne(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Solution solution;
 
-	@OneToMany(mappedBy = "register", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<PageCaptureData> captureData = new ArrayList<>();
 
 	public static Register create(
@@ -108,6 +108,15 @@ public class Register extends BaseTimeEntity {
 		// endDateTime & duration 갱신
 		this.duration += TimeUtils.getDuration(endDate, newEndDate);
 		this.endDate = newEndDate;
+	}
+
+	/**
+	 * 서비스 제공 기간이 지난 AI Solution 정보를 지웁니다.
+	 */
+	public void deleteSolution() {
+		if (this.solution != null) {
+			this.solution = null;
+		}
 	}
 
 	@Override
