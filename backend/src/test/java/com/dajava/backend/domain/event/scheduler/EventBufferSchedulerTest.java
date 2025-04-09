@@ -37,10 +37,9 @@ public class EventBufferSchedulerTest {
 		props.setInactiveSessionDetectThresholdMs("60000"); // String
 		props.setActiveSessionFlushIntervalMs("300000");    // String
 		props.setInactiveThresholdMs(600000L);
-
 		activityHandleService = mock(ActivityHandleService.class);  // EventBatchService mock 추가
 		eventBuffer = new EventBuffer();
-		scheduler = new EventBufferScheduler(activityHandleService, eventBuffer,props);
+		scheduler = new EventBufferScheduler(eventBuffer, activityHandleService,props);
 	}
 
 	@Test
