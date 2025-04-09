@@ -162,6 +162,9 @@ public class HeatmapServiceImpl implements HeatmapService {
 			allEvents.addAll(pageData);
 			pageNumber++;
 		} while (!pageData.isEmpty());
+		if (allEvents.isEmpty()) {
+			throw new HeatmapException(SOLUTION_EVENT_DATA_NOT_FOUND);
+		}
 
 		return allEvents;
 	}

@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +18,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
-import com.dajava.backend.domain.event.entity.SolutionData;
-import com.dajava.backend.domain.event.entity.SolutionEvent;
-import com.dajava.backend.domain.event.repository.SolutionDataRepository;
+import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
+import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
@@ -33,8 +35,9 @@ class HeatmapServiceImplTest {
 	@Mock
 	private RegisterRepository registerRepository;
 
+	// ElasticSearch에서 이벤트 document를 직접 조회하는 Repository
 	@Mock
-	private SolutionDataRepository solutionDataRepository;
+	private SolutionEventDocumentRepository solutionEventDocumentRepository;
 
 	@Mock
 	private PasswordUtils passwordUtils;
@@ -43,12 +46,11 @@ class HeatmapServiceImplTest {
 	private HeatmapServiceImpl heatmapService;
 
 	private Register register;
-	private SolutionData mockSolutionData;
-	private List<SolutionEvent> mockEvents;
+	private List<SolutionEventDocument> mockDocuments;
 
 	@BeforeEach
 	void setUp() {
-		// Register
+		// Register 객체 초기화
 		register = Register.builder()
 			.serialNumber("5_team_testSerial")
 			.password("password123!")
@@ -56,30 +58,34 @@ class HeatmapServiceImplTest {
 			.captureData(new ArrayList<>())
 			.build();
 
-		List<PageCaptureData> PageCaptureList = new ArrayList<>();
-		PageCaptureList.add(
+		List<PageCaptureData> pageCaptureList = new ArrayList<>();
+		pageCaptureList.add(
 			PageCaptureData.builder()
 				.pageUrl("http://localhost:3000/myPage1")
 				.captureFileName("sample1.png")
 				.register(register)
 				.build()
 		);
-		PageCaptureList.add(
+		pageCaptureList.add(
 			PageCaptureData.builder()
 				.pageUrl("http://localhost:3000/myPage2")
 				.captureFileName("sample2.png")
 				.register(register)
 				.build()
 		);
-
-		register.getCaptureData().addAll(PageCaptureList);
+		register.getCaptureData().addAll(pageCaptureList);
 		registerRepository.save(register);
 
-		// 이벤트 리스트 초기화
-		mockEvents = new ArrayList<>();
+		// ElasticSearch에 저장된 이벤트 Document들을 생성
+		mockDocuments = new ArrayList<>();
 
-		// 클릭 이벤트 생성
-		SolutionEvent clickEvent = SolutionEvent.builder()
+		// 클릭 이벤트 document (timestamp: 밀리초 단위)
+		long clickTimestamp = LocalDateTime.now()
+			.minusDays(4)
+			.atZone(ZoneId.systemDefault())
+			.toInstant()
+			.toEpochMilli();
+		SolutionEventDocument clickDoc = SolutionEventDocument.builder()
 			.type("click")
 			.clientX(100)
 			.clientY(200)
@@ -88,12 +94,17 @@ class HeatmapServiceImplTest {
 			.scrollHeight(3000)
 			.sessionId("session1")
 			.pageUrl("http://localhost:3000/myPage1")
-			.timestamp(LocalDateTime.now().minusDays(4))
+			.timestamp(clickTimestamp)
 			.build();
-		mockEvents.add(clickEvent);
+		mockDocuments.add(clickDoc);
 
-		// 이동 이벤트 생성
-		SolutionEvent mousemoveEvent = SolutionEvent.builder()
+		// 마우스무브 이벤트 document
+		long mousemoveTimestamp = LocalDateTime.now()
+			.minusDays(4)
+			.atZone(ZoneId.systemDefault())
+			.toInstant()
+			.toEpochMilli();
+		SolutionEventDocument mousemoveDoc = SolutionEventDocument.builder()
 			.type("mousemove")
 			.clientX(150)
 			.clientY(250)
@@ -102,13 +113,19 @@ class HeatmapServiceImplTest {
 			.scrollHeight(3000)
 			.sessionId("session1")
 			.pageUrl("http://localhost:3000/myPage1")
-			.timestamp(LocalDateTime.now().minusDays(4))
+			.timestamp(mousemoveTimestamp)
 			.build();
-		mockEvents.add(mousemoveEvent);
+		mockDocuments.add(mousemoveDoc);
 
-		// 스크롤 이벤트 생성
+		// 스크롤 이벤트 document 5개 생성
 		for (int i = 0; i < 5; i++) {
-			SolutionEvent scrollEvent = SolutionEvent.builder()
+			long scrollTimestamp = LocalDateTime.now()
+				.minusDays(4)
+				.minusMinutes(20 - i)
+				.atZone(ZoneId.systemDefault())
+				.toInstant()
+				.toEpochMilli();
+			SolutionEventDocument scrollDoc = SolutionEventDocument.builder()
 				.type("scroll")
 				.scrollY(i * 100)
 				.viewportHeight(800)
@@ -116,17 +133,10 @@ class HeatmapServiceImplTest {
 				.scrollHeight(3000)
 				.sessionId("session" + (i % 2 + 1))
 				.pageUrl("http://localhost:3000/myPage1")
-				.timestamp(LocalDateTime.now().minusDays(4).minusMinutes(20 - i))
+				.timestamp(scrollTimestamp)
 				.build();
-			mockEvents.add(scrollEvent);
+			mockDocuments.add(scrollDoc);
 		}
-
-		// SolutionData 객체 생성
-		mockSolutionData = SolutionData.builder()
-			.solutionEvents(mockEvents)
-			.build();
-
-		solutionDataRepository.save(mockSolutionData);
 	}
 
 	@Test
@@ -140,12 +150,12 @@ class HeatmapServiceImplTest {
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
 				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(true);
-
-			when(solutionDataRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.of(mockSolutionData));
+			// 페이징을 위해 첫 호출에 mockDocuments, 이후는 빈 리스트로 종료
+			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
+				.thenReturn(mockDocuments)
+				.thenReturn(Collections.emptyList());
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);
@@ -172,12 +182,11 @@ class HeatmapServiceImplTest {
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
 				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(true);
-
-			when(solutionDataRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.of(mockSolutionData));
+			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
+				.thenReturn(mockDocuments)
+				.thenReturn(Collections.emptyList());
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);
@@ -200,12 +209,11 @@ class HeatmapServiceImplTest {
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
 				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(true);
-
-			when(solutionDataRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.of(mockSolutionData));
+			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
+				.thenReturn(mockDocuments)
+				.thenReturn(Collections.emptyList());
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);
@@ -231,7 +239,7 @@ class HeatmapServiceImplTest {
 		// When & Then
 		assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
 		verify(registerRepository).findBySerialNumber(serialNumber);
-		verify(solutionDataRepository, never()).findBySerialNumber(any());
+		verify(solutionEventDocumentRepository, never()).findBySerialNumber(any(), any());
 	}
 
 	@Test
@@ -245,20 +253,18 @@ class HeatmapServiceImplTest {
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
 				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(false);
 
 			// When & Then
 			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
 			verify(registerRepository).findBySerialNumber(serialNumber);
-			// 비밀번호 검증 실패 시, solutionDataRepository 는 호출되지 않아야 함
-			verify(solutionDataRepository, never()).findBySerialNumber(any());
+			verify(solutionEventDocumentRepository, never()).findBySerialNumber(any(), any());
 		}
 	}
 
 	@Test
-	@DisplayName("6. 솔루션 데이터가 없을 때 예외 발생 테스트")
+	@DisplayName("6. 솔루션 데이터(이벤트 Document)가 없을 때 예외 발생 테스트")
 	void t006() {
 		// Given
 		String serialNumber = "5_team_testSerial";
@@ -268,16 +274,15 @@ class HeatmapServiceImplTest {
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
 				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(true);
-
-			when(solutionDataRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.empty());
+			// 이벤트 Document가 하나도 없는 경우(emptyList)
+			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
+				.thenReturn(Collections.emptyList());
 
 			// When & Then
 			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
-			verify(solutionDataRepository).findBySerialNumber(serialNumber);
+			verify(solutionEventDocumentRepository).findBySerialNumber(eq(serialNumber), any(Pageable.class));
 		}
 	}
 
@@ -289,24 +294,18 @@ class HeatmapServiceImplTest {
 		String password = "password123!";
 		String type = "click";
 
-		// 빈 이벤트 리스트를 가진 SolutionData 객체 생성
-		SolutionData emptyData = SolutionData.builder()
-			.solutionEvents(new ArrayList<>())
-			.build();
-
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
 				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(true);
-
-			when(solutionDataRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.of(emptyData));
+			// 페이징 결과로 빈 리스트가 반환되는 경우
+			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
+				.thenReturn(Collections.emptyList());
 
 			// When & Then
 			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
-			verify(solutionDataRepository).findBySerialNumber(serialNumber);
+			verify(solutionEventDocumentRepository).findBySerialNumber(eq(serialNumber), any(Pageable.class));
 		}
 	}
 
@@ -321,16 +320,18 @@ class HeatmapServiceImplTest {
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
 				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(true);
-
-			when(solutionDataRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.of(mockSolutionData));
+			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
+				.thenReturn(mockDocuments)
+				.thenReturn(Collections.emptyList());
 
 			// When & Then
 			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
-			verify(solutionDataRepository).findBySerialNumber(serialNumber);
+
+			// 페이징으로 인해 2번 호출됨
+			verify(solutionEventDocumentRepository, times(2))
+				.findBySerialNumber(eq(serialNumber), any(Pageable.class));
 		}
 	}
 
@@ -342,10 +343,14 @@ class HeatmapServiceImplTest {
 		String password = "password123!";
 		String type = "click";
 
-		// 1000개 이상의 이벤트 생성
-		List<SolutionEvent> largeEventList = new ArrayList<>();
+		// 1500개의 클릭 이벤트 Document 생성 (timestamp: 밀리초 단위)
+		List<SolutionEventDocument> largeEventDocs = new ArrayList<>();
 		for (int i = 0; i < 1500; i++) {
-			SolutionEvent event = SolutionEvent.builder()
+			long eventTimestamp = LocalDateTime.now().minusMinutes(i)
+				.atZone(ZoneId.systemDefault())
+				.toInstant()
+				.toEpochMilli();
+			SolutionEventDocument eventDoc = SolutionEventDocument.builder()
 				.type("click")
 				.clientX(i % 200)
 				.clientY(i % 300)
@@ -354,27 +359,21 @@ class HeatmapServiceImplTest {
 				.scrollHeight(3000)
 				.sessionId("session" + (i % 5))
 				.pageUrl("http://localhost:3000/myPage1")
-				.timestamp(LocalDateTime.now().minusMinutes(i))
+				.timestamp(eventTimestamp)
 				.build();
-			largeEventList.add(event);
+			largeEventDocs.add(eventDoc);
 		}
-
-		SolutionData largeData = SolutionData.builder()
-			.solutionEvents(largeEventList)
-			.build();
 
 		when(registerRepository.findBySerialNumber(serialNumber))
 			.thenReturn(Optional.of(register));
 
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
-			when(registerRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.of(register));
-
 			passwordUtilsMock.when(() -> PasswordUtils.verifyPassword(password, register.getPassword()))
 				.thenReturn(true);
-
-			when(solutionDataRepository.findBySerialNumber(serialNumber))
-				.thenReturn(Optional.of(largeData));
+			// 페이징: 첫 호출에 1500개의 Document, 이후 빈 리스트 반환으로 종료
+			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
+				.thenReturn(largeEventDocs)
+				.thenReturn(Collections.emptyList());
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);
@@ -384,7 +383,8 @@ class HeatmapServiceImplTest {
 			assertEquals(10, response.gridSize());
 			assertNotNull(response.gridCells());
 			assertNotNull(response.metadata());
-			assertTrue(response.metadata().totalEvents() == 750); // 클릭은 2:1 샘플링 적용
+			// 1500개의 click 이벤트에 대해 2:1 샘플링 적용하면 총 이벤트 수는 750개여야 함
+			assertEquals(750, response.metadata().totalEvents());
 			assertEquals("sample1.png", response.pageCapture());
 		}
 	}
