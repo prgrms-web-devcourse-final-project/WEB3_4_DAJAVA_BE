@@ -57,7 +57,9 @@ public class PageCaptureCleanupScheduler {
 					}
 				});
 			}
-			register.getCaptureData().clear();
+			if (register.getCaptureData() != null) {
+				register.getCaptureData().clear();
+			}
 			registerRepository.save(register);
 			log.info("Register({}) captureData 클리어 후 저장 완료", register.getSerialNumber());
 		}
