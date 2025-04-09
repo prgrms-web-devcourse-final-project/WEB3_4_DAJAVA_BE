@@ -10,7 +10,7 @@ spring:
   application:
     name: dajava_server
   datasource:
-    url: jdbc:h2:./db_dev;MODE=MySQL
+    url: jdbc:h2:file:./backend/db/db_dev
     username: sa
     password:
     driver-class-name: org.h2.Driver

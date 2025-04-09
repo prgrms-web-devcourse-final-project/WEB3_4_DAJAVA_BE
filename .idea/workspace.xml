@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="fd3e62cd-d769-4def-8f9c-d7f309e9a9f5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/global/utils/SolutionUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/global/utils/SolutionUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/config/RedisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,6 +80,7 @@
     "Docker.backend: Compose Deployment.executor": "Run",
     "Gradle./Users/jhons/Downloads/BE/Final/backend.executor": "Run",
     "Gradle.Build backend.executor": "Run",
+    "Gradle.Tests in 'backend.test'.executor": "Run",
     "JUnit.All in com.dajava.backend.main.executor": "Run",
     "JUnit.All in com.dajava.backend.test (1).executor": "Run",
     "JUnit.All in com.dajava.backend.test (2).executor": "Run",
@@ -120,6 +122,28 @@
     </key>
   </component>
   <component name="RunManager" selected="Spring Boot.BackendApplication">
+    <configuration name="Tests in 'backend.test'" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/backend" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":test" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
     <configuration name="/Users/jhons/Downloads/BE/Final/backend" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -184,6 +208,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Spring Boot.BackendApplication" />
+        <item itemvalue="Gradle.Tests in 'backend.test'" />
         <item itemvalue="Gradle./Users/jhons/Downloads/BE/Final/backend" />
         <item itemvalue="Docker.backend: Compose Deployment" />
         <item itemvalue="Docker.backend.elasticsearch: Compose Deployment" />
