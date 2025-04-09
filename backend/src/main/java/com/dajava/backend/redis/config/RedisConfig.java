@@ -12,24 +12,16 @@ public class RedisConfig {
 	private String host;
 	@Value("${spring.data.redis.port}")
 	private int port;
-	// @Value("${spring.data.redis.password}")
-	// private String password;
-
-	/**
-	 * redis 기본 config 입니다.
-	 */
-	@Bean
-	public RedisConnectionFactory redisConnectionFactory() {
-		return new LettuceConnectionFactory(host, port);
-	}
+	@Value("${spring.data.redis.password}")
+	private String password;
 
 	/**
 	 * redis DB에 비밀번호 설정 시 적용 config 입니다.
 	 */
-	// @Bean
-	// public RedisConnectionFactory redisConnectionFactory() {
-		// LettuceConnectionFactory factory = new LettuceConnectionFactory(host, port);
-		// factory.setPassword(password);
-		// return factory;
-	// }
+	@Bean
+	public RedisConnectionFactory redisConnectionFactory() {
+		LettuceConnectionFactory factory = new LettuceConnectionFactory(host, port);
+		factory.setPassword(password);
+		return factory;
+	}
 }
