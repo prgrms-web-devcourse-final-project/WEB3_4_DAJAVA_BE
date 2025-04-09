@@ -1,4 +1,4 @@
-package com.dajava.backend.global.component.buffer;
+package com.dajava.backend.redis.buffer;
 
 import java.util.HashSet;
 import java.util.List;
@@ -10,18 +10,18 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.redis.utils.EventQueueRedisBuffer;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-/**
- * 리포지드에 저장하기 전 이벤트 데이터를 임시 저장하는 버퍼 데이터 구조 입니다.
- */
-@Getter
 @Component
-public class EventBuffer {
-	private final EventQueueBuffer<PointerClickEventRequest> clickBuffer = new EventQueueBuffer<>();
-	private final EventQueueBuffer<PointerMoveEventRequest> moveBuffer = new EventQueueBuffer<>();
-	private final EventQueueBuffer<PointerScrollEventRequest> scrollBuffer = new EventQueueBuffer<>();
+@RequiredArgsConstructor
+@Getter
+public class EventRedisBuffer {
+	private final EventQueueRedisBuffer<PointerClickEventRequest> clickBuffer;
+	private final EventQueueRedisBuffer<PointerMoveEventRequest> moveBuffer;
+	private final EventQueueRedisBuffer<PointerScrollEventRequest> scrollBuffer;
 
 	// add
 	public void addClickEvent(PointerClickEventRequest event, SessionDataKey sessionDataKey) {
@@ -80,4 +80,3 @@ public class EventBuffer {
 		return activeSessionKeys;
 	}
 }
-

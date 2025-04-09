@@ -28,6 +28,7 @@ import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.AdminService;
+import com.dajava.backend.domain.register.service.RegisterCacheService;
 import com.dajava.backend.domain.register.service.RegisterService;
 import com.dajava.backend.global.exception.ErrorCode;
 
