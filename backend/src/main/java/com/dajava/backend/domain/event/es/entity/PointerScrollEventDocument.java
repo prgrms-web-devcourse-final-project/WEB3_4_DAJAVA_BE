@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
  * api로 들어온 scrollEvent를 저장하는 ES 인덱스 입니다.
  * @author NohDongHui
  */
-@Document(indexName = "pointer-scroll-events")
+@Document(indexName = "pointer-scroll-events", createIndex = false)
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
