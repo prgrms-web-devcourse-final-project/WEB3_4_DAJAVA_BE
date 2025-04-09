@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -60,6 +61,31 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	 */
 	List<Register> findByIsServiceExpiredTrue();
 
+	/**
+	 * Register 엔티티 중에서 삭제 대상인 데이터를 조회
+	 * 솔루션이 완료되었으며, delete 기준이 되는 시간보다 이전에 수정된(솔루션을 제공받은) 데이터를 찾는다.
+	 * @param deleteTime 삭제되어야 하는 시간 기준 값
+	 * @return List<Register>
+	 */
+	@Modifying
+	@Query("""
+		    DELETE FROM Register r
+		    WHERE r.isSolutionComplete = true
+		    AND r.modifiedDate < :deleteTime
+		""")
+	int deleteCleanupTargetRegisters(@Param("deleteTime") LocalDateTime deleteTime);
+	/**
+	 * 엔티티가 현재 시각 기준으로 14일 이상 수정 시각이 차이나는 Register 의 List를 조회후 반환
+	 * @param threshold 시간 비교를 위한 LocalDateTime 값 (서비스 정책상 14일 이전 데이터)
+	 * @return List<Register>
+	 */
+	@Query("""
+			SELECT r 
+			FROM Register r 
+			WHERE r.modifiedDate < :threshold 
+			AND r.isSolutionComplete = true
+		""")
+	List<Register> findAllCompletedRegisterList(LocalDateTime threshold);
 }
 
 
