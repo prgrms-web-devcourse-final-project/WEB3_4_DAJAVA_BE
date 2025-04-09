@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fd3e62cd-d769-4def-8f9c-d7f309e9a9f5" name="Changes" comment="chore: .gitignore -&gt; .idea추가">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/global/config/PlatformTransactionConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/domain/solution/service/SolutionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/domain/solution/service/SolutionServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,6 +77,7 @@
     "Docker.backend.kibana: Compose Deployment.executor": "Run",
     "Docker.backend.redis: Compose Deployment.executor": "Run",
     "Docker.backend: Compose Deployment.executor": "Run",
+    "Gradle./Users/jhons/Downloads/BE/Final/backend.executor": "Run",
     "JUnit.All in com.dajava.backend.main.executor": "Run",
     "JUnit.All in com.dajava.backend.test (1).executor": "Run",
     "JUnit.All in com.dajava.backend.test (2).executor": "Run",
@@ -92,8 +93,9 @@
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
+    "Spring Boot.BackendApplication (1).executor": "Run",
     "Spring Boot.BackendApplication.executor": "Run",
-    "git-widget-placeholder": "feature/es",
+    "git-widget-placeholder": "refactor/redis",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/jhons/Downloads/BE/WEB3_4_DAJAVA_BE",
     "node.js.detected.package.eslint": "true",
@@ -116,51 +118,17 @@
       <recent name="$PROJECT_DIR$/backend" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.BackendApplication">
-    <configuration name="All in com.dajava.backend.main" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="com.dajava.backend.main" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="All in com.dajava.backend.test (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="com.dajava.backend.test" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="All in com.dajava.backend.test (2)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="com.dajava.backend.test" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="All in com.dajava.backend.test (3)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="com.dajava.backend.test" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="All in com.dajava.backend.test (4)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="com.dajava.backend.test" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="BackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <component name="RunManager">
+    <configuration name="BackendApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
-      <module name="com.dajava.backend.main" />
+      <module name="backend.main" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.dajava.backend.BackendApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.dajava.backend.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -173,11 +141,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.All in com.dajava.backend.test (2)" />
-        <item itemvalue="JUnit.All in com.dajava.backend.test (4)" />
-        <item itemvalue="JUnit.All in com.dajava.backend.main" />
-        <item itemvalue="JUnit.All in com.dajava.backend.test (1)" />
-        <item itemvalue="JUnit.All in com.dajava.backend.test (3)" />
+        <item itemvalue="Spring Boot.BackendApplication (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -214,6 +178,8 @@
       <workItem from="1744043518425" duration="4359000" />
       <workItem from="1744075348612" duration="49000" />
       <workItem from="1744075399310" duration="5055000" />
+      <workItem from="1744180832004" duration="81000" />
+      <workItem from="1744180934605" duration="160000" />
     </task>
     <servers />
   </component>
