@@ -42,27 +42,37 @@ public class EsEventCleanUpScheduler {
 
 	//@Scheduled(fixedRateString = "${cleanup.scheduler.duration.log}")
 	public void deleteOldDocuments() {
-		long nowMinus1Day = Instant.now().minus(logDeleteDay, ChronoUnit.DAYS).toEpochMilli();
+		Instant now = Instant.now();
+		Instant deleteBefore = now.minus(logDeleteDay, ChronoUnit.DAYS);
 
-		for (String indexName : INDEX_NAMES) {
-			try {
-				// Criteria 기반 쿼리 생성
-				Criteria criteria = new Criteria("timestamp").lessThan(nowMinus1Day);
+		// 시간 단위로 24개 구간으로 쪼개기
+		for (int i = 0; i < 24; i++) {
+			Instant from = deleteBefore.plus(i, ChronoUnit.HOURS);
+			Instant to = deleteBefore.plus(i + 1, ChronoUnit.HOURS);
 
-				// 모든 문서 삭제 (match all)
-				//Query query = NativeQuery.builder()
-				//	.withQuery(q -> q.matchAll(m -> m))
-				//	.build();
+			long fromMillis = from.toEpochMilli();
+			long toMillis = to.toEpochMilli();
 
-				Query query = new CriteriaQuery(criteria);
+			for (String indexName : INDEX_NAMES) {
+				try {
+					Criteria criteria = new Criteria("timestamp")
+						.greaterThanEqual(fromMillis)
+						.lessThan(toMillis);
 
-				// deleteByQuery 실행
-				ByQueryResponse response = elasticsearchOperations.delete(query, Object.class, IndexCoordinates.of(indexName));
-				long deletedCount = response.getDeleted();
+					Query query = new CriteriaQuery(criteria);
 
-				log.info("[{}] 인덱스에서 오래된 click, move, scroll 문서 삭제 성공. 삭제된 문서 수: {}", indexName, deletedCount);
-			} catch (Exception e) {
-				log.error("[{}] 인덱스에서 오래된 click, move, scroll  문서 삭제 실패: {}", indexName, e.getMessage());
+					ByQueryResponse response = elasticsearchOperations.delete(query, Object.class,
+						IndexCoordinates.of(indexName));
+					long deletedCount = response.getDeleted();
+
+					log.info("[{}] 인덱스에서 [{} ~ {}] 범위의 click, move, scroll 문서 삭제 성공. 삭제된 문서 수: {}",
+						indexName, from, to, deletedCount
+					);
+				} catch (Exception e) {
+					log.error("[{}] 인덱스에서 [{} ~ {}] click, move, scroll 문서 삭제 실패: {}",
+						indexName, from, to, e.getMessage()
+					);
+				}
 			}
 		}
 	}
