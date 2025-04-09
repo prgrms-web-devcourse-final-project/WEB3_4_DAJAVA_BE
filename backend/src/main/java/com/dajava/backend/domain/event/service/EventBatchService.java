@@ -63,6 +63,8 @@ public class EventBatchService {
 			return;
 		}
 
+		// todo... sessionescache value가 boolean으로 바뀌면
+		// repository 에서 불린 값을 가져와서 체크
 		SessionDataDocument sessionDataDocument = sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 
 		processClickEvents(sessionDataKey);

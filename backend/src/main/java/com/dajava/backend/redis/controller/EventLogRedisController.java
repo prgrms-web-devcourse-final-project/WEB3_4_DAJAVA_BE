@@ -1,4 +1,7 @@
 package com.dajava.backend.redis.controller;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,8 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
-import com.dajava.backend.domain.event.service.EventLogService;
-import com.dajava.backend.redis.scheduler.EventRedisBufferScheduler;
+import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
+import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.redis.service.RedisService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventLogRedisController {
 	private final RedisService redisService;
+	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 	/**
 	 * Click(Touch) 이벤트 로깅
 	 * type 이 "click" 인 이벤트를 로깅합니다.
@@ -71,6 +76,14 @@ public class EventLogRedisController {
 		return "스크롤 이벤트 수신 완료";
 	}
 
+	@Operation(summary = "세션 시작 요청", description = "세션 시작 요청이 들어오면 해당 세션을 시작합니다.")
+	@PostMapping("/start")
+	@ResponseStatus(HttpStatus.OK)
+	public void logStart(@RequestBody SessionDataKey sessionDataKey) {
+		redisService.startSession(sessionDataKey);
+	}
+
+
 	@Operation(summary = "세션 종료 요청", description = "세션 종료 요청이 들어오면 해당 세션을 종료합니다.")
 	@PostMapping("/end/{sessionId}")
 	@ResponseStatus(HttpStatus.OK)
@@ -81,16 +94,11 @@ public class EventLogRedisController {
 	}
 
 
-	private final EventRedisBufferScheduler eventRedisBufferScheduler;
-
-	@GetMapping("/flush")
-	public String triggerFlushManually() {
-		eventRedisBufferScheduler.flushAllEventBuffers();
-		return "성공";
-	}
-	@GetMapping("/flush/inactive")
-	public String triggerFlushInactive() {
-		eventRedisBufferScheduler.flushInactiveEventBuffers();
-		return "성공";
+	// 엘라스틱 서치 들어가는지 테스트
+	@GetMapping("/api/test/session")
+	public List<SessionDataDocument> getAllSessions() {
+		List<SessionDataDocument> result = new ArrayList<>();
+		sessionDataDocumentRepository.findAll().forEach(result::add);
+		return result;
 	}
 }

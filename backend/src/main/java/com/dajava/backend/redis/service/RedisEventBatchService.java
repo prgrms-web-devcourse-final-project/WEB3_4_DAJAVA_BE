@@ -42,7 +42,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisEventBatchService {
 	private final EventRedisBuffer eventRedisBuffer;
-	// private final RedisSessionDataService redisSessionDataService;
 	private final SessionDataService sessionDataService;
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;

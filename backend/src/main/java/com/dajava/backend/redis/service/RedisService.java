@@ -1,8 +1,11 @@
 package com.dajava.backend.redis.service;
 
+import org.hibernate.Session;
+
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
+import com.dajava.backend.domain.event.dto.SessionDataKey;
 
 public interface RedisService {
 	/**
@@ -24,4 +27,5 @@ public interface RedisService {
 	 */
 	void createScrollEvent(PointerScrollEventRequest pointerScrollEventRequest);
 	void expireSession(String sessionId);
+	void startSession(SessionDataKey sessionDataKey);
 }

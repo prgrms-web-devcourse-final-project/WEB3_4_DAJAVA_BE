@@ -7,7 +7,6 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.domain.event.entity.SessionData;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.repository.SessionDataRepository;
@@ -68,7 +67,7 @@ public class EventLogServiceImpl implements EventLogService {
 		);
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
-		//sessionDataService.createOrFindSessionData(sessionDataKey);
+		// sessionDataService.createOrFindSessionData(sessionDataKey);
 		// es 용
 		sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
 

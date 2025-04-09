@@ -31,41 +31,20 @@ public class SessionDataService {
 	//private final Map<SessionDataKey, SessionData> sessionCache = new ConcurrentHashMap<>();
 	private final Map<SessionDataKey, SessionDataDocument> sessionEsCache = new ConcurrentHashMap<>();
 
-	/*
-	@Transactional
-	public SessionData createOrFindSessionData(SessionDataKey key) {
-		return sessionCache.computeIfAbsent(key, k ->
-			sessionDataRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
-					k.pageUrl(), k.sessionId(), k.memberSerialNumber()
-				)
-				.orElseGet(() -> {
-					SessionData newSession = SessionData.builder()
-						.sessionId(k.sessionId())
-						.pageUrl(k.pageUrl())
-						.memberSerialNumber(k.memberSerialNumber())
-						.isOutlier(false)
-						.isMissingValue(false)
-						.isSessionEnded(false)
-						.isVerified(false)
-						.build();
-					return sessionDataRepository.save(newSession);
-				})
-		);
-	}
-
-	// DB에 반영 완료시 Cache 에서 제거하는 로직
-	public void removeFromCache(SessionDataKey key) {
-		sessionCache.remove(key);
-	}
-	 */
+	// todo... sessionescache value가 boolean으로 바뀌면
+	// 아래가 조건 식 바꿔야하고
 
 	//session 엔티티 일련번호는 sessionId+url+serialNum으로 한다.
 	//트랜잭션이 보장 되지 않기 때문에 중복된 데이터가 들어간 경우 원래 있던 데이터에 덮어쓰기 형태가 되어야함.
+
 	public SessionDataDocument createOrFindSessionDataDocument(SessionDataKey key) {
 		return sessionEsCache.computeIfAbsent(key, k ->
+			// k 가 있으면
 			sessionDataDocumentRepository.findByPageUrlAndSessionIdAndMemberSerialNumber(
 					k.pageUrl(), k.sessionId(), k.memberSerialNumber()
 				)
+				// Todo... start api 적용 시 변경 예정
+				// 없으면
 				.orElseGet(() -> {
 					SessionDataDocument newSession = SessionDataDocument.create(
 						k.sessionId(),
@@ -82,6 +61,4 @@ public class SessionDataService {
 	public void removeFromEsCache(SessionDataKey key) {
 		sessionEsCache.remove(key);
 	}
-
 }
-

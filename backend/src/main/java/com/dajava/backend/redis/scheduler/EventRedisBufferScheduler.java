@@ -46,20 +46,16 @@ public class EventRedisBufferScheduler {
 		int inactiveCount = 0;
 		for (SessionDataKey sessionKey : activeKeys) {
 			String key = SessionDataKeyUtils.toKey(sessionKey);
-
 			// 세션의 마지막 활동 시간 확인
 			Long lastClickUpdate = eventRedisBuffer.getClickBuffer().getLastUpdated(key);
 			Long lastMoveUpdate = eventRedisBuffer.getMoveBuffer().getLastUpdated(key);
 			Long lastScrollUpdate = eventRedisBuffer.getScrollBuffer().getLastUpdated(key);
-
 			// 가장 최근 업데이트 시간 계산
 			Long latestUpdate = getLatestUpdate(lastClickUpdate, lastMoveUpdate, lastScrollUpdate);
-
 			// 비활성 세션 여부 확인
 			if (latestUpdate == null || (now - latestUpdate) >= properties.getInactiveThresholdMs()) {
 				log.info("비활성 세션 감지: {}", sessionKey);
 				inactiveCount++;
-
 				// 배치 처리를 통해 데이터 저장 및 캐시 제거
 				redisActivityHandleService.processInactiveBatchForSession(sessionKey);
 			}
@@ -98,13 +94,11 @@ public class EventRedisBufferScheduler {
 	 */
 	private Long getLatestUpdate(Long... updates) {
 		Long latest = null;
-
 		for (Long update : updates) {
 			if (update != null && (latest == null || update > latest)) {
 				latest = update;
 			}
 		}
-
 		return latest;
 	}
 }
