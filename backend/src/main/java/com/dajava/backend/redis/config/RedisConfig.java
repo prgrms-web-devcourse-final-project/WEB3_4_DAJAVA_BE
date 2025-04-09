@@ -25,6 +25,7 @@ public class RedisConfig {
 		config.setHostName(host);
 		config.setPort(port);
 		config.setPassword(password);
+
 		return new LettuceConnectionFactory(config);
 	}
 }
