@@ -21,11 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
-import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.heatmap.dto.GridCell;
 import com.dajava.backend.domain.heatmap.dto.HeatmapMetadata;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
+import com.dajava.backend.domain.heatmap.validation.UrlEqualityValidator;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -48,14 +48,13 @@ import lombok.extern.slf4j.Slf4j;
 public class HeatmapServiceImpl implements HeatmapService {
 
 	private final RegisterRepository registerRepository;
-	private final SolutionDataRepository solutionDataRepository;
+	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
+	private final UrlEqualityValidator urlEqualityValidator;
 
 	// 고정 그리드 사이즈
 	// 추후 기능 확장시 해당 사이즈를 인자로 받아 조정하도록 만들 계획
 	private static final int GRID_SIZE = 10;
 	private static final int PAGE_SIZE = 1000;
-
-	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
 
 	@Override
 	@Cacheable(value = "heatmapCache", key = "{#serialNumber, #type}")
@@ -223,9 +222,9 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 * @return HeatmapResponse 그리드 데이터와 메타 데이터를 포함한 히트맵 응답 DTO
 	 */
 	private HeatmapResponse createCoordinateHeatmap(List<SolutionEventDocument> events, String type, String targetUrl) {
-		// targetUrl 과 일치하는 이벤트만 필터링
+		// targetUrl 과 일치하는 이벤트만 필터링 (프로토콜 무시)
 		List<SolutionEventDocument> filteredEvents = events.stream()
-			.filter(event -> targetUrl.equals(event.getPageUrl()))
+			.filter(event -> urlEqualityValidator.isMatching(targetUrl, event.getPageUrl()))
 			.toList();
 
 		// 필터링 결과가 없으면 빈 히트맵 리턴
@@ -339,9 +338,9 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 * @return HeatmapResponse 그리드 데이터와 메타 데이터를 포함한 히트맵 응답 DTO
 	 */
 	private HeatmapResponse createScrollDepthHeatmap(List<SolutionEventDocument> events, String targetUrl) {
-		// targetUrl 과 일치하는 이벤트만 필터링
+		// targetUrl 과 일치하는 이벤트만 필터링 (프로토콜 무시)
 		List<SolutionEventDocument> filteredEvents = events.stream()
-			.filter(event -> targetUrl.equals(event.getPageUrl()))
+			.filter(event -> urlEqualityValidator.isMatching(targetUrl, event.getPageUrl()))
 			.toList();
 
 		// 필터링 결과가 없으면 빈 히트맵 리턴
