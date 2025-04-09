@@ -60,6 +60,18 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 	 */
 	List<Register> findByIsServiceExpiredTrue();
 
+	/**
+	 * 엔티티가 현재 시각 기준으로 14일 이상 수정 시각이 차이나는 Register 의 List를 조회후 반환
+	 * @param threshold 시간 비교를 위한 LocalDateTime 값 (서비스 정책상 14일 이전 데이터)
+	 * @return List<Register>
+	 */
+	@Query("""
+			SELECT r 
+			FROM Register r 
+			WHERE r.modifiedDate < :threshold 
+			AND r.isSolutionComplete = true
+		""")
+	List<Register> findAllCompletedRegisterList(LocalDateTime threshold);
 }
 
 
