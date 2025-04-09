@@ -61,10 +61,10 @@ public class RegisterService {
 	 */
 	@Transactional
 	public RegisterCreateResponse createRegister(final RegisterCreateRequest request) {
-		registerValidator.validateCreateRequest(request);
+		RegisterCreateRequest validatedRequest = registerValidator.validateCreateRequest(request);
 
-		Register newRegister = registerRepository.save(Register.create(request));
-		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
+		Register newRegister = registerRepository.save(Register.create(validatedRequest));
+		Order newOrder = orderRepository.save(Order.create(validatedRequest.email(), validatedRequest.url()));
 
 		log.info("Register 엔티티 생성 : {} ", newRegister);
 		// log.info("Order 엔티티 생성 : {} ", newOrder);
