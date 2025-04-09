@@ -7,9 +7,6 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
-import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
-import com.dajava.backend.domain.event.service.SessionDataService;
 import com.dajava.backend.redis.buffer.EventRedisBuffer;
 
 import lombok.RequiredArgsConstructor;
@@ -18,11 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RedisServiceImpl implements RedisService {
+public class EventServiceImpl implements EventService {
 	private final EventRedisBuffer eventRedisBuffer;
-	private final SessionDataService sessionDataService;
-	private final SessionDataDocumentRepository sessionDataDocumentRepository;
-	private final RedisActivityHandleService redisActivityHandleService;
 
 	@Override
 	@Transactional
@@ -54,32 +48,6 @@ public class RedisServiceImpl implements RedisService {
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
 		);
 		eventRedisBuffer.addScrollEvent(request, sessionDataKey);
-	}
-
-	@Override
-	@Transactional
-	public void startSession(SessionDataKey sessionDataKey) {
-		log.info("세션 시작");
-		SessionDataDocument esData = SessionDataDocument.create(
-			sessionDataKey.sessionId(),
-			sessionDataKey.memberSerialNumber(),
-			sessionDataKey.pageUrl(),
-			System.currentTimeMillis()
-		);
-		sessionDataDocumentRepository.save(esData);
-		// 중복이 있으면 그걸 담아 ?
-	}
-
-	@Override
-	@Transactional
-	public void expireSession(String sessionId) {
-		log.info("세션 종료");
-		SessionDataDocument esData = sessionDataDocumentRepository.findBySessionId(sessionId)
-			.orElseThrow();
-		SessionDataKey sessionDataKey = new SessionDataKey(
-			esData.getSessionId(), esData.getPageUrl(), esData.getMemberSerialNumber()
-		);
-		redisActivityHandleService.processInactiveBatchForSession(sessionDataKey);
 	}
 
 }

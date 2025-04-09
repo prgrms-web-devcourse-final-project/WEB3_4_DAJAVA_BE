@@ -7,6 +7,9 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
+/**
+ * redis 기본 설정을 위한 config입니다.
+ */
 @Configuration
 public class RedisConfig {
 	@Value("${spring.data.redis.host}")
@@ -16,9 +19,7 @@ public class RedisConfig {
 	@Value("${spring.data.redis.password}")
 	private String password;
 
-	/**
-	 * redis DB에 비밀번호 설정 시 적용 config 입니다.
-	 */
+
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 		RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();

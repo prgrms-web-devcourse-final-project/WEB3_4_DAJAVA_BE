@@ -5,7 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fd3e62cd-d769-4def-8f9c-d7f309e9a9f5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/controller/SessionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/service/SessionService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/service/SessionServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/config/RedisBufferConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/config/RedisEventConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/config/RedisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/controller/EventLogRedisController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/controller/EventController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/service/RedisService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/service/EventService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/service/RedisServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/dajava/backend/redis/service/EventServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
