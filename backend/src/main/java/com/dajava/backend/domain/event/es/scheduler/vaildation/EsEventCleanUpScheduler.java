@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 주기적으로 이벤트 데이터 삭제 로직을 실행하는 스케줄러 입니다.
  * es의 데이터를 조건에 맞춰 삭제합니다.
- *
+ * 추 후 테스트 코드 작성 필요
  * @author NohDongHui
  */
 @Slf4j
