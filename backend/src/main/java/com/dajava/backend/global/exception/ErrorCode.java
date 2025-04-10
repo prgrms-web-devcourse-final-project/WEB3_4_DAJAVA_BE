@@ -42,8 +42,10 @@ public enum ErrorCode {
 	EVENT_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 이벤트 데이터가 없습니다"),
 	SESSION_DATA_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 세션 데이터가 없습니다"),
 	ALREADY_OUTLIER_DOCUMENT(HttpStatus.BAD_REQUEST, "이미 이상치로 판별된 ES 이벤트 데이터 입니다."),
-	EVENT_DTO_NOT_FOUND(HttpStatus.NOT_FOUND, "버퍼에 이벤트 DTO가 없습니다");
+	EVENT_DTO_NOT_FOUND(HttpStatus.NOT_FOUND, "버퍼에 이벤트 DTO가 없습니다"),
 
+	// Response
+	SUCCESS_DATA_TO_STRING_ERROR(HttpStatus.VARIANT_ALSO_NEGOTIATES, "String 응답을 Json 형태로 변환 중 에러 발생");
 	private final HttpStatus httpStatus;
 	private final String description;
 }

@@ -14,7 +14,6 @@ import com.dajava.backend.redis.utils.EventQueueRedisBuffer;
  */
 @Configuration
 public class RedisEventConfig {
-
 	@Bean
 	public EventQueueRedisBuffer<PointerClickEventRequest> clickBuffer(StringRedisTemplate redisTemplate) {
 		return new EventQueueRedisBuffer<>(redisTemplate, PointerClickEventRequest.class);
