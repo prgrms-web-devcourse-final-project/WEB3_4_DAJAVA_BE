@@ -69,14 +69,4 @@ public class EventRedisBuffer {
 		moveBuffer.clearAll();
 		scrollBuffer.clearAll();
 	}
-
-	// 활성 세션 목록 반환 메서드
-	public Set<SessionDataKey> getAllActiveSessionKeys() {
-		Set<SessionDataKey> activeSessionKeys = new HashSet<>();
-
-		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("click:"));
-		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("move:"));
-		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("scroll:"));
-		return activeSessionKeys;
-	}
 }

@@ -11,6 +11,7 @@ import com.dajava.backend.global.utils.SessionDataKeyUtils;
 import com.dajava.backend.global.utils.EventRedisBuffer;
 import com.dajava.backend.domain.log.service.RedisActivityHandleService;
 import com.dajava.backend.domain.log.service.RedisEventBatchService;
+import com.dajava.backend.global.utils.session.SessionKeyCollector;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class EventRedisBufferScheduler {
 	private final EventRedisBuffer eventRedisBuffer;
 	private final BufferSchedulerProperties properties;
 	private final RedisActivityHandleService redisActivityHandleService;
+	private final SessionKeyCollector sessionKeyCollector;
 
 	/**
 	 * 1분마다 실행되어 비활성 세션을 감지하고 처리합니다.
@@ -42,7 +44,7 @@ public class EventRedisBufferScheduler {
 	public void flushInactiveEventBuffers() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
-		Set<SessionDataKey> activeKeys = eventRedisBuffer.getAllActiveSessionKeys();
+		Set<SessionDataKey> activeKeys = sessionKeyCollector.collectAllActiveSessionKeys();
 		int inactiveCount = 0;
 		for (SessionDataKey sessionKey : activeKeys) {
 			String key = SessionDataKeyUtils.toKey(sessionKey);
@@ -74,7 +76,7 @@ public class EventRedisBufferScheduler {
 	public void flushAllEventBuffers() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 
-		Set<SessionDataKey> activeKeys = eventRedisBuffer.getAllActiveSessionKeys();
+		Set<SessionDataKey> activeKeys = sessionKeyCollector.collectAllActiveSessionKeys();
 		log.info("처리할 활성 세션 수: {}", activeKeys.size());
 
 		for (SessionDataKey sessionKey : activeKeys) {
