@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dajava.backend.domain.email.EmailService;
 import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.RegisterInfo;
 import com.dajava.backend.domain.register.converter.RegisterConverter;
@@ -52,6 +53,7 @@ public class RegisterService {
 	private final RegisterValidator registerValidator;
 	private final FileStorageService fileStorageService;
 	private final RegisterCacheService registerCacheService;
+	private final EmailService emailService;
 
 	/**
 	 * 서비스 Register 생성 메서드
@@ -61,15 +63,21 @@ public class RegisterService {
 	 */
 	@Transactional
 	public RegisterCreateResponse createRegister(final RegisterCreateRequest request) {
-		registerValidator.validateCreateRequest(request);
+		RegisterCreateRequest validatedRequest = registerValidator.validateCreateRequest(request);
 
-		Register newRegister = registerRepository.save(Register.create(request));
-		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
+		Register newRegister = registerRepository.save(Register.create(validatedRequest));
+		Order newOrder = orderRepository.save(Order.create(validatedRequest.email(), validatedRequest.url()));
 
 		log.info("Register 엔티티 생성 : {} ", newRegister);
 		// log.info("Order 엔티티 생성 : {} ", newOrder);
 
 		registerCacheService.refreshCacheAll();
+
+		emailService.sendRegisterCreateEmail(
+			newRegister.getEmail(),
+			newRegister.getUrl(),
+			newRegister.getSerialNumber()
+		);
 
 		return toRegisterCreateResponse(newRegister);
 	}
@@ -123,10 +131,13 @@ public class RegisterService {
 			.map(RegisterConverter::toRegisterInfo)
 			.toList();
 
+		long registersSize = registerRepository.count();
+		long totalPages = (long) Math.ceil((double) registersSize / request.pageSize());
+
 		log.info("Solution 등록 리스트를 조회합니다. PageNum: {}, PageSize: {}, Search Count: {}",
 			request.pageNum(), request.pageSize(), registerInfos.size());
 
-		return RegistersInfoResponse.create(registerInfos);
+		return RegistersInfoResponse.create(registerInfos, registersSize, totalPages, request.pageNum(), request.pageSize());
 	}
 
 	/**
