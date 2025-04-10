@@ -20,9 +20,8 @@ import lombok.RequiredArgsConstructor;
 public class EventQueueRedisBuffer<T> {
 	private static final String EVENT_CACHE_PREFIX = "event:";
 	private static final String LAST_UPDATED_PREFIX = "lastUpdated:";
-	@Qualifier("redisTemplate")
 	private final StringRedisTemplate redisTemplate;
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper;
 
 	private final Class<T> clazz;
 

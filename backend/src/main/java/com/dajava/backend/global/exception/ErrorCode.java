@@ -45,7 +45,14 @@ public enum ErrorCode {
 	EVENT_DTO_NOT_FOUND(HttpStatus.NOT_FOUND, "버퍼에 이벤트 DTO가 없습니다"),
 
 	// Response
-	SUCCESS_DATA_TO_STRING_ERROR(HttpStatus.VARIANT_ALSO_NEGOTIATES, "String 응답을 Json 형태로 변환 중 에러 발생");
+	DATA_TO_STRING_ERROR(HttpStatus.VARIANT_ALSO_NEGOTIATES, "String 응답을 Json 형태로 변환 중 에러가 발생했습니다."),
+
+	// Log
+	SESSION_IDENTIFIER_NOT_FOUND(HttpStatus.NOT_FOUND, "sessionIdentify가 없습니다."),
+	SESSION_IDENTIFIER_PARSING_NOT_FOUND(HttpStatus.BAD_REQUEST, "Key 문자열이 없습니다."),
+	SESSION_IDENTIFIER_PARSING_ERROR(HttpStatus.BAD_REQUEST, "문자열 양식이 맞지 않습니다.");
+
+
 	private final HttpStatus httpStatus;
 	private final String description;
 }

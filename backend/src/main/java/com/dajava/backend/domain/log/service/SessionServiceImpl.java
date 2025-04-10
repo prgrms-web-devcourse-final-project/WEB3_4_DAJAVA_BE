@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
+import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,11 +18,11 @@ public class SessionServiceImpl implements SessionService  {
 
 	@Override
 	@Transactional
-	public void startSession(SessionDataKey sessionDataKey) {
+	public void startSession( SessionIdentifier sessionIdentifier) {
 		SessionDataDocument esData = SessionDataDocument.create(
-			sessionDataKey.sessionId(),
-			sessionDataKey.memberSerialNumber(),
-			sessionDataKey.pageUrl(),
+			sessionIdentifier.sessionId(),
+			sessionIdentifier.memberSerialNumber(),
+			sessionIdentifier.pageUrl(),
 			System.currentTimeMillis()
 		);
 		sessionDataDocumentRepository.save(esData);

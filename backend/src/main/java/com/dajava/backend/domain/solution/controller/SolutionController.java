@@ -45,7 +45,7 @@ public class SolutionController {
 		return solutionService.getAISolution(constructedRefineData, serialNumber);
 	}
 
-	@GetMapping("/info/{serialNumber}/{password}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping("/info/{serialNumber}/{password}")
 	@Operation(summary = "시리얼 번호 기반 UI 개선 솔루션 조회", description = "등록된 시리얼 번호와 비밀번호를 이용해 최종 UI 개선 솔루션을 조회합니다.")
 	public SolutionInfoResponse getSolutionInfo(@PathVariable String serialNumber, @PathVariable String password) {
 		return solutionService.getSolutionInfo(serialNumber, password);

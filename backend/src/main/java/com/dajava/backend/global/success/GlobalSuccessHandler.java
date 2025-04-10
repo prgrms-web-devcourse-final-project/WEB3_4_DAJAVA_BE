@@ -42,7 +42,7 @@
 // 				response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 // 				return objectMapper.writeValueAsString(SuccessData.create(body);
 // 			} catch (Exception e) {
-// 				throw new SolutionException(SUCCESS_DATA_TO_STRING_ERROR);
+// 				throw new SolutionException(DATA_TO_STRING_ERROR);
 // 			}
 // 		}
 //

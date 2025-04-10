@@ -7,10 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
-import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
+import com.dajava.backend.domain.log.dto.ClickEventRequest;
 import com.dajava.backend.domain.log.service.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,11 +35,12 @@ public class EventController {
 	@PostMapping("/click")
 	@ResponseStatus(HttpStatus.OK)
 	public String ClickEvent(
-		@RequestBody PointerClickEventRequest clickEventRequest
+		@RequestBody ClickEventRequest clickEventRequest
 	) {
 		eventService.createClickEvent(clickEventRequest);
 		return "클릭 이벤트 수신 완료";
 	}
+
 	/**
 	 * mousemove 이벤트 로깅
 	 * type 이 "mousemove"인 이벤트를 로깅합니다.

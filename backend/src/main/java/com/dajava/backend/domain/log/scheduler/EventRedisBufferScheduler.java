@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EventRedisBufferScheduler {
 
-	private final RedisEventBatchService redisEventBatchService;
 	private final EventRedisBuffer eventRedisBuffer;
 	private final BufferSchedulerProperties properties;
 	private final RedisActivityHandleService redisActivityHandleService;

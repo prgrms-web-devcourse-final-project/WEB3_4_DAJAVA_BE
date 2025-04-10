@@ -1,5 +1,7 @@
 package com.dajava.backend.domain.log.dto;
 
+import com.dajava.backend.domain.log.dto.base.BaseEventRequest;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 

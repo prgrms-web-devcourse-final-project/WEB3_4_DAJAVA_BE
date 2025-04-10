@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 import com.dajava.backend.domain.log.service.SessionService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,11 +21,12 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "SessionController", description = "세션 컨트롤러")
 public class SessionController {
 	final SessionService sessionService;
+
 	@Operation(summary = "세션 시작 요청", description = "세션 시작 요청이 들어오면 해당 세션을 시작합니다.")
 	@PostMapping("/start")
 	@ResponseStatus(HttpStatus.OK)
-	public void logStart(@RequestBody SessionDataKey sessionDataKey) {
-		sessionService.startSession(sessionDataKey);
+	public void logStart(@RequestBody SessionIdentifier sessionIdentifier) {
+		sessionService.startSession(sessionIdentifier);
 	}
 
 
