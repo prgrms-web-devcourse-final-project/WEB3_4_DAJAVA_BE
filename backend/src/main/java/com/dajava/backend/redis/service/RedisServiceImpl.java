@@ -29,7 +29,7 @@ public class RedisServiceImpl implements RedisService {
 	public void createClickEvent(PointerClickEventRequest request) {
 		log.info("클릭 이벤트 로깅: {}", request);
 		SessionDataKey sessionDataKey = new SessionDataKey(
-			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+			request.getSessionId(), request.getPageUrl(), request.getMemberSerialNumber()
 		);
 		eventRedisBuffer.addClickEvent(request, sessionDataKey);
 	}
@@ -40,7 +40,7 @@ public class RedisServiceImpl implements RedisService {
 		log.info("이동 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
-			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+			request.getSessionId(), request.getPageUrl(), request.getMemberSerialNumber()
 		);
 		eventRedisBuffer.addMoveEvent(request, sessionDataKey);
 	}
@@ -51,7 +51,7 @@ public class RedisServiceImpl implements RedisService {
 		log.info("스크롤 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
-			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+			request.getSessionId(), request.getPageUrl(), request.getMemberSerialNumber()
 		);
 		eventRedisBuffer.addScrollEvent(request, sessionDataKey);
 	}
