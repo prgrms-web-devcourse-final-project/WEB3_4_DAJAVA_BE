@@ -5,12 +5,12 @@ import java.util.Set;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
-import com.dajava.backend.global.utils.SessionDataKeyUtils;
-import com.dajava.backend.global.utils.EventRedisBuffer;
+import com.dajava.backend.global.utils.LogUtils;
+import com.dajava.backend.global.utils.event.EventRedisBuffer;
 import com.dajava.backend.domain.log.service.RedisActivityHandleService;
-import com.dajava.backend.domain.log.service.RedisEventBatchService;
+import com.dajava.backend.global.utils.session.SessionKeyCollector;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class EventRedisBufferScheduler {
+public class SessionScheduler {
 
 	private final EventRedisBuffer eventRedisBuffer;
 	private final BufferSchedulerProperties properties;
 	private final RedisActivityHandleService redisActivityHandleService;
+	private final SessionKeyCollector sessionKeyCollector;
 
 	/**
 	 * 1분마다 실행되어 비활성 세션을 감지하고 처리합니다.
@@ -38,25 +39,25 @@ public class EventRedisBufferScheduler {
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
 	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.inactiveSessionDetectThresholdMs}")
-	public void flushInactiveEventBuffers() {
+	public void flushInactiveSessions() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
-		Set<SessionDataKey> activeKeys = eventRedisBuffer.getAllActiveSessionKeys();
+		Set<SessionIdentifier> activeKeys = sessionKeyCollector.collectAllActiveSessionKeys();
 		int inactiveCount = 0;
-		for (SessionDataKey sessionKey : activeKeys) {
-			String key = SessionDataKeyUtils.toKey(sessionKey);
+		for (SessionIdentifier sessionIdentifier : activeKeys) {
+			String key = LogUtils.createRedisKey(sessionIdentifier);
 			// 세션의 마지막 활동 시간 확인
-			Long lastClickUpdate = eventRedisBuffer.getClickBuffer().getLastUpdated(key);
-			Long lastMoveUpdate = eventRedisBuffer.getMoveBuffer().getLastUpdated(key);
-			Long lastScrollUpdate = eventRedisBuffer.getScrollBuffer().getLastUpdated(key);
+			Long lastClickUpdate = eventRedisBuffer.getClick().getLastUpdated(key);
+			Long lastMoveUpdate = eventRedisBuffer.getMovement().getLastUpdated(key);
+			Long lastScrollUpdate = eventRedisBuffer.getScroll().getLastUpdated(key);
 			// 가장 최근 업데이트 시간 계산
 			Long latestUpdate = getLatestUpdate(lastClickUpdate, lastMoveUpdate, lastScrollUpdate);
 			// 비활성 세션 여부 확인
 			if (latestUpdate == null || (now - latestUpdate) >= properties.getInactiveThresholdMs()) {
-				log.info("비활성 세션 감지: {}", sessionKey);
+				log.info("비활성 세션 감지: {}", sessionIdentifier);
 				inactiveCount++;
 				// 배치 처리를 통해 데이터 저장 및 캐시 제거
-				redisActivityHandleService.processInactiveBatchForSession(sessionKey);
+				redisActivityHandleService.processInactiveBatchForSession(sessionIdentifier);
 			}
 		}
 
@@ -70,13 +71,13 @@ public class EventRedisBufferScheduler {
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
 	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.activeSessionFlushIntervalMs}")
-	public void flushAllEventBuffers() {
+	public void flushAllSessions() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 
-		Set<SessionDataKey> activeKeys = eventRedisBuffer.getAllActiveSessionKeys();
+		Set<SessionIdentifier> activeKeys = sessionKeyCollector.collectAllActiveSessionKeys();
 		log.info("처리할 활성 세션 수: {}", activeKeys.size());
 
-		for (SessionDataKey sessionKey : activeKeys) {
+		for (SessionIdentifier sessionKey : activeKeys) {
 			try {
 				redisActivityHandleService.processActiveBatchForSession(sessionKey);
 			} catch (Exception e) {

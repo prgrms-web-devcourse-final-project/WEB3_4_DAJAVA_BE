@@ -5,19 +5,35 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
-import com.dajava.backend.global.utils.EventQueueRedisBuffer;
+import com.dajava.backend.domain.log.dto.MovementEventRequest;
+import com.dajava.backend.domain.log.dto.ScrollEventRequest;
+import com.dajava.backend.global.utils.event.EventQueueRedisBuffer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-/**
- * Redis 키를 다르게 구성하기 위해 나눔
- */
 @Configuration
 public class RedisEventConfig {
+
 	@Bean
 	public EventQueueRedisBuffer<ClickEventRequest> clickBuffer(
 		StringRedisTemplate redisTemplate,
 		ObjectMapper objectMapper
 	) {
 		return new EventQueueRedisBuffer<>(redisTemplate, objectMapper, ClickEventRequest.class);
+	}
+
+	@Bean
+	public EventQueueRedisBuffer<MovementEventRequest> moveBuffer(
+		StringRedisTemplate redisTemplate,
+		ObjectMapper objectMapper
+	) {
+		return new EventQueueRedisBuffer<>(redisTemplate, objectMapper, MovementEventRequest.class);
+	}
+
+	@Bean
+	public EventQueueRedisBuffer<ScrollEventRequest> scrollBuffer(
+		StringRedisTemplate redisTemplate,
+		ObjectMapper objectMapper
+	) {
+		return new EventQueueRedisBuffer<>(redisTemplate, objectMapper, ScrollEventRequest.class);
 	}
 }

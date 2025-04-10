@@ -3,7 +3,6 @@ package com.dajava.backend.domain.log.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
@@ -18,11 +17,11 @@ public class SessionServiceImpl implements SessionService  {
 
 	@Override
 	@Transactional
-	public void startSession( SessionIdentifier sessionIdentifier) {
+	public void startSession(SessionIdentifier sessionIdentifier) {
 		SessionDataDocument esData = SessionDataDocument.create(
-			sessionIdentifier.sessionId(),
-			sessionIdentifier.memberSerialNumber(),
-			sessionIdentifier.pageUrl(),
+			sessionIdentifier.getSessionId(),
+			sessionIdentifier.getMemberSerialNumber(),
+			sessionIdentifier.getPageUrl(),
 			System.currentTimeMillis()
 		);
 		sessionDataDocumentRepository.save(esData);
@@ -33,9 +32,9 @@ public class SessionServiceImpl implements SessionService  {
 	public void expireSession(String sessionId) {
 		SessionDataDocument esData = sessionDataDocumentRepository.findBySessionId(sessionId)
 			.orElseThrow();
-		SessionDataKey sessionDataKey = new SessionDataKey(
+		SessionIdentifier sessionIdentifier = new SessionIdentifier(
 			esData.getSessionId(), esData.getPageUrl(), esData.getMemberSerialNumber()
 		);
-		redisActivityHandleService.processInactiveBatchForSession(sessionDataKey);
+		redisActivityHandleService.processInactiveBatchForSession(sessionIdentifier);
 	}
 }

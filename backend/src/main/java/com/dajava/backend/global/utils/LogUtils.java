@@ -24,9 +24,9 @@ public class LogUtils {
 			throw new LogException(SESSION_IDENTIFIER_NOT_FOUND);
 		}
 		return String.join(DELIMITER,
-			identifier.sessionId(),
-			identifier.pageUrl(),
-			identifier.memberSerialNumber());
+			identifier.getSessionId(),
+			identifier.getPageUrl(),
+			identifier.getMemberSerialNumber());
 	}
 
 	/**

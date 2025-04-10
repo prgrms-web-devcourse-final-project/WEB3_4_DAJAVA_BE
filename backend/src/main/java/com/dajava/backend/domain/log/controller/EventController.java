@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
-import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
+import com.dajava.backend.domain.log.dto.MovementEventRequest;
+import com.dajava.backend.domain.log.dto.ScrollEventRequest;
 import com.dajava.backend.domain.log.service.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,9 +49,9 @@ public class EventController {
 	@PostMapping("/movement")
 	@ResponseStatus(HttpStatus.OK)
 	public String MovementEvent(
-		@RequestBody PointerMoveEventRequest moveEventRequest
+		@RequestBody MovementEventRequest movementEventRequest
 	) {
-		eventService.createMoveEvent(moveEventRequest);
+		eventService.createMoveEvent(movementEventRequest);
 		return "이동 이벤트 수신 완료";
 	}
 
@@ -63,7 +63,7 @@ public class EventController {
 	@PostMapping("/scroll")
 	@ResponseStatus(HttpStatus.OK)
 	public String ScrollEvent(
-		@RequestBody PointerScrollEventRequest scrollEventRequest
+		@RequestBody ScrollEventRequest scrollEventRequest
 	) {
 		eventService.createScrollEvent(scrollEventRequest);
 		return "스크롤 이벤트 수신 완료";

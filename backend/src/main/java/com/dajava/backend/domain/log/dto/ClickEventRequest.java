@@ -3,6 +3,7 @@ package com.dajava.backend.domain.log.dto;
 import com.dajava.backend.domain.log.dto.base.BaseEventRequest;
 import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +14,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClickEventRequest extends BaseEventRequest {
-
+	@Schema(description = "이동시 X 좌표값", example = "100", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull
 	private Integer clientX;
 
+	@Schema(description = "이동시 Y 좌표값", example = "500", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull
 	private Integer clientY;
 

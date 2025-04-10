@@ -1,9 +1,8 @@
 package com.dajava.backend.domain.log.service;
 
-import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
-import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
-import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
+import com.dajava.backend.domain.log.dto.MovementEventRequest;
+import com.dajava.backend.domain.log.dto.ScrollEventRequest;
 
 public interface EventService {
 	/**
@@ -14,14 +13,14 @@ public interface EventService {
 	void createClickEvent(ClickEventRequest clickEventRequest);
 	/**
 	 * 마우스 이동 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
-	 * @param pointerMoveEventRequest // 요청할 데이터
+	 * @param movementEventRequest // 요청할 데이터
 	 * @return result // 처리된 응답 데이터
 	 */
-	void createMoveEvent(PointerMoveEventRequest pointerMoveEventRequest);
+	void createMoveEvent(MovementEventRequest movementEventRequest);
 	/**
 	 * 스크롤 이벤트 DTO 를 통해 sessionDataKey 를 발급하고, 버퍼에 담습니다.
-	 * @param pointerScrollEventRequest // 요청할 데이터
+	 * @param scrollEventRequest // 요청할 데이터
 	 * @return result // 처리된 응답 데이터
 	 */
-	void createScrollEvent(PointerScrollEventRequest pointerScrollEventRequest);
+	void createScrollEvent(ScrollEventRequest scrollEventRequest);
 }

@@ -50,7 +50,9 @@ public enum ErrorCode {
 	// Log
 	SESSION_IDENTIFIER_NOT_FOUND(HttpStatus.NOT_FOUND, "sessionIdentify가 없습니다."),
 	SESSION_IDENTIFIER_PARSING_NOT_FOUND(HttpStatus.BAD_REQUEST, "Key 문자열이 없습니다."),
-	SESSION_IDENTIFIER_PARSING_ERROR(HttpStatus.BAD_REQUEST, "문자열 양식이 맞지 않습니다.");
+	SESSION_IDENTIFIER_PARSING_ERROR(HttpStatus.BAD_REQUEST, "문자열 양식이 맞지 않습니다."),
+	REDIS_CACHING_ERROR(HttpStatus.BAD_REQUEST, "Redis에 저장하지 못했습니다.");
+
 
 
 	private final HttpStatus httpStatus;

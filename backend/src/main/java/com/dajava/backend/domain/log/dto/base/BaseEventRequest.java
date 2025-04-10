@@ -28,5 +28,5 @@ public abstract class BaseEventRequest {
 	@NotNull private Integer viewportHeight;
 
 	@NotNull
-	private SessionIdentifier sessionidentifier;
+	private SessionIdentifier sessionIdentifier;
 }

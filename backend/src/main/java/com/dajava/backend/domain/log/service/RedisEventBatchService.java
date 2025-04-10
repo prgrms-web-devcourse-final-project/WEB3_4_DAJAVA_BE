@@ -7,10 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.event.converter.PointerEventConverter;
-import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
-import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
-import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
-import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
@@ -20,7 +16,12 @@ import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRep
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.service.SessionDataService;
-import com.dajava.backend.global.utils.EventRedisBuffer;
+import com.dajava.backend.domain.log.converter.EventConverter;
+import com.dajava.backend.domain.log.dto.ClickEventRequest;
+import com.dajava.backend.domain.log.dto.MovementEventRequest;
+import com.dajava.backend.domain.log.dto.ScrollEventRequest;
+import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
+import com.dajava.backend.global.utils.event.EventRedisBuffer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,34 +36,35 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RedisEventBatchService {
 	private final EventRedisBuffer eventRedisBuffer;
-	private final SessionDataService sessionDataService;
+
+	private final SessionDataDocumentRepository sessionDataDocumentRepository;
+	private final RedisSessionDataService redisSessionDataService;
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
-	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 
 	/**
 	 * 각 이벤트 타입의 저장 로직을 배치화한 로직입니다.
-	 * @param sessionDataKey sessionData 객체 생성 및 캐싱을 위해 주입합니다.
+	 * @param sessionIdentifier sessionData 객체 생성 및 캐싱을 위해 주입합니다.
 	 */
 	@Transactional
-	public void processBatchForSession(SessionDataKey sessionDataKey, boolean isInactive) {
-		log.info("{} 세션 이벤트 일괄 처리 시작", sessionDataKey);
+	public void processBatchForSession(SessionIdentifier sessionIdentifier, boolean isInactive) {
+		log.info("{} 세션 이벤트 일괄 처리 시작", sessionIdentifier);
 
-		int totalPendingEvents = countPendingEvents(sessionDataKey);
+		int totalPendingEvents = countPendingEvents(sessionIdentifier);
 
 		if (totalPendingEvents == 0) {
 			return;
 		}
 
-		SessionDataDocument sessionDataDocument = sessionDataService.createOrFindSessionDataDocument(sessionDataKey);
+		SessionDataDocument sessionDataDocument = redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
 
-		processClickEvents(sessionDataKey);
-		processMoveEvents(sessionDataKey);
-		processScrollEvents(sessionDataKey);
+		processClickEvents(sessionIdentifier);
+		processMoveEvents(sessionIdentifier);
+		processScrollEvents(sessionIdentifier);
 
 		if (isInactive) {
-			sessionDataService.removeFromEsCache(sessionDataKey);
+			redisSessionDataService.removeFromEsCache(sessionIdentifier);
 			// 세션 종료 flag 값 true 로 변경
 			sessionDataDocument.endSession();
 		}
@@ -71,49 +73,49 @@ public class RedisEventBatchService {
 
 	/**
 	 *
-	 * @param sessionDataKey sessionDataKey 를 통해 버퍼의 이벤트 갯수를 가져옵니다
+	 * @param sessionIdentifier sessionDataKey 를 통해 버퍼의 이벤트 갯수를 가져옵니다
 	 * @return 총 이벤트 갯수 (int)
 	 */
-	private int countPendingEvents(SessionDataKey sessionDataKey) {
-		return eventRedisBuffer.getClickEvents(sessionDataKey).size()
-			+ eventRedisBuffer.getMoveEvents(sessionDataKey).size()
-			+ eventRedisBuffer.getScrollEvents(sessionDataKey).size();
+	private int countPendingEvents(SessionIdentifier sessionIdentifier) {
+		return eventRedisBuffer.getClickEvents(sessionIdentifier).size()
+			+ eventRedisBuffer.getMoveEvents(sessionIdentifier).size()
+			+ eventRedisBuffer.getScrollEvents(sessionIdentifier).size();
 	}
 
 	/**
 	 * 클릭 이벤트의 버퍼에 접근 후, sessionData 에 데이터를 저장합니다.
 	 * 현재 es에도 같이 저장합니다.
-	 * @param sessionDataKey sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
+	 * @param sessionIdentifier sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
 	 */
-	private void processClickEvents(SessionDataKey sessionDataKey) {
-		List<PointerClickEventRequest> clickEvents = eventRedisBuffer.flushClickEvents(sessionDataKey);
-		log.info("세션 {}: 클릭 이벤트 {} 개 처리", sessionDataKey, clickEvents.size());
+	private void processClickEvents(SessionIdentifier sessionIdentifier) {
+		List<ClickEventRequest> clickEvents = eventRedisBuffer.flushClickEvents(sessionIdentifier);
+		log.info("세션 {}: 클릭 이벤트 {} 개 처리", sessionIdentifier, clickEvents.size());
 
 		//es에 저장할 형태
 		List<PointerClickEventDocument> documents = new ArrayList<>();
-		for (PointerClickEventRequest request : clickEvents) {
+		for (ClickEventRequest request : clickEvents) {
 
-			PointerClickEventDocument doc = PointerEventConverter.toClickEventDocument(request);
+			PointerClickEventDocument doc = EventConverter.toClickEventDocument(request);
 			documents.add(doc);
 		}
 
 		if (!documents.isEmpty()) {
-			pointerClickEventDocumentRepository.saveAll(documents); // Elasticsearch 저장
+			pointerClickEventDocumentRepository.saveAll(documents);
 		}
 	}
 
 	/**
 	 * 무브 이벤트의 버퍼에 접근 후, sessionData 에 데이터를 저장합니다.
-	 * @param sessionDataKey sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
+	 * @param sessionIdentifier sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
 	 */
-	private void processMoveEvents(SessionDataKey sessionDataKey) {
-		List<PointerMoveEventRequest> moveEvents = eventRedisBuffer.flushMoveEvents(sessionDataKey);
-		log.info("세션 {}: 이동 이벤트 {} 개 처리", sessionDataKey, moveEvents.size());
+	private void processMoveEvents(SessionIdentifier sessionIdentifier) {
+		List<MovementEventRequest> moveEvents = eventRedisBuffer.flushMoveEvents(sessionIdentifier);
+		log.info("세션 {}: 이동 이벤트 {} 개 처리", sessionIdentifier, moveEvents.size());
 
 		//es에 저장할 형태
 		List<PointerMoveEventDocument> documents = new ArrayList<>();
-		for (PointerMoveEventRequest request : moveEvents) {
-			PointerMoveEventDocument doc = PointerEventConverter.toMoveEventDocument(request);
+		for (MovementEventRequest request : moveEvents) {
+			PointerMoveEventDocument doc = EventConverter.toMoveEventDocument(request);
 			documents.add(doc);
 		}
 
@@ -124,17 +126,17 @@ public class RedisEventBatchService {
 
 	/**
 	 * 스크롤 이벤트의 버퍼에 접근 후, sessionData 에 데이터를 저장합니다.
-	 * @param sessionDataKey sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
+	 * @param sessionIdentifier sessionDataKey 를 통해 eventBuffer 에 접근한 뒤, 관련 이벤트 리스트를 가져오고, 버퍼를 초기화합니다.
 	 */
-	private void processScrollEvents(SessionDataKey sessionDataKey) {
-		List<PointerScrollEventRequest> scrollEvents = eventRedisBuffer.flushScrollEvents(sessionDataKey);
-		log.info("세션 {}: 스크롤 이벤트 {} 개 처리", sessionDataKey, scrollEvents.size());
+	private void processScrollEvents(SessionIdentifier sessionIdentifier) {
+		List<ScrollEventRequest> scrollEvents = eventRedisBuffer.flushScrollEvents(sessionIdentifier);
+		log.info("세션 {}: 스크롤 이벤트 {} 개 처리", sessionIdentifier, scrollEvents.size());
 
 		//es에 저장할 형태
 		List<PointerScrollEventDocument> documents = new ArrayList<>();
-		for (PointerScrollEventRequest request : scrollEvents) {
+		for (ScrollEventRequest request : scrollEvents) {
 
-			PointerScrollEventDocument doc = PointerEventConverter.toScrollEventDocument(request);
+			PointerScrollEventDocument doc = EventConverter.toScrollEventDocument(request);
 			documents.add(doc);
 		}
 

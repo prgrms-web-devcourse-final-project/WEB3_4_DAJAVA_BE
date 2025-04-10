@@ -1,9 +1,7 @@
 package com.dajava.backend.domain.event.converter;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
