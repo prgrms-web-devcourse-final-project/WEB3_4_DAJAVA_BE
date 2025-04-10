@@ -1,4 +1,4 @@
-package com.dajava.backend.redis.buffer;
+package com.dajava.backend.global.utils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +10,6 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.redis.utils.EventQueueRedisBuffer;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

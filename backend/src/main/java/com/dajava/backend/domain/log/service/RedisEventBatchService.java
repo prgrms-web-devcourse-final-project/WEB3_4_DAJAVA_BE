@@ -11,9 +11,6 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.domain.event.entity.PointerClickEvent;
-import com.dajava.backend.domain.event.entity.PointerMoveEvent;
-import com.dajava.backend.domain.event.entity.PointerScrollEvent;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
@@ -22,12 +19,8 @@ import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRe
 import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
-import com.dajava.backend.domain.event.repository.PointerClickEventRepository;
-import com.dajava.backend.domain.event.repository.PointerMoveEventRepository;
-import com.dajava.backend.domain.event.repository.PointerScrollEventRepository;
-import com.dajava.backend.domain.event.repository.SessionDataRepository;
 import com.dajava.backend.domain.event.service.SessionDataService;
-import com.dajava.backend.redis.buffer.EventRedisBuffer;
+import com.dajava.backend.global.utils.EventRedisBuffer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

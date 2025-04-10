@@ -1,4 +1,4 @@
-package com.dajava.backend.redis.scheduler;
+package com.dajava.backend.domain.log.scheduler;
 
 import java.util.Set;
 
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
-import com.dajava.backend.redis.buffer.EventRedisBuffer;
+import com.dajava.backend.global.utils.EventRedisBuffer;
 import com.dajava.backend.domain.log.service.RedisActivityHandleService;
 import com.dajava.backend.domain.log.service.RedisEventBatchService;
 
