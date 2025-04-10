@@ -71,6 +71,8 @@ public class RegisterService {
 
 		registerCacheService.refreshCacheAll();
 
+		// TODO: 검증된 request 로 이메일 전송
+
 		return toRegisterCreateResponse(newRegister);
 	}
 
