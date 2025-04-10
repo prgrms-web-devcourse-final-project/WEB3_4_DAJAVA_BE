@@ -70,15 +70,7 @@ public class EventQueueRedisBuffer<T> {
 		redisTemplate.delete(LAST_UPDATED_PREFIX + key);
 		return events;
 	}
-	// 활동 즁안 세션 판단
-	public Set<SessionDataKey> getActiveSessionKeys() {
-		Set<String> keys = redisTemplate.keys(EVENT_CACHE_PREFIX + "*");
-		if (keys == null) return Collections.emptySet();
-		return keys.stream()
-			.map(k -> k.replace(EVENT_CACHE_PREFIX, ""))
-			.map(SessionDataKeyUtils::parseKey)
-			.collect(Collectors.toSet());
-	}
+
  	// 업데이트 수정
 	public Long getLastUpdated(String key) {
 		String value = redisTemplate.opsForValue().get(LAST_UPDATED_PREFIX + key);

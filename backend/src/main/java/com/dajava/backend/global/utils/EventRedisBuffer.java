@@ -10,6 +10,7 @@ import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
 import com.dajava.backend.domain.event.dto.PointerScrollEventRequest;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.global.utils.session.ActiveSessionManager;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class EventRedisBuffer {
 	private final EventQueueRedisBuffer<PointerClickEventRequest> clickBuffer;
 	private final EventQueueRedisBuffer<PointerMoveEventRequest> moveBuffer;
 	private final EventQueueRedisBuffer<PointerScrollEventRequest> scrollBuffer;
+	private final ActiveSessionManager activeSessionManager;
 
 	// add
 	public void addClickEvent(PointerClickEventRequest event, SessionDataKey sessionDataKey) {
@@ -72,10 +74,9 @@ public class EventRedisBuffer {
 	public Set<SessionDataKey> getAllActiveSessionKeys() {
 		Set<SessionDataKey> activeSessionKeys = new HashSet<>();
 
-		activeSessionKeys.addAll(clickBuffer.getActiveSessionKeys());
-		activeSessionKeys.addAll(moveBuffer.getActiveSessionKeys());
-		activeSessionKeys.addAll(scrollBuffer.getActiveSessionKeys());
-
+		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("click:"));
+		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("move:"));
+		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("scroll:"));
 		return activeSessionKeys;
 	}
 }
