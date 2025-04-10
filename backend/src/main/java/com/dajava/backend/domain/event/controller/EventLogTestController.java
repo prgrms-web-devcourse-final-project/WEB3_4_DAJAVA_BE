@@ -35,7 +35,7 @@ public class EventLogTestController {
 	@GetMapping("/test/remove")
 	@ResponseStatus(HttpStatus.OK)
 	public String removeLog() {
-		esEventCleanUpScheduler.deleteOldDocuments();
+		esEventCleanUpScheduler.deleteOldEventDocuments();
 		return "click, move, scroll 로그 이벤트 삭제 완료";
 	}
 }
