@@ -123,10 +123,13 @@ public class RegisterService {
 			.map(RegisterConverter::toRegisterInfo)
 			.toList();
 
+		long registersSize = registerRepository.count();
+		long totalPages = (long) Math.ceil((double) registersSize / request.pageSize());
+
 		log.info("Solution 등록 리스트를 조회합니다. PageNum: {}, PageSize: {}, Search Count: {}",
 			request.pageNum(), request.pageSize(), registerInfos.size());
 
-		return RegistersInfoResponse.create(registerInfos);
+		return RegistersInfoResponse.create(registerInfos, registersSize, totalPages, request.pageNum(), request.pageSize());
 	}
 
 	/**
