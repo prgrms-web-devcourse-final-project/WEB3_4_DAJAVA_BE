@@ -1,16 +1,19 @@
 package com.dajava.backend.domain.log.dto.base;
 
 import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 public abstract class BaseEventRequest {
 	@Schema(description = "랜덤으로 생성된 이벤트 식별자", example = "e25f6b52-4a1b-4721-8651-8839f23727cb", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull private String eventId;
@@ -28,5 +31,6 @@ public abstract class BaseEventRequest {
 	@NotNull private Integer viewportHeight;
 
 	@NotNull
+	@JsonUnwrapped
 	private SessionIdentifier sessionIdentifier;
 }
