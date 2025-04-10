@@ -1,14 +1,15 @@
-version: '3.7'
+
 
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+    platform: linux/amd64
     container_name: elasticsearch
     restart: unless-stopped
     environment:
       - discovery.type=single-node
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
       - TZ=Asia/Seoul
       - xpack.security.enabled=false
       - xpack.security.enrollment.enabled=false
@@ -20,10 +21,10 @@ services:
       - elastic
     volumes:
       - esdata:/usr/share/elasticsearch/data
-    deploy:
-      resources:
-        limits:
-          memory: 900m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.13.2
@@ -48,7 +49,7 @@ services:
       - elastic
     volumes:
       - redis-data:/data
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass 1234
     environment:
       - TZ=Asia/Seoul
 
