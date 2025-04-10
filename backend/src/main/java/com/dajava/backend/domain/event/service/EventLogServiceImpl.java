@@ -39,7 +39,7 @@ public class EventLogServiceImpl implements EventLogService {
 	@Override
 	@Transactional
 	public void createClickEvent(PointerClickEventRequest request) {
-		log.info("클릭 이벤트 로깅: {}", request);
+		// log.info("클릭 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
@@ -60,7 +60,7 @@ public class EventLogServiceImpl implements EventLogService {
 	@Override
 	@Transactional
 	public void createMoveEvent(PointerMoveEventRequest request) {
-		log.info("이동 이벤트 로깅: {}", request);
+		// log.info("이동 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
@@ -81,7 +81,7 @@ public class EventLogServiceImpl implements EventLogService {
 	@Override
 	@Transactional
 	public void createScrollEvent(PointerScrollEventRequest request) {
-		log.info("스크롤 이벤트 로깅: {}", request);
+		// log.info("스크롤 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
 			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
