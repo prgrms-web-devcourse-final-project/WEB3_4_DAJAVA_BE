@@ -175,4 +175,13 @@ public class RegisterService {
 			fileName
 		);
 	}
+
+	@Transactional
+	public void modifyToFalseCompletedAdminSolution(String serialNumber) {
+
+		Register targetSolution = registerRepository.findBySerialNumber(serialNumber).get();
+		targetSolution.setSolutionComplete(false);
+		registerRepository.save(targetSolution);
+
+	}
 }
