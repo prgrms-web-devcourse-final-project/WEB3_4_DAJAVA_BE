@@ -17,18 +17,6 @@ public class SessionServiceImpl implements SessionService  {
 
 	@Override
 	@Transactional
-	public void startSession(SessionIdentifier sessionIdentifier) {
-		SessionDataDocument esData = SessionDataDocument.create(
-			sessionIdentifier.getSessionId(),
-			sessionIdentifier.getMemberSerialNumber(),
-			sessionIdentifier.getPageUrl(),
-			System.currentTimeMillis()
-		);
-		sessionDataDocumentRepository.save(esData);
-	}
-
-	@Override
-	@Transactional
 	public void expireSession(String sessionId) {
 		SessionDataDocument esData = sessionDataDocumentRepository.findBySessionId(sessionId)
 			.orElseThrow();

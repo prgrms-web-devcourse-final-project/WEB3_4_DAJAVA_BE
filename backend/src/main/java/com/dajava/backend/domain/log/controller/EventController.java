@@ -49,6 +49,7 @@ public class EventController {
 	public String MovementEvent(
 		@RequestBody MovementEventRequest movementEventRequest
 	) {
+
 		eventService.createMoveEvent(movementEventRequest);
 		return "이동 이벤트 수신 완료";
 	}
