@@ -40,7 +40,7 @@ public class EventBufferSchedulerTest {
 
 		activityHandleService = mock(ActivityHandleService.class);  // EventBatchService mock 추가
 		eventBuffer = new EventBuffer();
-		scheduler = new EventBufferScheduler(activityHandleService, eventBuffer,props);
+		scheduler = new EventBufferScheduler(eventBuffer, activityHandleService, props);
 	}
 
 	@Test
