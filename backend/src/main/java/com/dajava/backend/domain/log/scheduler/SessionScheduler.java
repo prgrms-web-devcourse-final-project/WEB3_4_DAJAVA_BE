@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
-import com.dajava.backend.global.utils.EventRedisBuffer;
+import com.dajava.backend.global.utils.event.EventRedisBuffer;
 import com.dajava.backend.domain.log.service.RedisActivityHandleService;
 import com.dajava.backend.domain.log.service.RedisEventBatchService;
 import com.dajava.backend.global.utils.session.SessionKeyCollector;
@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class EventRedisBufferScheduler {
+public class SessionScheduler {
 
 	private final RedisEventBatchService redisEventBatchService;
 	private final EventRedisBuffer eventRedisBuffer;
@@ -41,7 +41,7 @@ public class EventRedisBufferScheduler {
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
 	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.inactiveSessionDetectThresholdMs}")
-	public void flushInactiveEventBuffers() {
+	public void flushInactiveSessions() {
 		log.info("비활성 세션 처리 작업 시작");
 		long now = System.currentTimeMillis();
 		Set<SessionDataKey> activeKeys = sessionKeyCollector.collectAllActiveSessionKeys();
@@ -73,7 +73,7 @@ public class EventRedisBufferScheduler {
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
 	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.activeSessionFlushIntervalMs}")
-	public void flushAllEventBuffers() {
+	public void flushAllSessions() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 
 		Set<SessionDataKey> activeKeys = sessionKeyCollector.collectAllActiveSessionKeys();

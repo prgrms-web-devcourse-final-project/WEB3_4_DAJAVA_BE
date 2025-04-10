@@ -1,4 +1,4 @@
-package com.dajava.backend.global.utils;
+package com.dajava.backend.global.utils.event;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
+import com.dajava.backend.global.utils.SessionDataKeyUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;

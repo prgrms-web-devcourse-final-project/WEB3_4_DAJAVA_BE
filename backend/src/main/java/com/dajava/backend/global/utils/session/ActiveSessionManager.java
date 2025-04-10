@@ -1,16 +1,13 @@
 package com.dajava.backend.global.utils.session;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.event.dto.SessionDataKey;
-import com.dajava.backend.global.utils.EventQueueRedisBuffer;
 import com.dajava.backend.global.utils.SessionDataKeyUtils;
 
 import lombok.RequiredArgsConstructor;

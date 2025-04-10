@@ -20,7 +20,7 @@ import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRep
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.service.SessionDataService;
-import com.dajava.backend.global.utils.EventRedisBuffer;
+import com.dajava.backend.global.utils.event.EventRedisBuffer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

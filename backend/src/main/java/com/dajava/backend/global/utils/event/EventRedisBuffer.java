@@ -1,8 +1,6 @@
-package com.dajava.backend.global.utils;
+package com.dajava.backend.global.utils.event;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
