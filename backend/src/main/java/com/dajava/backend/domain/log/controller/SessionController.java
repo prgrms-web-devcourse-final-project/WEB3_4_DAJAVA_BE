@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 import com.dajava.backend.domain.log.service.SessionService;
+import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +28,6 @@ public class SessionController {
 	public void logStart(@RequestBody SessionIdentifier sessionIdentifier) {
 		sessionService.startSession(sessionIdentifier);
 	}
-
 
 	@Operation(summary = "세션 종료 요청", description = "세션 종료 요청이 들어오면 해당 세션을 종료합니다.")
 	@PostMapping("/end/{sessionId}")
