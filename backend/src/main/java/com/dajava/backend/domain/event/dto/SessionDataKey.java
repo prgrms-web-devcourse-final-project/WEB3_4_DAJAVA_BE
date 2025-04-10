@@ -15,6 +15,5 @@ public record SessionDataKey(
 
 	@Schema(description = "행동 솔루션 신청시 생성된 UUID 식별자", example = "a07cb1fc-e5db-4578-89a6-34d7a31f9389", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull String memberSerialNumber
-) {
-}
+) {}
 

@@ -2,6 +2,9 @@ package com.dajava.backend.domain.register.dto.register;
 
 import java.time.LocalDateTime;
 
+import com.dajava.backend.domain.register.exception.RegisterException;
+import com.dajava.backend.global.exception.ErrorCode;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.NonNull;
 
@@ -27,6 +30,17 @@ public record RegisterCreateRequest(
 	@NonNull
 	LocalDateTime endDate
 ) {
+
+	/**
+	 * URL에 프로토콜 정보가 없다면 https:// 을 접두사로 추가한 새로운 RegisterCreateRequest 객체 반환
+	 */
+	public RegisterCreateRequest withNormalizedUrl() {
+		if (url == null || url.isBlank()) {
+			throw new RegisterException(ErrorCode.REGISTER_URL_EMPTY);
+		}
+
+		return new RegisterCreateRequest(email, password, "https://" + url, startDate, endDate);
+	}
 
 	@Override
 	public String toString() {

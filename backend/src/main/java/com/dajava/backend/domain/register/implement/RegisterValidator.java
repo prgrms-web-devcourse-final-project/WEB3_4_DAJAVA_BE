@@ -34,17 +34,24 @@ public class RegisterValidator {
 	 * 솔루션 등록 요청 검증 메서드
 	 * @param request 솔루션 등록 요청 DTO
 	 */
-	public void validateCreateRequest(final RegisterCreateRequest request) {
-
+	public RegisterCreateRequest validateCreateRequest(final RegisterCreateRequest request) {
 		// Request Data 유효성 검증
-		if (!isValidEmail(request.email()) || !isValidDate(request.startDate(), request.endDate())) {
-			throw new RegisterException(INVALID_REGISTER_REQUEST);
-		}
+		// if (!isValidEmail(request.email()) || !isValidDate(request.startDate(), request.endDate())) {
+		// 	throw new RegisterException(INVALID_REGISTER_REQUEST);
+		// }
 
 		// 2. Url 등록 가능 여부 체크
 		if (!registerRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
 			throw new RegisterException(ALREADY_REGISTER_URL);
 		}
+
+		RegisterCreateRequest normalizedRequest = request;
+		// 3. Url 에 프로토콜이 포함되었는지 확인
+		if (!isValidUrl(request.url())) {
+			normalizedRequest = request.withNormalizedUrl();
+		}
+
+		return normalizedRequest;
 	}
 
 	/**
@@ -119,6 +126,14 @@ public class RegisterValidator {
 			return false;
 		}
 
+		return true;
+	}
+
+	private boolean isValidUrl(final String url) {
+		// url 이 프로토콜 정보를 갖고 있어야 한다.
+		if (!url.startsWith("http://") && !url.startsWith("https://")) {
+			return false;
+		}
 		return true;
 	}
 }

@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
+@Tag(name = "ImageController", description = "이미지 파일 반환 컨트롤러")
 @RequestMapping("/v1/images")
 public class ImageController {
 
@@ -32,6 +35,9 @@ public class ImageController {
 	 * @param request  HttpServletRequest (MIME 타입 결정용)
 	 * @return Resource 형태의 이미지 파일
 	 */
+	@Operation(
+		summary = "이미지 캡쳐 파일 로드",
+		description = "URL 경로의 파일명으로 파일을 로드합니다")
 	@GetMapping("/{fileName:.+}")
 	@ResponseStatus(HttpStatus.OK)
 	public Resource getImage(@PathVariable String fileName, HttpServletRequest request) {

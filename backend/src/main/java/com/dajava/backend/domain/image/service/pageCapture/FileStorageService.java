@@ -71,6 +71,20 @@ public class FileStorageService {
 		return fileName;
 	}
 
+	/**
+	 * 지정된 파일명을 사용하여 파일 시스템에서 파일을 삭제합니다.
+	 *
+	 * @param fileName 삭제할 파일의 이름 (UUID 기반 파일명 + 확장자)
+	 */
+	public void deleteFile(String fileName) {
+		try {
+			Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+			Files.deleteIfExists(filePath);
+		} catch (IOException ex) {
+			throw new RuntimeException("파일 삭제에 실패했습니다: " + fileName, ex);
+		}
+	}
+
 	private void saveFile(String fileName, MultipartFile file) {
 		try {
 			Path targetLocation = this.fileStorageLocation.resolve(fileName);

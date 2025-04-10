@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,16 +14,18 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.event.entity.SolutionData;
-import com.dajava.backend.domain.event.entity.SolutionEvent;
-import com.dajava.backend.domain.event.repository.SolutionDataRepository;
+import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
+import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
 import com.dajava.backend.domain.heatmap.dto.GridCell;
 import com.dajava.backend.domain.heatmap.dto.HeatmapMetadata;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
+import com.dajava.backend.domain.heatmap.validation.UrlEqualityValidator;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -47,35 +48,48 @@ import lombok.extern.slf4j.Slf4j;
 public class HeatmapServiceImpl implements HeatmapService {
 
 	private final RegisterRepository registerRepository;
-	private final SolutionDataRepository solutionDataRepository;
+	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
+	private final UrlEqualityValidator urlEqualityValidator;
 
 	// 고정 그리드 사이즈
 	// 추후 기능 확장시 해당 사이즈를 인자로 받아 조정하도록 만들 계획
 	private static final int GRID_SIZE = 10;
+	private static final int PAGE_SIZE = 1000;
 
 	@Override
 	@Cacheable(value = "heatmapCache", key = "{#serialNumber, #type}")
 	@Transactional(readOnly = true)
 	public HeatmapResponse getHeatmap(String serialNumber, String password, String type) {
 		long startTime = System.currentTimeMillis();
+		boolean sortByTimestamp = false;
+		// type 이 scroll 이면 정렬 플래그 변경
+		if (type.equals("scroll")) {
+			sortByTimestamp = true;
+		}
 		try {
 			Register findRegister = registerRepository.findBySerialNumber(serialNumber)
 				.orElseThrow(() -> new HeatmapException(SOLUTION_SERIAL_NUMBER_INVALID));
+
+			// 현재 하나의 URL 만을 받기 때문에 이벤트 필터링을 위해 필요
+			String targetUrl = findRegister.getUrl();
 
 			// 해싱된 password 로 접근 권한 확인
 			if (!PasswordUtils.verifyPassword(password, findRegister.getPassword())) {
 				throw new HeatmapException(SOLUTION_PASSWORD_INVALID);
 			}
 
-			// SolutionData 가져오기
-			SolutionData solutionData = solutionDataRepository.findBySerialNumber(serialNumber)
-				.orElseThrow(() -> new HeatmapException(SOLUTION_DATA_NOT_FOUND));
+			// // SolutionData 가져오기
+			// SolutionData solutionData = solutionDataRepository.findBySerialNumber(serialNumber)
+			// 	.orElseThrow(() -> new HeatmapException(SOLUTION_DATA_NOT_FOUND));
+			//
+			// // SolutionEvent 의 List 가져오기
+			// List<SolutionEvent> events = solutionData.getSolutionEvents();
+			// if (events.isEmpty()) {
+			// 	throw new HeatmapException(SOLUTION_EVENT_DATA_NOT_FOUND);
+			// }
 
-			// SolutionEvent 의 List 가져오기
-			List<SolutionEvent> events = solutionData.getSolutionEvents();
-			if (events.isEmpty()) {
-				throw new HeatmapException(SOLUTION_EVENT_DATA_NOT_FOUND);
-			}
+			// ES에 접근 후 데이터 가져오도록 변경
+			List<SolutionEventDocument> events = getAllEvents(serialNumber, sortByTimestamp);
 
 			// 이벤트 샘플링으로 데이터가 방대한 경우 반환 시간 최적화
 			if (events.size() > 1000) {
@@ -85,17 +99,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 			// 그리드 생성 로직으로 결과값 생성
 			HeatmapResponse response;
 			if ("scroll".equalsIgnoreCase(type)) {
-				events.sort(Comparator.comparing(SolutionEvent::getTimestamp));
-				response = createScrollDepthHeatmap(events);
+				response = createScrollDepthHeatmap(events, targetUrl);
 			} else if ("click".equalsIgnoreCase(type) || "mousemove".equalsIgnoreCase(type)) {
-				response = createCoordinateHeatmap(events, type);
+				response = createCoordinateHeatmap(events, type, targetUrl);
 			} else {
 				throw new HeatmapException(INVALID_EVENT_TYPE);
 			}
 
 			// toBuilder 를 통해 pageCapture 경로값 추가
-			String targetUrl = findRegister.getUrl();
-
 			List<PageCaptureData> captureDataList = findRegister.getCaptureData();
 
 			Optional<PageCaptureData> optionalData = captureDataList.stream()
@@ -126,6 +137,38 @@ public class HeatmapServiceImpl implements HeatmapService {
 	}
 
 	/**
+	 * Pagenation 으로 1회 쿼리 호출시 1000개의 이벤트를 가져옵니다.
+	 * sortByTimestamp 플래그로 정렬 여부를 결정합니다.
+	 * 데이터가 없다면 중단되고 모든 이벤트를 반환합니다.
+	 *
+	 * @param serialNumber ES에 접근해 데이터를 가져오기 위한 값입니다.
+	 * @param sortByTimestamp 플래그 여부에 따라 정렬을 할지 말지 결정합니다.
+	 * @return
+	 */
+	private List<SolutionEventDocument> getAllEvents(String serialNumber, boolean sortByTimestamp) {
+		List<SolutionEventDocument> allEvents = new ArrayList<>();
+		int pageNumber = 0;
+		List<SolutionEventDocument> pageData;
+
+		do {
+			PageRequest pageRequest;
+			if (sortByTimestamp) {
+				pageRequest = PageRequest.of(pageNumber, PAGE_SIZE, Sort.by(Sort.Direction.ASC, "timestamp"));
+			} else {
+				pageRequest = PageRequest.of(pageNumber, PAGE_SIZE);
+			}
+			pageData = solutionEventDocumentRepository.findBySerialNumber(serialNumber, pageRequest);
+			allEvents.addAll(pageData);
+			pageNumber++;
+		} while (!pageData.isEmpty());
+		if (allEvents.isEmpty()) {
+			throw new HeatmapException(SOLUTION_EVENT_DATA_NOT_FOUND);
+		}
+
+		return allEvents;
+	}
+
+	/**
 	 * 빈 히트맵 응답을 생성하는 로직입니다.
 	 * 솔루션에 대해 이벤트가 존재하지 않는 경우 빈 응답을 반환합니다.
 	 */
@@ -148,7 +191,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 * 이벤트 목록에서 샘플링을 수행합니다.
 	 * 이벤트 수가 많을 경우 모든 이벤트를 처리하는 대신 일부만 샘플링하여 효율성을 높힐 수 있습니다.
 	 */
-	private List<SolutionEvent> sampleEvents(List<SolutionEvent> events, String eventType) {
+	private List<SolutionEventDocument> sampleEvents(List<SolutionEventDocument> events, String eventType) {
 		int sampleRate;
 
 		if ("mousemove".equalsIgnoreCase(eventType)) {
@@ -159,7 +202,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 			sampleRate = 2; // 클릭 이벤트 2 : 1
 		}
 
-		List<SolutionEvent> sampledEvents = new ArrayList<>();
+		List<SolutionEventDocument> sampledEvents = new ArrayList<>();
 		for (int i = 0; i < events.size(); i++) {
 			if (i % sampleRate == 0) {
 				sampledEvents.add(events.get(i));
@@ -178,9 +221,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 * @param type 세션 데이터에서 추출할 로그 데이터의 타입
 	 * @return HeatmapResponse 그리드 데이터와 메타 데이터를 포함한 히트맵 응답 DTO
 	 */
-	private HeatmapResponse createCoordinateHeatmap(List<SolutionEvent> events, String type) {
-		// 이벤트가 없을시 빈 히트맵 정보 반환
-		if (events.isEmpty()) {
+	private HeatmapResponse createCoordinateHeatmap(List<SolutionEventDocument> events, String type, String targetUrl) {
+		// targetUrl 과 일치하는 이벤트만 필터링 (프로토콜 무시)
+		List<SolutionEventDocument> filteredEvents = events.stream()
+			.filter(event -> urlEqualityValidator.isMatching(targetUrl, event.getPageUrl()))
+			.toList();
+
+		// 필터링 결과가 없으면 빈 히트맵 리턴
+		if (filteredEvents.isEmpty()) {
 			return createEmptyHeatmapResponse();
 		}
 
@@ -191,17 +239,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 		// 그리드 맵 - 좌표를 키로 사용하는 HashMap
 		Map<String, Integer> gridMap = new HashMap<>();
 
-		int totalEvents = 0;
+		// 이벤트 시간 초기화
 		LocalDateTime firstEventTime = null;
 		LocalDateTime lastEventTime = null;
-
-		// 첫번째 이벤트에서 페이지 URL 설정
-		String pageUrl = events.getFirst().getPageUrl();
 
 		// 세션을 구분하기 위한 고유 식별자 저장 HashSet
 		Set<String> sessionIds = new HashSet<>();
 
-		for (SolutionEvent event : events) {
+		for (SolutionEventDocument event : filteredEvents) {
 			// 타입값이 null 이거나 목표 타입이 아니면 건너뜀
 			if (event.getType() == null || !event.getType().equalsIgnoreCase(type)) {
 				continue;
@@ -239,7 +284,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 			// 해당 그리드 셀 카운트 증가
 			gridMap.put(gridKey, gridMap.getOrDefault(gridKey, 0) + 1);
-			totalEvents++;
 		}
 
 		// 최대 카운트 값
@@ -269,8 +313,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 		// 메타데이터 생성
 		HeatmapMetadata metadata = HeatmapMetadata.builder()
 			.maxCount(maxCount)
-			.totalEvents(totalEvents)
-			.pageUrl(pageUrl != null ? pageUrl : "unknown")
+			.totalEvents(filteredEvents.size())
+			.pageUrl(targetUrl)
 			.totalSessions(totalSessions)
 			.firstEventTime(firstEventTime)
 			.lastEventTime(lastEventTime)
@@ -293,21 +337,23 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 * @param events serialNumber 를 통해 가져온 세션 데이터
 	 * @return HeatmapResponse 그리드 데이터와 메타 데이터를 포함한 히트맵 응답 DTO
 	 */
-	private HeatmapResponse createScrollDepthHeatmap(List<SolutionEvent> events) {
-		// 이벤트가 없을시 빈 히트맵 정보 반환
-		if (events.isEmpty()) {
+	private HeatmapResponse createScrollDepthHeatmap(List<SolutionEventDocument> events, String targetUrl) {
+		// targetUrl 과 일치하는 이벤트만 필터링 (프로토콜 무시)
+		List<SolutionEventDocument> filteredEvents = events.stream()
+			.filter(event -> urlEqualityValidator.isMatching(targetUrl, event.getPageUrl()))
+			.toList();
+
+		// 필터링 결과가 없으면 빈 히트맵 리턴
+		if (filteredEvents.isEmpty()) {
 			return createEmptyHeatmapResponse();
 		}
 
 		int maxPageWidth = 0;
 		int maxPageHeight = 0;
 
-		// 첫번째 이벤트에서 페이지 URL 설정
-		String pageUrl = events.getFirst().getPageUrl();
-
 		// 시간순 정렬로 데이터를 가져오므로, 첫 데이터와 마지막 데이터로 시간 설정
-		LocalDateTime firstEventTime = events.getFirst().getTimestamp();
-		LocalDateTime lastEventTime = events.getLast().getTimestamp();
+		LocalDateTime firstEventTime = filteredEvents.getFirst().getTimestamp();
+		LocalDateTime lastEventTime = filteredEvents.getLast().getTimestamp();
 
 		// 화면 체류 시간 저장을 위한 HashMap
 		Map<Integer, Long> durationByGridY = new HashMap<>();
@@ -316,7 +362,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		Set<String> sessionIds = new HashSet<>();
 
 		// 시간 간격 비교를 위한 직전 이벤트
-		SolutionEvent prevEvent = events.getFirst();
+		SolutionEventDocument prevEvent = filteredEvents.getFirst();
 
 		// 첫번째 데이터 로그의 sessionId 를 HashSet 에 저장
 		sessionIds.add(prevEvent.getSessionId());
@@ -332,8 +378,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 		}
 
 		// event 리스트에서 전후 데이터의 타임스탬프를 비교해 grid 정보를 생성하는 로직
-		for (int i = 1; i < events.size(); i++) {
-			SolutionEvent cntEvent = events.get(i);
+		for (int i = 1; i < filteredEvents.size(); i++) {
+			SolutionEventDocument cntEvent = filteredEvents.get(i);
 
 			// 총 세션수를 count 하기 위해 HashSet 에 추가함
 			if (cntEvent.getSessionId() != null) {
@@ -406,8 +452,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 		// 메타데이터 생성
 		HeatmapMetadata metadata = HeatmapMetadata.builder()
 			.maxCount((int)(maxDuration / 100))
-			.totalEvents(events.size())
-			.pageUrl(pageUrl != null ? pageUrl : "unknown")
+			.totalEvents(filteredEvents.size())
+			.pageUrl(targetUrl)
 			.totalSessions(totalSessions)
 			.firstEventTime(firstEventTime)
 			.lastEventTime(lastEventTime)

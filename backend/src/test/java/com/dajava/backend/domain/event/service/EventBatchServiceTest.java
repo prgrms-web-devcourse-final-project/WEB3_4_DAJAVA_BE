@@ -74,10 +74,7 @@ public class EventBatchServiceTest {
 		eventBatchService = new EventBatchService(
 			eventBuffer,
 			sessionDataService,
-			clickRepository,
 			moveRepository,
-			scrollRepository,
-			sessionDataRepository,
 			pointerClickEventDocumentRepository,
 			pointerMoveEventDocumentRepository,
 			pointerScrollEventDocumentRepository,
@@ -94,7 +91,8 @@ public class EventBatchServiceTest {
 		// given
 		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
-		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1", "https://example.com", System.currentTimeMillis());
+		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1",
+			"https://example.com", System.currentTimeMillis());
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
 			new PointerClickEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
@@ -129,7 +127,8 @@ public class EventBatchServiceTest {
 		// given
 		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
-		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1", "https://example.com", System.currentTimeMillis());
+		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1",
+			"https://example.com", System.currentTimeMillis());
 
 		List<PointerClickEventRequest> clickEvents = Collections.emptyList();
 		List<PointerMoveEventRequest> moveEvents = Collections.singletonList(
@@ -183,7 +182,8 @@ public class EventBatchServiceTest {
 		// given
 		SessionDataKey key = new SessionDataKey("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
 		SessionData sessionData = SessionData.create("session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER);
-		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1", "https://example.com", System.currentTimeMillis());
+		SessionDataDocument sessionDataDocument = SessionDataDocument.create("sessionDocument1", "member1",
+			"https://example.com", System.currentTimeMillis());
 
 		List<PointerClickEventRequest> clickEvents = Collections.singletonList(
 			new PointerClickEventRequest("user1", "session1", "https://example.com", TEST_MEMBER_SERIAL_NUMBER,
