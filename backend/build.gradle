@@ -51,6 +51,7 @@ dependencies {
 
     //ES
     implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.elasticsearch:elasticsearch:8.11.1'
 
     // Caffeine Cache
     implementation("org.springframework.boot:spring-boot-starter-cache")
@@ -60,6 +61,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 test {
