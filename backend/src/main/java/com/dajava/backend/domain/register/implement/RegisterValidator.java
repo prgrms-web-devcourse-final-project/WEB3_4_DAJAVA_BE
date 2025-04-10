@@ -36,9 +36,9 @@ public class RegisterValidator {
 	 */
 	public RegisterCreateRequest validateCreateRequest(final RegisterCreateRequest request) {
 		// Request Data 유효성 검증
-		if (!isValidEmail(request.email()) || !isValidDate(request.startDate(), request.endDate())) {
-			throw new RegisterException(INVALID_REGISTER_REQUEST);
-		}
+		// if (!isValidEmail(request.email()) || !isValidDate(request.startDate(), request.endDate())) {
+		// 	throw new RegisterException(INVALID_REGISTER_REQUEST);
+		// }
 
 		// 2. Url 등록 가능 여부 체크
 		if (!registerRepository.checkUrlAvailability(request.url(), LocalDateTime.now().minusDays(7))) {
