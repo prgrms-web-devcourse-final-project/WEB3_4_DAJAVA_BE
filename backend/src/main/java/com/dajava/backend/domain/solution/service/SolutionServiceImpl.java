@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import reactor.core.scheduler.Schedulers;
+import com.dajava.backend.domain.email.EmailService;
 import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.event.repository.SolutionDataRepository;
 import com.dajava.backend.domain.register.entity.Register;
@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Gemini 솔루션 활용을 위한 서비스 클래스
@@ -45,6 +46,8 @@ public class SolutionServiceImpl implements SolutionService {
 	private final SolutionDataRepository solutionDataRepository;
 
 	private final GeminiApiConfig geminiApiConfig;
+
+	private final EmailService emailService;
 
 	/**
 	 * Gemini API 통신 후 UI 개선 솔루션을 받기 위한 메서드
@@ -83,6 +86,10 @@ public class SolutionServiceImpl implements SolutionService {
 							register.setSolutionComplete(true);
 							registerRepository.save(register);
 
+							emailService.sendSolutionCompleteEmail(
+								register.getEmail(), register.getUrl(), register.getSerialNumber()
+							);
+
 							return new SolutionResponse(text);
 						});
 					}).subscribeOn(Schedulers.boundedElastic());
@@ -94,7 +101,6 @@ public class SolutionServiceImpl implements SolutionService {
 				}
 			});
 	}
-
 
 	/**
 	 * 솔루션 정보 조회 메서드

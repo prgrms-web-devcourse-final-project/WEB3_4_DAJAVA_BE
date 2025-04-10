@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.dajava.backend.domain.email.EmailService;
 import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.RegisterInfo;
 import com.dajava.backend.domain.register.converter.RegisterConverter;
@@ -52,6 +53,7 @@ public class RegisterService {
 	private final RegisterValidator registerValidator;
 	private final FileStorageService fileStorageService;
 	private final RegisterCacheService registerCacheService;
+	private final EmailService emailService;
 
 	/**
 	 * 서비스 Register 생성 메서드
@@ -70,6 +72,12 @@ public class RegisterService {
 		// log.info("Order 엔티티 생성 : {} ", newOrder);
 
 		registerCacheService.refreshCacheAll();
+
+		emailService.sendRegisterCreateEmail(
+			newRegister.getEmail(),
+			newRegister.getUrl(),
+			newRegister.getSerialNumber()
+		);
 
 		return toRegisterCreateResponse(newRegister);
 	}
