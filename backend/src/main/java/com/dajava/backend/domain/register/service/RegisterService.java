@@ -61,10 +61,10 @@ public class RegisterService {
 	 */
 	@Transactional
 	public RegisterCreateResponse createRegister(final RegisterCreateRequest request) {
-		registerValidator.validateCreateRequest(request);
+		RegisterCreateRequest validatedRequest = registerValidator.validateCreateRequest(request);
 
-		Register newRegister = registerRepository.save(Register.create(request));
-		Order newOrder = orderRepository.save(Order.create(request.email(), request.url()));
+		Register newRegister = registerRepository.save(Register.create(validatedRequest));
+		Order newOrder = orderRepository.save(Order.create(validatedRequest.email(), validatedRequest.url()));
 
 		log.info("Register 엔티티 생성 : {} ", newRegister);
 		// log.info("Order 엔티티 생성 : {} ", newOrder);
@@ -123,10 +123,13 @@ public class RegisterService {
 			.map(RegisterConverter::toRegisterInfo)
 			.toList();
 
+		long registersSize = registerRepository.count();
+		long totalPages = (long) Math.ceil((double) registersSize / request.pageSize());
+
 		log.info("Solution 등록 리스트를 조회합니다. PageNum: {}, PageSize: {}, Search Count: {}",
 			request.pageNum(), request.pageSize(), registerInfos.size());
 
-		return RegistersInfoResponse.create(registerInfos);
+		return RegistersInfoResponse.create(registerInfos, registersSize, totalPages, request.pageNum(), request.pageSize());
 	}
 
 	/**
