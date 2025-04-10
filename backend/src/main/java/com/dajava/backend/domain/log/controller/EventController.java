@@ -17,8 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 /**
- * EventLog 의 컨트롤러 입니다.
- * /v1/logs 로 들어온 마우스 이벤트 로그의 엔드포인트
+ * 이벤트 수집 컨트롤러 입니다.
  * @author Metronon
  */
 @RestController
@@ -27,9 +26,9 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventController {
 	private final EventService eventService;
+
 	/**
-	 * Click(Touch) 이벤트 로깅
-	 * type 이 "click" 인 이벤트를 로깅합니다.
+	 * type 이 "click" 인 Click(Touch) 이벤트 로깅
 	 */
 	@Operation(summary = "클릭 이벤트 로깅", description = "마우스 이벤트 클릭(터치) 타입의 이벤트를 로깅합니다.")
 	@PostMapping("/click")
@@ -42,8 +41,7 @@ public class EventController {
 	}
 
 	/**
-	 * mousemove 이벤트 로깅
-	 * type 이 "mousemove"인 이벤트를 로깅합니다.
+	 * type 이 "mousemove"인 mousemove 이벤트 로깅
 	 */
 	@Operation(summary = "이동 이벤트 로깅", description = "마우스 이벤트 이동 타입의 이벤트를 로깅합니다.")
 	@PostMapping("/movement")
@@ -56,8 +54,7 @@ public class EventController {
 	}
 
 	/**
-	 * scroll 이벤트 로깅
-	 * type 이 "scroll"인 이벤트를 로깅합니다.
+	 * type 이 "scroll"인 scroll 이벤트 로깅
 	 */
 	@Operation(summary = "스크롤 이벤트 로깅", description = "마우스 이벤트 스크롤 타입의 이벤트를 로깅합니다.")
 	@PostMapping("/scroll")

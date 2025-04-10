@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.event.converter.PointerEventConverter;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
@@ -15,7 +14,6 @@ import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRe
 import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
-import com.dajava.backend.domain.event.service.SessionDataService;
 import com.dajava.backend.domain.log.converter.EventConverter;
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
 import com.dajava.backend.domain.log.dto.MovementEventRequest;
@@ -90,8 +88,6 @@ public class RedisEventBatchService {
 	private void processClickEvents(SessionIdentifier sessionIdentifier) {
 		List<ClickEventRequest> clickEvents = eventRedisBuffer.flushClickEvents(sessionIdentifier);
 		log.info("세션 {}: 클릭 이벤트 {} 개 처리", sessionIdentifier, clickEvents.size());
-
-		//es에 저장할 형태
 		List<PointerClickEventDocument> documents = new ArrayList<>();
 		for (ClickEventRequest request : clickEvents) {
 
@@ -111,8 +107,6 @@ public class RedisEventBatchService {
 	private void processMoveEvents(SessionIdentifier sessionIdentifier) {
 		List<MovementEventRequest> moveEvents = eventRedisBuffer.flushMoveEvents(sessionIdentifier);
 		log.info("세션 {}: 이동 이벤트 {} 개 처리", sessionIdentifier, moveEvents.size());
-
-		//es에 저장할 형태
 		List<PointerMoveEventDocument> documents = new ArrayList<>();
 		for (MovementEventRequest request : moveEvents) {
 			PointerMoveEventDocument doc = EventConverter.toMoveEventDocument(request);
@@ -131,15 +125,12 @@ public class RedisEventBatchService {
 	private void processScrollEvents(SessionIdentifier sessionIdentifier) {
 		List<ScrollEventRequest> scrollEvents = eventRedisBuffer.flushScrollEvents(sessionIdentifier);
 		log.info("세션 {}: 스크롤 이벤트 {} 개 처리", sessionIdentifier, scrollEvents.size());
-
-		//es에 저장할 형태
 		List<PointerScrollEventDocument> documents = new ArrayList<>();
 		for (ScrollEventRequest request : scrollEvents) {
 
 			PointerScrollEventDocument doc = EventConverter.toScrollEventDocument(request);
 			documents.add(doc);
 		}
-
 		if (!documents.isEmpty()) {
 			pointerScrollEventDocumentRepository.saveAll(documents);
 		}

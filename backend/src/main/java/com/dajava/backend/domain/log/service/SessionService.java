@@ -6,5 +6,4 @@ public interface SessionService {
 	void startSession( SessionIdentifier sessionIdentifier);
 
 	void expireSession(String sessionId);
-
 }

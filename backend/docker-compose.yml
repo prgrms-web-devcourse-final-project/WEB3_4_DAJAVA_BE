@@ -21,7 +21,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1500m
+          memory: 900m
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.13.2

@@ -1,16 +1,13 @@
 package com.dajava.backend.global.utils.event;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.log.dto.ClickEventRequest;
-import com.dajava.backend.domain.log.dto.MovementEventRequest;
-import com.dajava.backend.domain.log.dto.ScrollEventRequest;
-import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
+import com.dajava.backend.domain.log.dto.*;
+import com.dajava.backend.domain.log.enums.EventType;
 import com.dajava.backend.global.utils.session.ActiveSessionManager;
+import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,56 +16,68 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public class EventRedisBuffer {
+
 	private final EventQueueRedisBuffer<ClickEventRequest> click;
 	private final EventQueueRedisBuffer<MovementEventRequest> movement;
 	private final EventQueueRedisBuffer<ScrollEventRequest> scroll;
 	private final ActiveSessionManager activeSessionManager;
 
-	// add
 	public void addClickEvent(ClickEventRequest event, SessionIdentifier sessionIdentifier) {
-		click.cacheEvents(sessionIdentifier, event);
+		addEvent(click, event, sessionIdentifier);
 	}
 
 	public void addMoveEvent(MovementEventRequest event, SessionIdentifier sessionIdentifier) {
-		movement.cacheEvents(sessionIdentifier, event);
+		addEvent(movement, event, sessionIdentifier);
 	}
 
 	public void addScrollEvent(ScrollEventRequest event, SessionIdentifier sessionIdentifier) {
-		scroll.cacheEvents(sessionIdentifier, event);
+		addEvent(scroll, event, sessionIdentifier);
 	}
 
-	// get
 	public List<ClickEventRequest> getClickEvents(SessionIdentifier sessionIdentifier) {
-		return click.getEvents(sessionIdentifier);
+		return getEvents(click, sessionIdentifier);
 	}
 
 	public List<MovementEventRequest> getMoveEvents(SessionIdentifier sessionIdentifier) {
-		return movement.getEvents(sessionIdentifier);
+		return getEvents(movement, sessionIdentifier);
 	}
 
 	public List<ScrollEventRequest> getScrollEvents(SessionIdentifier sessionIdentifier) {
-		return scroll.getEvents(sessionIdentifier);
+		return getEvents(scroll, sessionIdentifier);
 	}
 
-	// flush
 	public List<ClickEventRequest> flushClickEvents(SessionIdentifier sessionIdentifier) {
-		return click.flushEvents(sessionIdentifier);
+		return flushEvents(click, sessionIdentifier);
 	}
 
 	public List<MovementEventRequest> flushMoveEvents(SessionIdentifier sessionIdentifier) {
-		return movement.flushEvents(sessionIdentifier);
+		return flushEvents(movement, sessionIdentifier);
 	}
 
 	public List<ScrollEventRequest> flushScrollEvents(SessionIdentifier sessionIdentifier) {
-		return scroll.flushEvents(sessionIdentifier);
+		return flushEvents(scroll, sessionIdentifier);
 	}
 
-	// 활성 세션 목록 반환 메서드
+	private <T> void addEvent(EventQueueRedisBuffer<T> buffer, T event, SessionIdentifier sessionIdentifier) {
+		buffer.cacheEvents(sessionIdentifier, event);
+	}
+
+	private <T> List<T> getEvents(EventQueueRedisBuffer<T> buffer, SessionIdentifier sessionIdentifier) {
+		return buffer.getEvents(sessionIdentifier);
+	}
+
+	private <T> List<T> flushEvents(EventQueueRedisBuffer<T> buffer, SessionIdentifier sessionIdentifier) {
+		return buffer.flushEvents(sessionIdentifier);
+	}
+
+	// 세션 키 조회
 	public Set<SessionIdentifier> getAllActiveSessionKeys() {
 		Set<SessionIdentifier> activeSessionKeys = new HashSet<>();
-		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("click:"));
-		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("move:"));
-		activeSessionKeys.addAll(activeSessionManager.getActiveSessionKeysForType("scroll:"));
+		for (EventType type : EventType.values()) {
+			activeSessionKeys.addAll(
+				activeSessionManager.getActiveSessionKeysForType(type.getPrefix())
+			);
+		}
 		return activeSessionKeys;
 	}
 }

@@ -1,12 +1,13 @@
 package com.dajava.backend.domain.log.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
 import com.dajava.backend.domain.log.dto.MovementEventRequest;
 import com.dajava.backend.domain.log.dto.ScrollEventRequest;
 import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
+import com.dajava.backend.domain.log.handler.EventHandler;
+import com.dajava.backend.domain.log.handler.SessionIdentifierExtractor;
 import com.dajava.backend.global.utils.event.EventRedisBuffer;
 
 import lombok.RequiredArgsConstructor;
@@ -19,43 +20,48 @@ public class EventServiceImpl implements EventService {
 	private final EventRedisBuffer eventRedisBuffer;
 
 	@Override
-	@Transactional
-	public void createClickEvent(ClickEventRequest clickEventRequest) {
-		log.info("클릭 이벤트 로깅: {}", clickEventRequest);
-
-		SessionIdentifier sessionIdentifier = new SessionIdentifier(
-			clickEventRequest.getSessionIdentifier().getSessionId(),
-			clickEventRequest.getSessionIdentifier().getPageUrl(),
-			clickEventRequest.getSessionIdentifier().getMemberSerialNumber()
+	public void createClickEvent(ClickEventRequest request) {
+		handleEvent("클릭 이벤트", request,
+			req -> toSessionIdentifier(req.getSessionIdentifier()),
+			eventRedisBuffer::addClickEvent
 		);
-
-		eventRedisBuffer.addClickEvent(clickEventRequest, sessionIdentifier);
 	}
-
 	@Override
-	@Transactional
-	public void createMoveEvent(MovementEventRequest movementEventRequest) {
-		log.info("이동 이벤트 로깅: {}", movementEventRequest);
-
-		SessionIdentifier sessionIdentifier = new SessionIdentifier(
-			movementEventRequest.getSessionIdentifier().getSessionId(),
-			movementEventRequest.getSessionIdentifier().getPageUrl(),
-			movementEventRequest.getSessionIdentifier().getMemberSerialNumber()
+	public void createMoveEvent(MovementEventRequest request) {
+		handleEvent("이동 이벤트", request,
+			req -> toSessionIdentifier(req.getSessionIdentifier()),
+			eventRedisBuffer::addMoveEvent
 		);
-		eventRedisBuffer.addMoveEvent(movementEventRequest, sessionIdentifier);
 	}
-
 	@Override
-	@Transactional
-	public void createScrollEvent(ScrollEventRequest scrollEventRequest) {
-		log.info("스크롤 이벤트 로깅: {}", scrollEventRequest);
-
-		SessionIdentifier sessionIdentifier = new SessionIdentifier(
-			scrollEventRequest.getSessionIdentifier().getSessionId(),
-			scrollEventRequest.getSessionIdentifier().getPageUrl(),
-			scrollEventRequest.getSessionIdentifier().getMemberSerialNumber()
+	public void createScrollEvent(ScrollEventRequest request) {
+		handleEvent("스크롤 이벤트", request,
+			req -> toSessionIdentifier(req.getSessionIdentifier()),
+			eventRedisBuffer::addScrollEvent
 		);
-		eventRedisBuffer.addScrollEvent(scrollEventRequest, sessionIdentifier);
 	}
 
+	private <T> void handleEvent(
+		String logLabel,
+		T request,
+		SessionIdentifierExtractor<T> extractor,
+		EventHandler<T> handler
+	) {
+		try {
+			SessionIdentifier sessionIdentifier = extractor.extract(request);
+			log.info("[{}] sessionId={}, pageUrl={}, memberSerial={}", logLabel,
+				sessionIdentifier.getSessionId(),
+				sessionIdentifier.getPageUrl(),
+				sessionIdentifier.getMemberSerialNumber()
+			);
+			handler.handle(request, sessionIdentifier);
+		} catch (Exception e) {
+			log.error("[{}][에러] 이벤트 실패: {}", logLabel, request, e);
+			throw e;
+		}
+	}
+
+	private SessionIdentifier toSessionIdentifier(SessionIdentifier sessionIdentifier) {
+		return new SessionIdentifier(sessionIdentifier.getSessionId(), sessionIdentifier.getPageUrl(), sessionIdentifier.getMemberSerialNumber());
+	}
 }
