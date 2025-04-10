@@ -1,4 +1,4 @@
-package com.dajava.backend.redis.service;
+package com.dajava.backend.domain.log.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

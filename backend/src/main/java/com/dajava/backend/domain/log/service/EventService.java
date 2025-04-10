@@ -1,4 +1,4 @@
-package com.dajava.backend.redis.service;
+package com.dajava.backend.domain.log.service;
 
 import com.dajava.backend.domain.event.dto.PointerClickEventRequest;
 import com.dajava.backend.domain.event.dto.PointerMoveEventRequest;
