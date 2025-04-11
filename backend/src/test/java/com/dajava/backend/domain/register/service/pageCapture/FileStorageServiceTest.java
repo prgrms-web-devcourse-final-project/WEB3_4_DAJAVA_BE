@@ -12,14 +12,27 @@ import java.util.Comparator;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
+import com.dajava.backend.domain.register.repository.PageCaptureDataRepository;
 
 @SpringBootTest
 public class FileStorageServiceTest {
+
+	@Value("${image.path}")
+	String path;
+
+	@Autowired
+	private final PageCaptureDataRepository pageCaptureDataRepository;
+
+	public FileStorageServiceTest(PageCaptureDataRepository pageCaptureDataRepository) {
+		this.pageCaptureDataRepository = pageCaptureDataRepository;
+	}
 
 	// 테스트 종료 후 "C:/page-capture" 하위 모든 파일/디렉터리 삭제
 	@AfterAll
@@ -42,7 +55,7 @@ public class FileStorageServiceTest {
 	@DisplayName("1. 신규 파일 업로드 시 파일 생성 테스트")
 	void t001() throws Exception {
 		// Given
-		FileStorageService fileStorageService = new FileStorageService("C:/page-capture");
+		FileStorageService fileStorageService = new FileStorageService(path);
 		MockMultipartFile imageFile = new MockMultipartFile(
 			"imageFile",
 			"test-image.png",
@@ -71,7 +84,7 @@ public class FileStorageServiceTest {
 	@DisplayName("2. 기존 파일 덮어쓰기(Override) 테스트")
 	void t002() throws Exception {
 		// Given
-		FileStorageService fileStorageService = new FileStorageService("C:/page-capture");
+		FileStorageService fileStorageService = new FileStorageService(path);
 
 		// 먼저 신규 업로드로 파일 생성
 		MockMultipartFile imageFileOriginal = new MockMultipartFile(
