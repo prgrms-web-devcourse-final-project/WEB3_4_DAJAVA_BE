@@ -36,7 +36,7 @@ public class SchedulerInitializer implements ServletContextListener {
 		RegisterCacheService registerCacheService = context.getBean(RegisterCacheService.class);
 
 		try {
-			registerCacheService.refreshCache();
+			registerCacheService.refreshCacheAll();
 			log.info("서버 시작 Register 캐시 초기화 완료");
 		} catch (Exception e) {
 			log.error("Register 캐시 갱신 중 에러가 발생했습니다", e);
@@ -51,7 +51,7 @@ public class SchedulerInitializer implements ServletContextListener {
 
 		scheduler.scheduleAtFixedRate(() -> {
 			try {
-				registerCacheService.refreshCache();
+				registerCacheService.refreshCacheAll();
 			} catch (Exception e) {
 				log.error("Register 캐시 갱신 중 에러가 발생했습니다", e);
 			}

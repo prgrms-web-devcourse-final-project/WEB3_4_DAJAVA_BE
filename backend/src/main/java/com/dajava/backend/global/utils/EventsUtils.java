@@ -7,6 +7,9 @@ import com.dajava.backend.domain.event.entity.PointerClickEvent;
 import com.dajava.backend.domain.event.entity.PointerEvent;
 import com.dajava.backend.domain.event.entity.PointerMoveEvent;
 import com.dajava.backend.domain.event.entity.PointerScrollEvent;
+import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
+import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
 
 public class EventsUtils {
 
@@ -17,5 +20,23 @@ public class EventsUtils {
 		if (events != null) {
 			events.sort(Comparator.comparing(PointerEvent::getCreateDate));
 		}
+	}
+
+	public static List<PointerClickEventDocument> filterValidClickEvents(List<PointerClickEventDocument> events) {
+		return events.stream()
+			.filter(PointerClickEventDocument::isValid)
+			.toList();
+	}
+
+	public static List<PointerMoveEventDocument> filterValidMoveEvents(List<PointerMoveEventDocument> events) {
+		return events.stream()
+			.filter(PointerMoveEventDocument::isValid)
+			.toList();
+	}
+
+	public static List<PointerScrollEventDocument> filterValidScrollEvents(List<PointerScrollEventDocument> events) {
+		return events.stream()
+			.filter(PointerScrollEventDocument::isValid)
+			.toList();
 	}
 }

@@ -24,6 +24,7 @@ import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
+import com.dajava.backend.domain.heatmap.validation.UrlEqualityValidator;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -38,6 +39,9 @@ class HeatmapServiceImplTest {
 	// ElasticSearch에서 이벤트 document를 직접 조회하는 Repository
 	@Mock
 	private SolutionEventDocumentRepository solutionEventDocumentRepository;
+
+	@Mock
+	private UrlEqualityValidator urlEqualityValidator;
 
 	@Mock
 	private PasswordUtils passwordUtils;
@@ -146,6 +150,7 @@ class HeatmapServiceImplTest {
 		String serialNumber = "5_team_testSerial";
 		String password = "password123!";
 		String type = "click";
+		String targetUrl = "http://localhost:3000/myPage1";
 
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
@@ -156,6 +161,9 @@ class HeatmapServiceImplTest {
 			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
 				.thenReturn(mockDocuments)
 				.thenReturn(Collections.emptyList());
+
+			// URL 비교 메서드 stubs 추가
+			when(urlEqualityValidator.isMatching(eq(targetUrl), anyString())).thenReturn(true);
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);
@@ -178,6 +186,7 @@ class HeatmapServiceImplTest {
 		String serialNumber = "5_team_testSerial";
 		String password = "password123!";
 		String type = "mousemove";
+		String targetUrl = "http://localhost:3000/myPage1";
 
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
@@ -187,6 +196,9 @@ class HeatmapServiceImplTest {
 			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
 				.thenReturn(mockDocuments)
 				.thenReturn(Collections.emptyList());
+
+			// URL 비교 메서드 stubs 추가
+			when(urlEqualityValidator.isMatching(eq(targetUrl), anyString())).thenReturn(true);
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);
@@ -205,6 +217,7 @@ class HeatmapServiceImplTest {
 		String serialNumber = "5_team_testSerial";
 		String password = "password123!";
 		String type = "scroll";
+		String targetUrl = "http://localhost:3000/myPage1";
 
 		try (MockedStatic<PasswordUtils> passwordUtilsMock = mockStatic(PasswordUtils.class)) {
 			when(registerRepository.findBySerialNumber(serialNumber))
@@ -214,6 +227,9 @@ class HeatmapServiceImplTest {
 			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
 				.thenReturn(mockDocuments)
 				.thenReturn(Collections.emptyList());
+
+			// URL 비교 메서드 stubs 추가
+			when(urlEqualityValidator.isMatching(eq(targetUrl), anyString())).thenReturn(true);
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);
@@ -326,6 +342,8 @@ class HeatmapServiceImplTest {
 				.thenReturn(mockDocuments)
 				.thenReturn(Collections.emptyList());
 
+			// URL 비교 메서드 stubbing은 제거 (실제로 호출되지 않음)
+
 			// When & Then
 			assertThrows(HeatmapException.class, () -> heatmapService.getHeatmap(serialNumber, password, type));
 
@@ -342,6 +360,7 @@ class HeatmapServiceImplTest {
 		String serialNumber = "5_team_testSerial";
 		String password = "password123!";
 		String type = "click";
+		String targetUrl = "http://localhost:3000/myPage1";
 
 		// 1500개의 클릭 이벤트 Document 생성 (timestamp: 밀리초 단위)
 		List<SolutionEventDocument> largeEventDocs = new ArrayList<>();
@@ -374,6 +393,9 @@ class HeatmapServiceImplTest {
 			when(solutionEventDocumentRepository.findBySerialNumber(eq(serialNumber), any(Pageable.class)))
 				.thenReturn(largeEventDocs)
 				.thenReturn(Collections.emptyList());
+
+			// URL 비교 메서드 stubs 추가
+			when(urlEqualityValidator.isMatching(eq(targetUrl), anyString())).thenReturn(true);
 
 			// When
 			HeatmapResponse response = heatmapService.getHeatmap(serialNumber, password, type);

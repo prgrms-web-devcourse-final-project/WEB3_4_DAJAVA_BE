@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: true
   elasticsearch:
     uris: http://127.0.0.1:9200/
   profiles:

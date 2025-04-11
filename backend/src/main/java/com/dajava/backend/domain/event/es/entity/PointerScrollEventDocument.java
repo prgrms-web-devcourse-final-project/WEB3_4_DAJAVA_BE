@@ -61,4 +61,16 @@ public class PointerScrollEventDocument {
 		return TimeUtils.toLocalDateTime(this.timestamp);
 	}
 
+	public boolean isValid() {
+		return sessionId != null &&
+			pageUrl != null &&
+			timestamp != null &&
+			scrollY != null &&
+			scrollHeight != null &&
+			viewportHeight != null &&
+			browserWidth != null &&
+			memberSerialNumber != null &&
+			id != null;
+	}
+
 }

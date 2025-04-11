@@ -42,7 +42,7 @@ public class EventLogServiceImpl implements EventLogService {
 		// log.info("클릭 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
-			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+			request.getSessionId(), request.getPageUrl(), request.getMemberSerialNumber()
 		);
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
@@ -63,7 +63,7 @@ public class EventLogServiceImpl implements EventLogService {
 		// log.info("이동 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
-			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+			request.getSessionId(), request.getPageUrl(), request.getMemberSerialNumber()
 		);
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성
@@ -84,7 +84,7 @@ public class EventLogServiceImpl implements EventLogService {
 		// log.info("스크롤 이벤트 로깅: {}", request);
 
 		SessionDataKey sessionDataKey = new SessionDataKey(
-			request.sessionId(), request.pageUrl(), request.memberSerialNumber()
+			request.getSessionId(), request.getPageUrl(), request.getMemberSerialNumber()
 		);
 
 		// SessionData 를 통해 Cache 확인, 없으면 생성

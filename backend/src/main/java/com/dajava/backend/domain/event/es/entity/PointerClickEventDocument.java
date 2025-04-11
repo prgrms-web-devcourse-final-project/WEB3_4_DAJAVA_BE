@@ -59,4 +59,19 @@ public class PointerClickEventDocument {
 	public LocalDateTime getTimestamp() {
 		return TimeUtils.toLocalDateTime(this.timestamp);
 	}
+
+	public boolean isValid() {
+		return sessionId != null &&
+			pageUrl != null &&
+			timestamp != null &&
+			clientX != null &&
+			clientY != null &&
+			element != null &&
+			scrollHeight != null &&
+			viewportHeight != null &&
+			browserWidth != null &&
+			id != null &&
+			memberSerialNumber != null &&
+			scrollY != null;
+	}
 }

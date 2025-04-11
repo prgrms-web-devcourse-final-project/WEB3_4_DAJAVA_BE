@@ -71,6 +71,7 @@ public class Register extends BaseTimeEntity {
 	@OneToOne(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Solution solution;
 
+	@Builder.Default
 	@OneToMany(mappedBy = "register", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<PageCaptureData> captureData = new ArrayList<>();
 
