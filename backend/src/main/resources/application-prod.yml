@@ -11,6 +11,8 @@ spring:
     username: lldj
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  cache:
+    type: redis
   jpa:
     hibernate:
       ddl-auto: update # 테스트 시에 새롭게 나오도록 수정
@@ -21,16 +23,17 @@ spring:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
+  data:
+    redis:
+      host: redis_1
+      port: 6379
+      password: 1234
 
 springdoc:
   swagger-ui:
     urls:
       - name: production
         url: https://dajava.pg.chsan626.co.kr/swagger-ui/index.html
-  data:
-    redis:
-      host: ${SPRING_REDIS_HOST:localhost}
-      port: ${SPRING_REDIS_PORT:6379}
 gemini:
   api:
     key: ${DAJAVA_AI_API_KEY}
