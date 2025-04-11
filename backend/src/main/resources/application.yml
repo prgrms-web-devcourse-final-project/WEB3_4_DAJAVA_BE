@@ -19,6 +19,10 @@ spring:
     driver-class-name: org.h2.Driver
   cache:
     type: redis
+  servlet:
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-request-size}
+      max-request-size: 10MB
   jpa:
     hibernate:
       ddl-auto: create
