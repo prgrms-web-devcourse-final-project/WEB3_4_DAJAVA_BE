@@ -1,15 +1,11 @@
 package com.dajava.backend.domain.event.es.scheduler.vaildation;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.event.converter.PointerEventConverter;
 import com.dajava.backend.domain.event.es.entity.PointerClickEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
@@ -19,6 +15,7 @@ import com.dajava.backend.domain.event.es.service.PointerEventDocumentService;
 import com.dajava.backend.domain.event.es.service.SessionDataDocumentService;
 import com.dajava.backend.domain.event.es.service.SolutionEventDocumentService;
 import com.dajava.backend.domain.event.exception.PointerEventException;
+import com.dajava.backend.domain.log.converter.EventConverter;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.utils.EventsUtils;
 
@@ -132,7 +129,7 @@ public class EsEventValidateScheduler {
 
 		log.info("검증 완료");
 
-		List<SolutionEventDocument> solutionEvents = PointerEventConverter.toSolutionEventDocuments(
+		List<SolutionEventDocument> solutionEvents = EventConverter.toSolutionEventDocuments(
 			clickEvents, moveEvents, scrollEvents);
 
 		solutionEventDocumentService.saveAllSolutionEvents(solutionEvents);

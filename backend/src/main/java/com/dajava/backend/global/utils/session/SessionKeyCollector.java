@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class SessionKeyCollector {
-	private static final List<String> EVENT_TYPES = List.of("click:", "move:", "scroll:");
+	private static final List<String> EVENT_TYPES = List.of("click", "move", "scroll");
 	private final ActiveSessionManager activeSessionManager;
 
 	public Set<SessionIdentifier> collectAllActiveSessionKeys() {

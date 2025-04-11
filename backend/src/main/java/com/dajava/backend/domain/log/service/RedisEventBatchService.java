@@ -14,6 +14,7 @@ import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRe
 import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
+import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.domain.log.converter.EventConverter;
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
 import com.dajava.backend.domain.log.dto.MovementEventRequest;
@@ -54,17 +55,19 @@ public class RedisEventBatchService {
 		if (totalPendingEvents == 0) {
 			return;
 		}
-
 		SessionDataDocument sessionDataDocument = redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
-
 		processClickEvents(sessionIdentifier);
 		processMoveEvents(sessionIdentifier);
 		processScrollEvents(sessionIdentifier);
 
 		if (isInactive) {
-			redisSessionDataService.removeFromEsCache(sessionIdentifier);
-			// 세션 종료 flag 값 true 로 변경
-			sessionDataDocument.endSession();
+			try {
+				redisSessionDataService.removeFromEsCache(sessionIdentifier);
+				sessionDataDocument.endSession();
+			} catch (PointerEventException e) {
+				// Todo...
+				log.info(e.getMessage());
+			}
 		}
 		sessionDataDocumentRepository.save(sessionDataDocument);
 	}
