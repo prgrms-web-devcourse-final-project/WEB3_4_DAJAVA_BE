@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 public class RedisEventConfig {
-
 	@Bean
 	public EventQueueRedisBuffer<ClickEventRequest> clickBuffer(
 		StringRedisTemplate redisTemplate,

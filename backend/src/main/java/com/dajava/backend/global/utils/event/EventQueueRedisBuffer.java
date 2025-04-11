@@ -26,10 +26,11 @@ public class EventQueueRedisBuffer<T> {
 		this.metadataManager = new MetadataManager(redisTemplate);
 	}
 
-	// Todo...
-	public void cacheEvents( SessionIdentifier sessionIdentifier, T event) {
-		String eventKey = KeyGenerator.buildEventKey(event, sessionIdentifier);
+
+	public void cacheEvents(SessionIdentifier sessionIdentifier, T event) {
+		String eventKey = KeyGenerator.buildEventKey( sessionIdentifier,event);
 		String updatedKey = KeyGenerator.buildLastUpdatedKey(eventKey);
+
 		try {
 			String json = serializer.serialize(event);
 			redisTemplate.opsForList().leftPush(eventKey, json);
@@ -39,9 +40,8 @@ public class EventQueueRedisBuffer<T> {
 			throw new LogException(REDIS_CACHING_ERROR);
 		}
 	}
-
-	public List<T> getEvents(T event, SessionIdentifier sessionIdentifier) {
-		String key = KeyGenerator.buildEventKey(event, sessionIdentifier);
+	public List<T> getEvents(SessionIdentifier sessionIdentifier, T event) {
+		String key = KeyGenerator.buildEventKey(sessionIdentifier, event);
 		List<String> jsonList = redisTemplate.opsForList().range(key, 0, -1);
 
 		if (jsonList == null || jsonList.isEmpty()) return Collections.emptyList();
@@ -52,11 +52,11 @@ public class EventQueueRedisBuffer<T> {
 			.collect(Collectors.toList());
 	}
 
-	public List<T> flushEvents(SessionIdentifier sessionIdentifier) {
-		String eventKey = KeyGenerator.buildEventKey(sessionIdentifier);
+	public List<T> flushEvents(SessionIdentifier sessionIdentifier,T event) {
+		String eventKey = KeyGenerator.buildEventKey( sessionIdentifier,event);
 		String updatedKey = KeyGenerator.buildLastUpdatedKey(eventKey);
 
-		List<T> events = getEvents(sessionIdentifier);
+		List<T> events = getEvents(sessionIdentifier,event);
 		redisTemplate.delete(eventKey);
 		redisTemplate.delete(updatedKey);
 		return events;
