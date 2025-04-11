@@ -1,6 +1,7 @@
 package com.dajava.backend.global.exception;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -41,5 +42,18 @@ public class GlobalExceptionHandler {
 		log.error("Heatmap Error, message : {}", e.getMessage());
 		return ResponseEntity.status(e.errorCode.getHttpStatus())
 			.body(ErrorData.create(e.getMessage()));
+	}
+
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<ErrorData> handleValidationException(MethodArgumentNotValidException e) {
+		log.warn("Validation Error: {}", e.getMessage());
+
+		// 첫 번째 필드 오류만 응답에 담음 (전체 리스트로 줄 수도 있음)
+		String errorMessage = e.getBindingResult().getFieldErrors().stream()
+			.findFirst()
+			.map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+			.orElse("잘못된 요청입니다.");
+
+		return ResponseEntity.badRequest().body(ErrorData.create(errorMessage));
 	}
 }
