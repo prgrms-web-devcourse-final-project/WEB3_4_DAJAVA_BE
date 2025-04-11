@@ -24,6 +24,7 @@ import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRep
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
+import com.dajava.backend.domain.image.service.pageCapture.FileCleanupService;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
@@ -41,6 +42,7 @@ public class InitData {
 	@Value("${init.flag:1}")
 	private int initFlag;
 
+	private final FileCleanupService fileCleanupService;
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
@@ -105,10 +107,15 @@ public class InitData {
 	@Bean
 	public ApplicationRunner baseInitDataApplicationRunner() {
 		return args -> {
+			cleanUp();
 			self.work1();
 			//self.work2();
 			//self.work3();
 		};
+	}
+
+	public void cleanUp() {
+		fileCleanupService.deleteNonLinkedFile();
 	}
 
 	@Transactional
@@ -232,9 +239,7 @@ public class InitData {
 
 		sessionDataDocumentRepository.save(sessionData);
 
-
 		List<SolutionEventDocument> docs = new ArrayList<>();
-
 
 		for (int i = 0; i < 10; i++) {
 			SolutionEventDocument doc = SolutionEventDocument.create(

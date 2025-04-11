@@ -16,7 +16,10 @@ import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.PageCaptureDataRepository;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class FileCleanupService {
 
 	// 파일 저장 경로 (외부 설정에서 주입)
@@ -55,6 +58,7 @@ public class FileCleanupService {
 	 * 해당 로직은 서버 시작시 최초 1회 기동합니다. (추후 스케줄링할 여지 있음)
 	 */
 	public void deleteNonLinkedFile() {
+		log.info("연관되지 않은 모든 이미지 파일 삭제 시작");
 		// Register 에 있는 모든 URL Set
 		List<Register> registers = registerRepository.findAll();
 		Set<String> registerUrls = registers.stream()
