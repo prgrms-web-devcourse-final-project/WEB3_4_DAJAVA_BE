@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
  * @author Metronon
  */
 @RestController
-@RequestMapping("/v1/logs/redis")
+@RequestMapping("/v1/logs")
 @RequiredArgsConstructor
 @Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventController {
@@ -68,10 +68,5 @@ public class EventController {
 	) {
 		eventService.createScrollEvent(scrollEventRequest);
 		return "스크롤 이벤트 수신 완료";
-	}
-	@GetMapping("/test")
-	public String test() {
-		sessionScheduler.flushAllSessions();
-		return "성공";
 	}
 }

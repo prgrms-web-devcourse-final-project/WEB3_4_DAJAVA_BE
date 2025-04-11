@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/v1/session")
+@RequestMapping("/v1/logs")
 @RequiredArgsConstructor
 @Tag(name = "SessionController", description = "세션 컨트롤러")
 public class SessionController {
