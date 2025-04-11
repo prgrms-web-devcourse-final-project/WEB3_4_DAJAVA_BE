@@ -22,7 +22,7 @@ public class SessionServiceImpl implements SessionService  {
 		SessionIdentifier sessionIdentifier = new SessionIdentifier(
 			esData.getSessionId(), esData.getPageUrl(), esData.getMemberSerialNumber()
 		);
-		SessionFlagActive(sessionIdentifier);
+		SessionFlagInActive(sessionIdentifier);
 	}
 
 	@Override
