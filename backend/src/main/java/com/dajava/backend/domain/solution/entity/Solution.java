@@ -28,7 +28,7 @@ public class Solution extends BaseTimeEntity {
 	 * 솔루션의 내용 (텍스트 형식)
 	 */
 	@Lob
-	@Column(nullable = false)
+	@Column(nullable = false, columnDefinition = "LONGTEXT")
 	private String text;
 	/**
 	 * Register 엔티티와 1:1 관계

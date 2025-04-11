@@ -9,6 +9,7 @@ import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
 import com.dajava.backend.domain.register.exception.AdminException;
 import com.dajava.backend.domain.register.exception.RegisterException;
+import com.dajava.backend.domain.solution.exception.SolutionException;
 
 import lombok.extern.slf4j.Slf4j;
 

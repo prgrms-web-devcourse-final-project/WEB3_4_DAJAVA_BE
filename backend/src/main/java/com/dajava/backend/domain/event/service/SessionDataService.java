@@ -31,7 +31,6 @@ public class SessionDataService {
 	//private final Map<SessionDataKey, SessionData> sessionCache = new ConcurrentHashMap<>();
 	private final Map<SessionDataKey, SessionDataDocument> sessionEsCache = new ConcurrentHashMap<>();
 
-	// todo... sessionescache value가 boolean으로 바뀌면
 	// 아래가 조건 식 바꿔야하고
 
 	//session 엔티티 일련번호는 sessionId+url+serialNum으로 한다.

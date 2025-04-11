@@ -43,7 +43,18 @@ public enum ErrorCode {
 	EVENT_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 이벤트 데이터가 없습니다"),
 	SESSION_DATA_DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "ES 세션 데이터가 없습니다"),
 	ALREADY_OUTLIER_DOCUMENT(HttpStatus.BAD_REQUEST, "이미 이상치로 판별된 ES 이벤트 데이터 입니다."),
-	EVENT_DTO_NOT_FOUND(HttpStatus.NOT_FOUND, "버퍼에 이벤트 DTO가 없습니다");
+	EVENT_DTO_NOT_FOUND(HttpStatus.NOT_FOUND, "버퍼에 이벤트 DTO가 없습니다"),
+
+	// Response
+	DATA_TO_STRING_ERROR(HttpStatus.VARIANT_ALSO_NEGOTIATES, "String 응답을 Json 형태로 변환 중 에러가 발생했습니다."),
+
+	// Log
+	SESSION_IDENTIFIER_NOT_FOUND(HttpStatus.NOT_FOUND, "sessionIdentify가 없습니다."),
+	SESSION_IDENTIFIER_PARSING_NOT_FOUND(HttpStatus.BAD_REQUEST, "Key 문자열이 없습니다."),
+	SESSION_IDENTIFIER_PARSING_ERROR(HttpStatus.BAD_REQUEST, "문자열 양식이 맞지 않습니다."),
+	REDIS_CACHING_ERROR(HttpStatus.BAD_REQUEST, "Redis에 저장하지 못했습니다.");
+
+
 
 	private final HttpStatus httpStatus;
 	private final String description;

@@ -49,6 +49,8 @@ public class SolutionServiceImpl implements SolutionService {
 
 	private final EmailService emailService;
 
+	private final ObjectMapper objectMapper;
+
 	/**
 	 * Gemini API 통신 후 UI 개선 솔루션을 받기 위한 메서드
 	 * @param refineData // 요청할 데이터
@@ -60,13 +62,13 @@ public class SolutionServiceImpl implements SolutionService {
 
 	@Override
 	public Mono<SolutionResponse> getAISolution(String refineData, String serialNumber) {
+
 		return geminiApiConfig.geminiWebClient().post()
 			.uri(uriBuilder -> uriBuilder.queryParam("key", geminiApiConfig.getApiKey()).build())
 			.bodyValue(refineData)
 			.retrieve()
 			.bodyToMono(String.class)
 			.flatMap(result -> {
-				ObjectMapper objectMapper = new ObjectMapper();
 				try {
 					JsonNode rootNode = objectMapper.readTree(result);
 					String text = rootNode.at("/candidates/0/content/parts/0/text").asText();

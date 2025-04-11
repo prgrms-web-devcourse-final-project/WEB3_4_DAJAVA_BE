@@ -48,3 +48,4 @@ db_dev.trace.db
 
 .DS_Store
 src/.DS_Store
+daemon/
