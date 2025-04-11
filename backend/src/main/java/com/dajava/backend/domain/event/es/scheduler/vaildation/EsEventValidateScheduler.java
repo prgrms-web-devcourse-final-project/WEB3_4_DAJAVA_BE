@@ -15,16 +15,11 @@ import com.dajava.backend.domain.event.es.entity.PointerMoveEventDocument;
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
 import com.dajava.backend.domain.event.es.entity.SessionDataDocument;
 import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
-import com.dajava.backend.domain.event.es.repository.PointerClickEventDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
-import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
 import com.dajava.backend.domain.event.es.service.PointerEventDocumentService;
 import com.dajava.backend.domain.event.es.service.SessionDataDocumentService;
 import com.dajava.backend.domain.event.es.service.SolutionEventDocumentService;
 import com.dajava.backend.domain.event.exception.PointerEventException;
-import com.dajava.backend.global.component.analyzer.ValidateSchedulerProperties;
+import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.utils.EventsUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -49,7 +44,7 @@ public class EsEventValidateScheduler {
 	private final EsMoveEventAnalyzer esMoveEventAnalyzer;
 	private final EsScrollEventAnalyzer esScrollEventAnalyzer;
 
-	private final ValidateSchedulerProperties validateSchedulerProperties;
+	private final BufferSchedulerProperties bufferSchedulerProperties;
 
 
 
@@ -61,12 +56,12 @@ public class EsEventValidateScheduler {
 	 * 배치 처리 구현에 페이징을 사용했습니다.
 	 * 그래도 메모리 터지는 경우 최대 데이터 상한선을 설정해 스케줄러가 처리 가능한 데이터 제한
 	 */
-	@Scheduled(fixedRateString = "#{@validateSchedulerProperties.validateEndSessionMs}")
+	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.validateEndSessionMs}")
 	public void endedSessionValidate() {
 
 		log.info("검증 스케줄러 시작");
 
-		int batchSize = validateSchedulerProperties.getBatchSize();
+		int batchSize = bufferSchedulerProperties.getBatchSize();
 		int page = 0;
 
 		Page<SessionDataDocument> resultPage;
@@ -115,7 +110,7 @@ public class EsEventValidateScheduler {
 		String sessionId = sessionDataDocument.getSessionId();
 		log.info("검증 되는 세션 아이디 : {}", sessionId);
 
-		int batchSize = validateSchedulerProperties.getBatchSize();
+		int batchSize = bufferSchedulerProperties.getBatchSize();
 		List<PointerClickEventDocument> clickEvents = pointerEventDocumentService.fetchAllClickEventDocumentsBySessionId(sessionId, batchSize);
 		List<PointerMoveEventDocument> moveEvents = pointerEventDocumentService.fetchAllMoveEventDocumentsBySessionId(sessionId, batchSize);
 		List<PointerScrollEventDocument> scrollEvents = pointerEventDocumentService.fetchAllScrollEventDocumentsBySessionId(sessionId, batchSize);

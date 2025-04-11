@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.Data;
 
+/*
 @ConfigurationProperties(prefix = "event.scheduler")
 @Data
 @Component
@@ -15,3 +16,5 @@ public class ValidateSchedulerProperties {
 	private int batchSize ;
 
 }
+
+ */
