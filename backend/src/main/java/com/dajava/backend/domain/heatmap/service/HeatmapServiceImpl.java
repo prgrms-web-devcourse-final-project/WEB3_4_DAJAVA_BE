@@ -91,6 +91,9 @@ public class HeatmapServiceImpl implements HeatmapService {
 			// ES에 접근 후 데이터 가져오도록 변경
 			List<SolutionEventDocument> events = getAllEvents(serialNumber, sortByTimestamp);
 
+			// 샘플링 처리 전 totalEvents
+			int totalEvents = events.size();
+
 			// 이벤트 샘플링으로 데이터가 방대한 경우 반환 시간 최적화
 			if (events.size() > 1000) {
 				events = sampleEvents(events, type);
@@ -100,7 +103,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 			HeatmapResponse response;
 			if ("scroll".equalsIgnoreCase(type)) {
 				response = createScrollDepthHeatmap(events, targetUrl);
-			} else if ("click".equalsIgnoreCase(type) || "mousemove".equalsIgnoreCase(type)) {
+			} else if ("click".equalsIgnoreCase(type) || "move".equalsIgnoreCase(type)) {
 				response = createCoordinateHeatmap(events, type, targetUrl);
 			} else {
 				throw new HeatmapException(INVALID_EVENT_TYPE);
@@ -122,8 +125,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 			// 소요 시간 측정
 			long endTime = System.currentTimeMillis();
-			log.info("히트맵 생성 성능 분석 결과: 일련 번호={}, type={}, totalEvent={}, 소요시간={}ms",
-				serialNumber, type, events.size(), (endTime - startTime)
+			log.info("히트맵 생성 성능 분석 결과: 일련 번호={}, type={}, totalEvent={}, afterSamplingEvent={} 소요시간={}ms",
+				serialNumber, type, totalEvents, events.size(), (endTime - startTime)
 			);
 
 			return response;
@@ -194,7 +197,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 	private List<SolutionEventDocument> sampleEvents(List<SolutionEventDocument> events, String eventType) {
 		int sampleRate;
 
-		if ("mousemove".equalsIgnoreCase(eventType)) {
+		if ("move".equalsIgnoreCase(eventType)) {
 			sampleRate = events.size() > 10000 ? 20 : 10; // 이동 이벤트가 10000개 이상 ? 20 : 1 / 10 : 1
 		} else if ("scroll".equalsIgnoreCase(eventType)) {
 			sampleRate = 5; // 스크롤 이벤트 5 : 1
