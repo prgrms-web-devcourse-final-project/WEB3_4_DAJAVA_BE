@@ -33,6 +33,7 @@ public class EventRedisBuffer {
 		addEvent(scroll, event, sessionIdentifier);
 	}
 
+	/// /
 	public List<ClickEventRequest> getClickEvents(SessionIdentifier sessionIdentifier) {
 		return getEvents(click, sessionIdentifier);
 	}

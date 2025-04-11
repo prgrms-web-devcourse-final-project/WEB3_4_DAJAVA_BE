@@ -8,9 +8,10 @@ public class KeyGenerator {
 	private static final String LAST_UPDATED_PREFIX = "lastUpdated:";
 
 
-	public static String buildEventKey(SessionIdentifier sessionIdentifier) {
-		return EVENT_CACHE_PREFIX + LogUtils.createRedisKey(sessionIdentifier);
+	public static String buildEventKey(String type, SessionIdentifier sessionIdentifier) {
+		return EVENT_CACHE_PREFIX + type + LogUtils.createRedisKey(sessionIdentifier);
 	}
+
 
 	public static String buildLastUpdatedKey(String eventKey) {
 		return LAST_UPDATED_PREFIX + eventKey;

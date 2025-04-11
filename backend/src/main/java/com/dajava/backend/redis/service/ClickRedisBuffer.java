@@ -1,4 +1,16 @@
-package com.dajava.backend.global.utils.event;
+package com.dajava.backend.redis.service;
+
+import static com.dajava.backend.global.exception.ErrorCode.*;
+
+import com.dajava.backend.domain.log.dto.ClickEventRequest;
+import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
+import com.dajava.backend.domain.log.exception.LogException;
+import com.dajava.backend.global.utils.event.EventQueueRedisBuffer;
+import com.dajava.backend.global.utils.event.EventSerializer;
+import com.dajava.backend.global.utils.event.KeyGenerator;
+import com.dajava.backend.global.utils.event.MetadataManager;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,32 +18,22 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.springframework.data.redis.core.StringRedisTemplate;
-
-import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
-import com.dajava.backend.domain.log.exception.LogException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static com.dajava.backend.global.exception.ErrorCode.*;
-
-public class EventQueueRedisBuffer<T> {
-
+public class ClickRedisBuffer {
 	private final StringRedisTemplate redisTemplate;
 	private final EventSerializer<T> serializer;
 	private final MetadataManager metadataManager;
 
-	public EventQueueRedisBuffer(StringRedisTemplate redisTemplate, ObjectMapper objectMapper, Class<T> clazz) {
+	public ClickRedisBuffer(StringRedisTemplate redisTemplate, ObjectMapper objectMapper, Class<ClickEventRequest> clazz  ) {
 		this.redisTemplate = redisTemplate;
 		this.serializer = new EventSerializer<>(objectMapper, clazz);
 		this.metadataManager = new MetadataManager(redisTemplate);
 	}
 
-	// Todo...
-	public void cacheEvents( SessionIdentifier sessionIdentifier, T event) {
-		String eventKey = KeyGenerator.buildEventKey(event, sessionIdentifier);
+	public void cacheEvents( SessionIdentifier sessionIdentifier ) {
+		String eventKey = KeyGenerator.buildEventKey("click", sessionIdentifier);
 		String updatedKey = KeyGenerator.buildLastUpdatedKey(eventKey);
 		try {
-			String json = serializer.serialize(event);
+			String json = serializer.serialize("click");
 			redisTemplate.opsForList().leftPush(eventKey, json);
 			redisTemplate.expire(eventKey, 1, TimeUnit.HOURS);
 			metadataManager.updateLastUpdated(updatedKey);

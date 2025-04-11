@@ -31,7 +31,7 @@ public class EventController {
 	private final SessionScheduler sessionScheduler;
 
 	/**
-	 * type 이 "click" 인 Click(Touch) 이벤트 로깅
+	 * type 이 "click" 인 Click(Touch) 이벤트가 redis에 저장
 	 */
 	@Operation(summary = "클릭 이벤트 로깅", description = "마우스 이벤트 클릭(터치) 타입의 이벤트를 로깅합니다.")
 	@PostMapping("/click")
@@ -44,7 +44,7 @@ public class EventController {
 	}
 
 	/**
-	 * type 이 "mousemove"인 mousemove 이벤트 로깅
+	 * type 이 "mousemove"인 mousemove 이벤트가 redis에 저장
 	 */
 	@Operation(summary = "이동 이벤트 로깅", description = "마우스 이벤트 이동 타입의 이벤트를 로깅합니다.")
 	@PostMapping("/movement")
@@ -58,7 +58,7 @@ public class EventController {
 	}
 
 	/**
-	 * type 이 "scroll"인 scroll 이벤트 로깅
+	 * type 이 "scroll"인 scroll 이벤트가 redis에 저장
 	 */
 	@Operation(summary = "스크롤 이벤트 로깅", description = "마우스 이벤트 스크롤 타입의 이벤트를 로깅합니다.")
 	@PostMapping("/scroll")
