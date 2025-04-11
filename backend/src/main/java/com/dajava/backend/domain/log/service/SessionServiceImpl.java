@@ -13,8 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SessionServiceImpl implements SessionService  {
 	private final SessionDataDocumentRepository sessionDataDocumentRepository;
-	private final RedisActivityHandleService redisActivityHandleService;
-
+	private final RedisEventBatchService redisEventBatchService;
 	@Override
 	@Transactional
 	public void expireSession(String sessionId) {
@@ -23,6 +22,19 @@ public class SessionServiceImpl implements SessionService  {
 		SessionIdentifier sessionIdentifier = new SessionIdentifier(
 			esData.getSessionId(), esData.getPageUrl(), esData.getMemberSerialNumber()
 		);
-		redisActivityHandleService.processInactiveBatchForSession(sessionIdentifier);
+		SessionFlagActive(sessionIdentifier);
 	}
+
+	@Override
+	@Transactional
+	public void SessionFlagActive(SessionIdentifier sessionIdentifier) {
+		redisEventBatchService.processBatchForSession(sessionIdentifier, false);
+	}
+
+	@Override
+	@Transactional
+	public void SessionFlagInActive(SessionIdentifier sessionIdentifier) {
+		redisEventBatchService.processBatchForSession(sessionIdentifier, true);
+	}
+
 }

@@ -6,10 +6,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
+import com.dajava.backend.domain.log.service.SessionService;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.utils.LogUtils;
 import com.dajava.backend.global.utils.event.EventRedisBuffer;
-import com.dajava.backend.domain.log.service.RedisActivityHandleService;
 import com.dajava.backend.global.utils.session.SessionKeyCollector;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +29,8 @@ public class SessionScheduler {
 
 	private final EventRedisBuffer eventRedisBuffer;
 	private final BufferSchedulerProperties properties;
-	private final RedisActivityHandleService redisActivityHandleService;
 	private final SessionKeyCollector sessionKeyCollector;
+	private final SessionService sessionService;
 
 	/**
 	 * 1분마다 실행되어 비활성 세션을 감지하고 처리합니다.
@@ -57,7 +57,7 @@ public class SessionScheduler {
 				log.info("비활성 세션 감지: {}", sessionIdentifier);
 				inactiveCount++;
 				// 배치 처리를 통해 데이터 저장 및 캐시 제거
-				redisActivityHandleService.processInactiveBatchForSession(sessionIdentifier);
+				sessionService.SessionFlagInActive(sessionIdentifier);
 			}
 		}
 
@@ -79,7 +79,7 @@ public class SessionScheduler {
 
 		for (SessionIdentifier sessionKey : activeKeys) {
 			try {
-				redisActivityHandleService.processActiveBatchForSession(sessionKey);
+				sessionService.SessionFlagActive(sessionKey);
 			} catch (Exception e) {
 				log.error("세션 {} 처리 중 오류 발생: {}", sessionKey, e.getMessage(), e);
 			}

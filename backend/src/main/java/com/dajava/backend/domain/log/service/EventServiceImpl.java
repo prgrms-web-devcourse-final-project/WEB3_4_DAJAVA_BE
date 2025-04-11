@@ -2,7 +2,6 @@ package com.dajava.backend.domain.log.service;
 
 import org.springframework.stereotype.Service;
 
-import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
 import com.dajava.backend.domain.log.dto.MovementEventRequest;
 import com.dajava.backend.domain.log.dto.ScrollEventRequest;
@@ -27,14 +26,12 @@ public class EventServiceImpl implements EventService {
 				request.getSessionIdentifier().getPageUrl(),
 				request.getSessionIdentifier().getMemberSerialNumber()
 			);
-
 			log.info("[클릭 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
 				sessionIdentifier.getSessionId(),
 				sessionIdentifier.getPageUrl(),
 				sessionIdentifier.getMemberSerialNumber()
 			);
 			redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
-
 			eventRedisBuffer.addClickEvent(request, sessionIdentifier);
 		} catch (Exception e) {
 			log.error("[클릭 이벤트][에러] 클릭 이벤트 실패: {}", request, e);
@@ -50,13 +47,11 @@ public class EventServiceImpl implements EventService {
 				request.getSessionIdentifier().getPageUrl(),
 				request.getSessionIdentifier().getMemberSerialNumber()
 			);
-
 			log.info("[이동 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
 				sessionIdentifier.getSessionId(),
 				sessionIdentifier.getPageUrl(),
 				sessionIdentifier.getMemberSerialNumber()
 			);
-
 			redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
 
 			eventRedisBuffer.addMoveEvent(request, sessionIdentifier);
@@ -80,9 +75,7 @@ public class EventServiceImpl implements EventService {
 				sessionIdentifier.getPageUrl(),
 				sessionIdentifier.getMemberSerialNumber()
 			);
-
 			redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
-
 			eventRedisBuffer.addScrollEvent(request, sessionIdentifier);
 		} catch (Exception e) {
 			log.error("[스크롤 이벤트][에러] 스크롤 이벤트 실패: {}", request, e);

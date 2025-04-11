@@ -5,7 +5,6 @@ import java.util.*;
 import org.springframework.stereotype.Component;
 
 import com.dajava.backend.domain.log.dto.*;
-import com.dajava.backend.domain.log.enums.EventType;
 import com.dajava.backend.global.utils.session.ActiveSessionManager;
 import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 
@@ -70,14 +69,4 @@ public class EventRedisBuffer {
 		return buffer.flushEvents(sessionIdentifier);
 	}
 
-	// 세션 키 조회
-	public Set<SessionIdentifier> getAllActiveSessionKeys() {
-		Set<SessionIdentifier> activeSessionKeys = new HashSet<>();
-		for (EventType type : EventType.values()) {
-			activeSessionKeys.addAll(
-				activeSessionManager.getActiveSessionKeysForType(type.getPrefix())
-			);
-		}
-		return activeSessionKeys;
-	}
 }

@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.dajava.backend.domain.event.dto.SessionDataKey;
 import com.dajava.backend.domain.log.dto.identifier.SessionIdentifier;
 
 import lombok.RequiredArgsConstructor;

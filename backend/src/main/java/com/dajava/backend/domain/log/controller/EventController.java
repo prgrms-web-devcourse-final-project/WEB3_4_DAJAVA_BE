@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.log.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dajava.backend.domain.log.dto.ClickEventRequest;
 import com.dajava.backend.domain.log.dto.MovementEventRequest;
 import com.dajava.backend.domain.log.dto.ScrollEventRequest;
+import com.dajava.backend.domain.log.scheduler.SessionScheduler;
 import com.dajava.backend.domain.log.service.EventService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventController {
 	private final EventService eventService;
+	private final SessionScheduler sessionScheduler;
 
 	/**
 	 * type 이 "click" 인 Click(Touch) 이벤트 로깅
@@ -65,5 +68,10 @@ public class EventController {
 	) {
 		eventService.createScrollEvent(scrollEventRequest);
 		return "스크롤 이벤트 수신 완료";
+	}
+	@GetMapping("/test")
+	public String test() {
+		sessionScheduler.flushAllSessions();
+		return "성공";
 	}
 }
