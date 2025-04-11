@@ -244,9 +244,9 @@ public class InitData {
 		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
 		SessionDataDocument sessionData = SessionDataDocument.create(
-			sessionId,                                                            // sessionId
-			serialNumber,                                                    // memberSerialNumber
-			pageUrl,                                                            // pageUrl
+			sessionId,                                                           // sessionId
+			serialNumber,                                                        // memberSerialNumber
+			pageUrl,                                                             // pageUrl
 			timestamp                                                            // timestamp
 		);
 
@@ -271,7 +271,7 @@ public class InitData {
 		for (int i = 0; i < 500; i++) {
 			Integer navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange);
 			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId,                                                        // 사용자 식별자
+				sessionId,                                                      // 사용자 식별자
 				pageUrl,                                                        // 이벤트 페이지 URL
 				"click",                                                        // 이벤트 타입: click, scroll, move 등
 				navScrollY,                                                     // scrollY
@@ -282,7 +282,7 @@ public class InitData {
 				navClientX,                                                     // clientX
 				navClientY1 + getRandomOffset(navYRange),                       // clientY
 				"button",                                                       // element
-				serialNumber,                                                    // serialNumber
+				serialNumber,                                                   // serialNumber
 				i % 10 == 0                                                     // isOutlier
 			);
 			docs.add(doc);
@@ -292,9 +292,9 @@ public class InitData {
 		for (int i = 0; i < 2000; i++) {
 			Integer navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange) * 5;
 			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId,                                // 사용자 식별자
-				pageUrl,                                    // 이벤트 페이지 URL
-				(i % 4 == 0) ? "scroll" : "mousemove",                           // 이벤트 타입: click, scroll, move 등
+				sessionId,                                                         // 사용자 식별자
+				pageUrl,                                                         // 이벤트 페이지 URL
+				(i % 4 == 0) ? "scroll" : "move",                                // 이벤트 타입: click, scroll, move 등
 				navScrollY,                                                      // scrollY
 				scrollHeight,                                                    // scrollHeight
 				viewportHeight,                                                  // viewportHeight
@@ -302,8 +302,8 @@ public class InitData {
 				timestamp + i,                                                   // timestamp (밀리초 단위)
 				navClientX,                                                      // clientX
 				navClientY1 + getRandomOffset(navYRange) * 5,                    // clientY
-				null,                                                         // element
-				serialNumber,                                                     // serialNumber
+				null,                                                            // element
+				serialNumber,                                                    // serialNumber
 				i % 10 == 0                                                      // isOutlier
 			);
 			docs.add(doc);
@@ -327,8 +327,8 @@ public class InitData {
 			Integer heroClientX = heroClientXList.get((i / 3) % heroClientXList.size()) + getRandomOffset(heroXRange);
 			Integer heroClientY = heroClientYList.get((i / 2) % heroClientYList.size()) + getRandomOffset(heroYRange);
 			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId,                                                         // 사용자 식별자
-				serialNumber,                                                     // 이벤트 페이지 URL
+				sessionId,                                                       // 사용자 식별자
+				serialNumber,                                                    // 이벤트 페이지 URL
 				"click",                                                         // 이벤트 타입: click, scroll, move 등
 				heroScrollY,                                                     // scrollY
 				scrollHeight,                                                    // scrollHeight
@@ -338,7 +338,7 @@ public class InitData {
 				heroClientX,                                                     // clientX
 				heroClientY,                                                     // clientY
 				"img",                                                           // element
-				serialNumber,                                                     // serialNumber
+				serialNumber,                                                    // serialNumber
 				i % 10 == 0                                                      // isOutlier
 			);
 			docs.add(doc);
@@ -351,9 +351,9 @@ public class InitData {
 			Integer heroClientY =
 				heroClientYList.get((i / 2) % heroClientYList.size()) + getRandomOffset(heroYRange) * 5;
 			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId,                                                         // 사용자 식별자
+				sessionId,                                                       // 사용자 식별자
 				pageUrl,                                                         // 이벤트 페이지 URL
-				(i % 4 == 0) ? "scroll" : "mousemove",                           // 이벤트 타입: click, scroll, move 등
+				(i % 4 == 0) ? "scroll" : "move",                             // 이벤트 타입: click, scroll, move 등
 				heroScrollY,                                                     // scrollY
 				scrollHeight,                                                    // scrollHeight
 				viewportHeight,                                                  // viewportHeight
@@ -362,7 +362,7 @@ public class InitData {
 				heroClientX,                                                     // clientX
 				heroClientY,                                                     // clientY
 				null,                                                            // element
-				serialNumber,                                                     // serialNumber
+				serialNumber,                                                    // serialNumber
 				i % 10 == 0                                                      // isOutlier
 			);
 			docs.add(doc);
@@ -380,7 +380,7 @@ public class InitData {
 			Integer middleClientX = middleClientX1 + getRandomOffset(middleXRange);
 			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange);
 			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId,                                                         // 사용자 식별자
+				sessionId,                                                       // 사용자 식별자
 				pageUrl,                                                         // 이벤트 페이지 URL
 				"click",                                                         // 이벤트 타입: click, scroll, move 등
 				middleScrollY,                                                   // scrollY
@@ -391,7 +391,7 @@ public class InitData {
 				middleClientX,                                                   // clientX
 				middleClientY,                                                   // clientY
 				"button",                                                        // element
-				serialNumber,                                                     // serialNumber
+				serialNumber,                                                    // serialNumber
 				i % 10 == 0                                                      // isOutlier
 			);
 			docs.add(doc);
@@ -402,9 +402,9 @@ public class InitData {
 			Integer middleClientX = middleClientX1 + getRandomOffset(middleXRange) * 5;
 			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange) * 5;
 			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId,                                                         // 사용자 식별자
+				sessionId,                                                       // 사용자 식별자
 				pageUrl,                                                         // 이벤트 페이지 URL
-				(i % 4 == 0) ? "scroll" : "mousemove",                           // 이벤트 타입: click, scroll, move 등
+				(i % 4 == 0) ? "scroll" : "move",                             // 이벤트 타입: click, scroll, move 등
 				middleScrollY,                                                   // scrollY
 				scrollHeight,                                                    // scrollHeight
 				viewportHeight,                                                  // viewportHeight
