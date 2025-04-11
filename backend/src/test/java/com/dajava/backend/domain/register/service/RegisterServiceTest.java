@@ -19,7 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.dajava.backend.domain.email.EmailService;
+import com.dajava.backend.domain.email.AsyncEmailSender;
 import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
@@ -46,16 +46,15 @@ class RegisterServiceTest {
 	FileStorageService fileStorageService;
 
 	@MockitoBean
-	private EmailService emailService;
-
-	@BeforeEach
-	public void setup() {
-		doNothing().when(emailService).sendEmail(anyString(), anyString(), anyString());
-	}
+	private AsyncEmailSender asyncEmailSender;
 
 	@BeforeEach
 	void setUp() throws Exception {
+		// Register Repository 전부 삭제
 		repository.deleteAll();
+
+		// email 관련 작업 실제로 송신이 이루어지지 않게 방지
+		doNothing().when(asyncEmailSender).sendEmail(anyString(), anyString(), anyString());
 	}
 
 	@Test
