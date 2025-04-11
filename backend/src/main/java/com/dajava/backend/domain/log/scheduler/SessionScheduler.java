@@ -70,7 +70,7 @@ public class SessionScheduler {
 	 * 처리하여 데이터 손실 위험을 줄입니다.
 	 * secret yml 을 통해 주기를 조정할 수 있습니다.
 	 */
-	@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.activeSessionFlushIntervalMs}")
+	//@Scheduled(fixedRateString = "#{@bufferSchedulerProperties.activeSessionFlushIntervalMs}")
 	public void flushAllSessions() {
 		log.info("모든 활성 세션 정기 처리 작업 시작");
 
