@@ -13,7 +13,7 @@ import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
 import com.dajava.backend.domain.solution.dto.SolutionRequest;
 import com.dajava.backend.domain.solution.dto.SolutionResponse;
 import com.dajava.backend.domain.solution.service.SolutionService;
-import com.dajava.backend.global.utils.SolutionUtils;
+import com.dajava.backend.domain.solution.utils.SolutionUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

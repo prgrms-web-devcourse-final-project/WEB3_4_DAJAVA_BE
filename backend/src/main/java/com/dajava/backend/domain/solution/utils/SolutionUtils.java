@@ -1,4 +1,4 @@
-package com.dajava.backend.global.utils;
+package com.dajava.backend.domain.solution.utils;
 
 import static com.dajava.backend.global.exception.ErrorCode.*;
 

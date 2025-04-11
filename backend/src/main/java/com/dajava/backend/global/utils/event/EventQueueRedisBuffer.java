@@ -26,7 +26,6 @@ public class EventQueueRedisBuffer<T> {
 		this.metadataManager = new MetadataManager(redisTemplate);
 	}
 
-
 	public void cacheEvents(SessionIdentifier sessionIdentifier, T event) {
 		String eventKey = KeyGenerator.buildEventKey( sessionIdentifier,event);
 		String updatedKey = KeyGenerator.buildLastUpdatedKey(eventKey);

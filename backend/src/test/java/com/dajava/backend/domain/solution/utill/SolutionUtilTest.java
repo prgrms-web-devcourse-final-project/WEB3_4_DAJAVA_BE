@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.dajava.backend.global.utils.SolutionUtils;
+import com.dajava.backend.domain.solution.utils.SolutionUtils;
 import com.dajava.backend.domain.solution.dto.SolutionRequest;
 
 /**
