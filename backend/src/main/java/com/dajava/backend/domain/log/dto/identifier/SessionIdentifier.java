@@ -15,12 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class SessionIdentifier {
-
-	@Schema(description = "session 고유 ID", example = "e25f6b52-4a1b-4721-8651-8839f23727cb", requiredMode = Schema.RequiredMode.REQUIRED)
+	@Schema(description = "session 고유 ID", example = "test-session-id", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull
 	private String sessionId;
 
-	@Schema(description = "솔루션 URL 정보", example = "localhost:3000/myPage", requiredMode = Schema.RequiredMode.REQUIRED)
+	@Schema(description = "솔루션 URL 정보", example = "localhost:3000", requiredMode = Schema.RequiredMode.REQUIRED)
 	@NotNull
 	private String pageUrl;
 

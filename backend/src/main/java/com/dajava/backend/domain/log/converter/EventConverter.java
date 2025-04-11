@@ -28,7 +28,7 @@ import com.dajava.backend.global.utils.TimeUtils;
 					.scrollY(request.getScrollY())
 					.scrollHeight(request.getScrollHeight())
 					.viewportHeight(request.getViewportHeight())
-					.element(request.getElement())
+					.element(request.getTag())
 					.isOutlier(false)
 					.build();
 			}
