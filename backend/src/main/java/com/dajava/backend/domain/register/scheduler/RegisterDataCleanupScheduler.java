@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
+import com.dajava.backend.domain.image.service.pageCapture.FileCleanupService;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 
@@ -22,14 +22,14 @@ public class RegisterDataCleanupScheduler {
 	private int cleanupDays;
 
 	private final RegisterRepository registerRepository;
-	private final FileStorageService fileStorageService;
+	private final FileCleanupService fileCleanupService;
 
 	public RegisterDataCleanupScheduler(
 		RegisterRepository registerRepository,
-		FileStorageService fileStorageService
+		FileCleanupService fileCleanupService
 	) {
 		this.registerRepository = registerRepository;
-		this.fileStorageService = fileStorageService;
+		this.fileCleanupService = fileCleanupService;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class RegisterDataCleanupScheduler {
 				register.getCaptureData().forEach(pageCaptureData -> {
 					String fileName = pageCaptureData.getCaptureFileName();
 					try {
-						fileStorageService.deleteFile(fileName);
+						fileCleanupService.deleteFile(fileName);
 						register.getCaptureData().clear();
 						log.info("파일 삭제 성공: {}", fileName);
 					} catch (Exception e) {

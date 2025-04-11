@@ -1,7 +1,10 @@
 package com.dajava.backend.domain.email.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+
+import java.util.Properties;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import com.dajava.backend.domain.email.AsyncEmailSender;
 import com.dajava.backend.domain.email.EmailService;
 
 import jakarta.mail.Address;
@@ -27,13 +31,20 @@ public class EmailServiceTest {
 
 	private EmailService emailService;
 
-	// 테스트용으로 username을 "noreply@dajava.com"으로 설정
+	// 테스트용 username
 	private final String username = "noreply@dajava.com";
 
 	@BeforeEach
 	public void setUp() throws Exception {
-		emailService = new EmailService(mailSender, username);
-		lenient().when(mailSender.createMimeMessage()).thenReturn(new MimeMessage((Session)null));
+		// AsyncEmailSender를 mocked mailSender와 username으로 생성
+		AsyncEmailSender asyncEmailSender = new AsyncEmailSender(mailSender, username);
+		// EmailService에 AsyncEmailSender를 주입
+		emailService = new EmailService(asyncEmailSender);
+		// MimeMessage를 만드는 경우 새 MimeMessage 인스턴스를 반환하도록 설정
+		// Session 객체는 빈 Properties를 사용해 생성합니다.
+		Properties props = new Properties();
+		Session session = Session.getDefaultInstance(props);
+		lenient().when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(session));
 	}
 
 	@Test
@@ -63,7 +74,8 @@ public class EmailServiceTest {
 
 		// 본문 검증: getContent()로 텍스트 내용 조회
 		Object content = sentMessage.getContent();
-		assertThat(content.toString()).contains(pageUrl)
+		assertThat(content.toString())
+			.contains(pageUrl)
 			.contains(serialNumber);
 
 		// 발신자(From) 검증
@@ -101,7 +113,8 @@ public class EmailServiceTest {
 
 		// 본문 검증
 		Object content = sentMessage.getContent();
-		assertThat(content.toString()).contains(pageUrl)
+		assertThat(content.toString())
+			.contains(pageUrl)
 			.contains(serialNumber);
 
 		// 발신자(From) 검증
@@ -123,7 +136,7 @@ public class EmailServiceTest {
 		// when
 		emailService.sendRegisterCreateEmail(to, pageUrl, serialNumber);
 
-		// then: 수신자 이메일이 없으므로 send() 메서드가 호출되지 않아야 함
+		// then: 수신자 이메일이 없으므로 mailSender.send()가 호출되지 않아야 함
 		verify(mailSender, never()).send(any(MimeMessage.class));
 	}
 
@@ -141,7 +154,7 @@ public class EmailServiceTest {
 		// when: 예외가 발생해도 catch문에서 처리되므로 예외는 전파되지 않아야 함
 		emailService.sendSolutionCompleteEmail(to, pageUrl, serialNumber);
 
-		// then: send() 메서드가 1회 호출된 것을 검증
+		// then: mailSender.send()가 1회 호출된 것을 검증
 		verify(mailSender, times(1)).send(any(MimeMessage.class));
 	}
 }
