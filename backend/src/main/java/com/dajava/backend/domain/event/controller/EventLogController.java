@@ -15,6 +15,7 @@ import com.dajava.backend.domain.event.service.EventLogService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -38,7 +39,7 @@ public class EventLogController {
 	@PostMapping("/click")
 	@ResponseStatus(HttpStatus.OK)
 	public String logClick(
-		@RequestBody PointerClickEventRequest clickEventRequest
+		@Valid @RequestBody PointerClickEventRequest clickEventRequest
 	) {
 		eventLogService.createClickEvent(clickEventRequest);
 		return "클릭 이벤트 수신 완료";
@@ -52,7 +53,7 @@ public class EventLogController {
 	@PostMapping("/movement")
 	@ResponseStatus(HttpStatus.OK)
 	public String logMovement(
-		@RequestBody PointerMoveEventRequest moveEventRequest
+		@Valid @RequestBody PointerMoveEventRequest moveEventRequest
 	) {
 		eventLogService.createMoveEvent(moveEventRequest);
 		return "이동 이벤트 수신 완료";
@@ -66,7 +67,7 @@ public class EventLogController {
 	@PostMapping("/scroll")
 	@ResponseStatus(HttpStatus.OK)
 	public String logScroll(
-		@RequestBody PointerScrollEventRequest scrollEventRequest
+		@Valid @RequestBody PointerScrollEventRequest scrollEventRequest
 	) {
 		eventLogService.createScrollEvent(scrollEventRequest);
 		return "스크롤 이벤트 수신 완료";

@@ -61,4 +61,18 @@ public class PointerMoveEventDocument {
 	public LocalDateTime getTimestamp() {
 		return TimeUtils.toLocalDateTime(this.timestamp);
 	}
+
+	public boolean isValid() {
+		return sessionId != null &&
+			pageUrl != null &&
+			timestamp != null &&
+			clientX != null &&
+			clientY != null &&
+			browserWidth != null &&
+			scrollHeight != null &&
+			viewportHeight != null &&
+			id != null &&
+			memberSerialNumber != null &&
+			scrollY != null;
+	}
 }

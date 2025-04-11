@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.dajava.backend.global.utils.SolutionUtils;
+import com.dajava.backend.domain.solution.utils.SolutionUtils;
 import com.dajava.backend.domain.solution.dto.SolutionRequest;
 
 /**
@@ -77,7 +77,7 @@ class SolutionUtilTest {
 	@Test
 	@DisplayName("String 형태 변화")
 	void testRefinePrompt() {
-		String expectedPrompt = "다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요. 브라우저 width는 1024px이고 브라우저 환경은 Chrome이야:";
+		String expectedPrompt = "다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요. 브라우저 width는 1024px이고 브라우저 환경은 Chrome이야 글자는 400자 이내로 해줘: ";
 
 		// eventData 추출
 		List<SolutionRequest.EventDataDto> eventData = mockSolutionRequest.eventData();

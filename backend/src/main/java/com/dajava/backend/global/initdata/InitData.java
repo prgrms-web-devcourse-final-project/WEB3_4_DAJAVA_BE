@@ -3,7 +3,9 @@ package com.dajava.backend.global.initdata;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +26,11 @@ import com.dajava.backend.domain.event.es.repository.PointerMoveEventDocumentRep
 import com.dajava.backend.domain.event.es.repository.PointerScrollEventDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SessionDataDocumentRepository;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
+import com.dajava.backend.domain.image.service.pageCapture.FileCleanupService;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.register.service.RegisterCacheService;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
@@ -41,12 +45,20 @@ public class InitData {
 	@Value("${init.flag:1}")
 	private int initFlag;
 
+	private final FileCleanupService fileCleanupService;
 	private final PointerClickEventDocumentRepository pointerClickEventDocumentRepository;
 	private final PointerMoveEventDocumentRepository pointerMoveEventDocumentRepository;
 	private final PointerScrollEventDocumentRepository pointerScrollEventDocumentRepository;
 	private final RegisterRepository registerRepository;
 	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
+	private final RegisterCacheService registerCacheService;
+	private static final Random random = new Random();
+
+	// -range 부터 +range 범위의 랜덤 오프셋을 반환합니다.
+	public static int getRandomOffset(int range) {
+		return random.nextInt(range * 2 + 1) - range;
+	}
 
 	private PointerClickEventDocument createEvent(Long time, int clientX, int clientY, String tag) {
 		return PointerClickEventDocument.builder()
@@ -55,7 +67,7 @@ public class InitData {
 			.clientX(clientX)
 			.clientY(clientY)
 			.sessionId("AiSolutionTestSessionNumber")
-			.pageUrl("localhost:3000/test123")
+			.pageUrl("https://www.dajava.link/main")
 			.browserWidth(1920)
 			.scrollHeight(2000)
 			.viewportHeight(300)
@@ -73,7 +85,7 @@ public class InitData {
 			.clientX(clientX)
 			.clientY(clientY)
 			.sessionId("AiSolutionTestSessionNumber")
-			.pageUrl("localhost:3000/test123")
+			.pageUrl("https://www.dajava.link/main")
 			.browserWidth(1920)
 			.memberSerialNumber("5_team_testSerial")
 			.scrollHeight(2000)
@@ -90,7 +102,7 @@ public class InitData {
 			.scrollY(scrollY)
 			.scrollHeight(scrollHeight)
 			.viewportHeight(viewportHeight)
-			.pageUrl("localhost:3000/test123")
+			.pageUrl("https://www.dajava.link/main")
 			.sessionId("AiSolutionTestSessionNumber")
 			.memberSerialNumber("5_team_testSerial")
 			.browserWidth(1920)
@@ -105,24 +117,28 @@ public class InitData {
 	@Bean
 	public ApplicationRunner baseInitDataApplicationRunner() {
 		return args -> {
+			if (initFlag != 1) {
+				return;
+			}
+
+			cleanUp();
 			self.work1();
-			//self.work2();
-			//self.work3();
+			// self.work2();
+			self.work3();
 		};
+	}
+
+	public void cleanUp() {
+		fileCleanupService.deleteNonLinkedFile();
 	}
 
 	@Transactional
 	public void work1() {
-
-		if (initFlag != 1) {
-			return;
-		}
-
 		RegisterCreateRequest request = new RegisterCreateRequest(
 			"chsan626@gmail.com",
 			"password123!",
-			"localhost:3000/test123",
-			LocalDateTime.now().withHour(0).withMinute(0).withSecond(1).withNano(0).plusDays(0),
+			"https://www.dajava.link/main",
+			LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(0),
 			LocalDateTime.now().plusDays(7).withHour(0).withMinute(0).withSecond(0).withNano(0)
 		);
 
@@ -141,15 +157,12 @@ public class InitData {
 
 		if (registerRepository.findBySerialNumber(register.getSerialNumber()).isEmpty()) {
 			Register newRegister = registerRepository.save(register);
+			registerCacheService.refreshCacheAll();
 			log.info("baseInit register 등록 완료");
 		}
 	}
 
 	public void work2() {
-
-		if (initFlag != 1) {
-			return;
-		}
 
 		LocalDateTime now = LocalDateTime.now();
 		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
@@ -157,7 +170,7 @@ public class InitData {
 		SessionDataDocument sessionData = SessionDataDocument.create(
 			"AiSolutionTestSessionNumber",              // sessionId
 			"5_team_testSerial",                                 // memberSerialNumber
-			"localhost:3000/test123",                           // pageUrl
+			"https://www.dajava.link/main",                           // pageUrl
 			timestamp                                          // timestamp (2025-04-07T12:00:00Z 기준 millis)
 		);
 
@@ -214,50 +227,200 @@ public class InitData {
 	}
 
 	/**
-	 * Gemini 솔루션 용 데이터 생성
-	 * @author jhon S, sungkibum
-	 * @since 2025-03-24
+	 * Gemini 솔루션 및 히트맵 생성용 데이터 생성 로직
+	 * @author Metronon
+	 * @since 2025-04-11
 	 */
 	public void work3() {
+		// 공통적으로 사용되는 Fixed 값
+		Integer browserWidth = 1798;
+		Integer viewportHeight = 1280;
+		Integer scrollHeight = 2587;
+		String serialNumber = "5_team_testSerial";
+		String pageUrl = "https://www.dajava.link/main";
+		String sessionId = "SolutionTestSessionId";
 
 		LocalDateTime now = LocalDateTime.now();
 		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
 		SessionDataDocument sessionData = SessionDataDocument.create(
-			"AiSolutionTestSessionNumber",              // sessionId
-			"5_team_testSerial",                                 // memberSerialNumber
-			"localhost:3000/test123",                           // pageUrl
-			timestamp                                          // timestamp (2025-04-07T12:00:00Z 기준 millis)
+			sessionId,                                                            // sessionId
+			serialNumber,                                                    // memberSerialNumber
+			pageUrl,                                                            // pageUrl
+			timestamp                                                            // timestamp
 		);
 
 		sessionDataDocumentRepository.save(sessionData);
 
-
 		List<SolutionEventDocument> docs = new ArrayList<>();
 
+		// 우상단 네비게이션 버튼 Fixed 값
+		Integer navScrollY = 0;
+		Integer navClientX1 = 1135;
+		Integer navClientX2 = 1255;
+		Integer navClientX3 = 1370;
+		Integer navClientX4 = 1535;
+		Integer navClientX5 = 1675;
+		Integer navClientY1 = 50;
+		Integer navXRange = 25;
+		Integer navYRange = 10;
 
-		for (int i = 0; i < 10; i++) {
+		List<Integer> navClientXList = Arrays.asList(navClientX1, navClientX2, navClientX3, navClientX4, navClientX5);
+
+		// 우상단 네비게이션 버튼 클릭 이벤트 생성 [정상 및 비정상 데이터]
+		for (int i = 0; i < 500; i++) {
+			Integer navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange);
 			SolutionEventDocument doc = SolutionEventDocument.create(
-				"AiSolutionTestSessionNumber",
-				"/home",
-				"click",               // 이벤트 타입: click, scroll, move 등
-				120,                   // scrollY
-				2200,                  // scrollHeight
-				900,                   // viewportHeight
-				1280,                  // browserWidth
-				timestamp + i, // timestamp (밀리초 단위)
-				300 + (10 * i),                   // clientX
-				200 + (10 * i),                   // clientY
-				"<div>", // element
-				"5_team_testSerial",          // serialNumber
-				true                  // isOutlier
+				sessionId,                                                        // 사용자 식별자
+				pageUrl,                                                        // 이벤트 페이지 URL
+				"click",                                                        // 이벤트 타입: click, scroll, move 등
+				navScrollY,                                                     // scrollY
+				scrollHeight,                                                   // scrollHeight
+				viewportHeight,                                                 // viewportHeight
+				browserWidth,                                                   // browserWidth
+				timestamp + i,                                                  // timestamp (밀리초 단위)
+				navClientX,                                                     // clientX
+				navClientY1 + getRandomOffset(navYRange),                       // clientY
+				"button",                                                       // element
+				serialNumber,                                                    // serialNumber
+				i % 10 == 0                                                     // isOutlier
+			);
+			docs.add(doc);
+		}
+
+		// 우상단 네비게이션 버튼 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
+		for (int i = 0; i < 2000; i++) {
+			Integer navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange) * 5;
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,                                // 사용자 식별자
+				pageUrl,                                    // 이벤트 페이지 URL
+				(i % 4 == 0) ? "scroll" : "mousemove",                           // 이벤트 타입: click, scroll, move 등
+				navScrollY,                                                      // scrollY
+				scrollHeight,                                                    // scrollHeight
+				viewportHeight,                                                  // viewportHeight
+				browserWidth,                                                    // browserWidth
+				timestamp + i,                                                   // timestamp (밀리초 단위)
+				navClientX,                                                      // clientX
+				navClientY1 + getRandomOffset(navYRange) * 5,                    // clientY
+				null,                                                         // element
+				serialNumber,                                                     // serialNumber
+				i % 10 == 0                                                      // isOutlier
+			);
+			docs.add(doc);
+		}
+
+		// 사이트 각 섹션 카드 Fixed 값
+		Integer heroScrollY = 900;
+		Integer heroClientX1 = 525;
+		Integer heroClientX2 = 890;
+		Integer heroClientX3 = 1270;
+		Integer heroClientY1 = 280;
+		Integer heroClientY2 = 825;
+		Integer heroXRange = 100;
+		Integer heroYRange = 200;
+
+		List<Integer> heroClientXList = Arrays.asList(heroClientX1, heroClientX2, heroClientX3);
+		List<Integer> heroClientYList = Arrays.asList(heroClientY1, heroClientY2);
+
+		// 중앙 섹션 카드 클릭 이벤트 생성 [정상 및 비정상 데이터]
+		for (int i = 0; i < 500; i++) {
+			Integer heroClientX = heroClientXList.get((i / 3) % heroClientXList.size()) + getRandomOffset(heroXRange);
+			Integer heroClientY = heroClientYList.get((i / 2) % heroClientYList.size()) + getRandomOffset(heroYRange);
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,                                                         // 사용자 식별자
+				serialNumber,                                                     // 이벤트 페이지 URL
+				"click",                                                         // 이벤트 타입: click, scroll, move 등
+				heroScrollY,                                                     // scrollY
+				scrollHeight,                                                    // scrollHeight
+				viewportHeight,                                                  // viewportHeight
+				browserWidth,                                                    // browserWidth
+				timestamp + i,                                                   // timestamp (밀리초 단위)
+				heroClientX,                                                     // clientX
+				heroClientY,                                                     // clientY
+				"img",                                                           // element
+				serialNumber,                                                     // serialNumber
+				i % 10 == 0                                                      // isOutlier
+			);
+			docs.add(doc);
+		}
+
+		// 중앙 섹션 카드 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
+		for (int i = 0; i < 2000; i++) {
+			Integer heroClientX =
+				heroClientXList.get((i / 3) % heroClientXList.size()) + getRandomOffset(heroXRange) * 5;
+			Integer heroClientY =
+				heroClientYList.get((i / 2) % heroClientYList.size()) + getRandomOffset(heroYRange) * 5;
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,                                                         // 사용자 식별자
+				pageUrl,                                                         // 이벤트 페이지 URL
+				(i % 4 == 0) ? "scroll" : "mousemove",                           // 이벤트 타입: click, scroll, move 등
+				heroScrollY,                                                     // scrollY
+				scrollHeight,                                                    // scrollHeight
+				viewportHeight,                                                  // viewportHeight
+				browserWidth,                                                    // browserWidth
+				timestamp + i,                                                   // timestamp (밀리초 단위)
+				heroClientX,                                                     // clientX
+				heroClientY,                                                     // clientY
+				null,                                                            // element
+				serialNumber,                                                     // serialNumber
+				i % 10 == 0                                                      // isOutlier
+			);
+			docs.add(doc);
+		}
+
+		// 가운데 솔루션 신청 버튼 Fixed 값
+		Integer middleScrollY = 0;
+		Integer middleClientX1 = 895;
+		Integer middleClientY1 = 546;
+		Integer middleXRange = 35;
+		Integer middleYRange = 5;
+
+		// 중앙 솔루션 신청 버튼 클릭 이벤트 생성 [정상 및 비정상 데이터]
+		for (int i = 0; i < 250; i++) {
+			Integer middleClientX = middleClientX1 + getRandomOffset(middleXRange);
+			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange);
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,                                                         // 사용자 식별자
+				pageUrl,                                                         // 이벤트 페이지 URL
+				"click",                                                         // 이벤트 타입: click, scroll, move 등
+				middleScrollY,                                                   // scrollY
+				scrollHeight,                                                    // scrollHeight
+				viewportHeight,                                                  // viewportHeight
+				browserWidth,                                                    // browserWidth
+				timestamp + i,                                                   // timestamp (밀리초 단위)
+				middleClientX,                                                   // clientX
+				middleClientY,                                                   // clientY
+				"button",                                                        // element
+				serialNumber,                                                     // serialNumber
+				i % 10 == 0                                                      // isOutlier
+			);
+			docs.add(doc);
+		}
+
+		// 중앙 솔루션 신청 버튼 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
+		for (int i = 0; i < 1000; i++) {
+			Integer middleClientX = middleClientX1 + getRandomOffset(middleXRange) * 5;
+			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange) * 5;
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,                                                         // 사용자 식별자
+				pageUrl,                                                         // 이벤트 페이지 URL
+				(i % 4 == 0) ? "scroll" : "mousemove",                           // 이벤트 타입: click, scroll, move 등
+				middleScrollY,                                                   // scrollY
+				scrollHeight,                                                    // scrollHeight
+				viewportHeight,                                                  // viewportHeight
+				browserWidth,                                                    // browserWidth
+				timestamp + i,                                                   // timestamp (밀리초 단위)
+				middleClientX,                                                   // clientX
+				middleClientY,                                                   // clientY
+				null,                                                            // element
+				serialNumber,                                                    // serialNumber
+				i % 10 == 0                                                      // isOutlier
 			);
 			docs.add(doc);
 		}
 
 		solutionEventDocumentRepository.saveAll(docs);
 
-		log.info("baseInit ai 솔루션용 테스트 데이터 등록 완료");
+		log.info("솔루션용 테스트 데이터 등록 완료");
 	}
-
 }

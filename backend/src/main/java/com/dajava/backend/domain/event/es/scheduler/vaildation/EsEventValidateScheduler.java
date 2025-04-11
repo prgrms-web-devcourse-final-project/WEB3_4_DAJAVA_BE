@@ -25,6 +25,7 @@ import com.dajava.backend.domain.event.es.service.SessionDataDocumentService;
 import com.dajava.backend.domain.event.es.service.SolutionEventDocumentService;
 import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.component.analyzer.ValidateSchedulerProperties;
+import com.dajava.backend.global.utils.EventsUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -118,6 +119,11 @@ public class EsEventValidateScheduler {
 		List<PointerClickEventDocument> clickEvents = pointerEventDocumentService.fetchAllClickEventDocumentsBySessionId(sessionId, batchSize);
 		List<PointerMoveEventDocument> moveEvents = pointerEventDocumentService.fetchAllMoveEventDocumentsBySessionId(sessionId, batchSize);
 		List<PointerScrollEventDocument> scrollEvents = pointerEventDocumentService.fetchAllScrollEventDocumentsBySessionId(sessionId, batchSize);
+
+		// null 값 있음 안되니 필터링
+		EventsUtils.filterValidClickEvents(clickEvents);
+		EventsUtils.filterValidMoveEvents(moveEvents);
+		EventsUtils.filterValidScrollEvents(scrollEvents);
 
 		log.info("검증 되는 clickEventsDocument 개수 : {}", clickEvents.size());
 		log.info("검증 되는 moveEventsDocument 개수 : {}", moveEvents.size());

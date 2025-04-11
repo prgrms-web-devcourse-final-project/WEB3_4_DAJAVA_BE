@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.event.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.dajava.backend.global.common.BaseTimeEntity;

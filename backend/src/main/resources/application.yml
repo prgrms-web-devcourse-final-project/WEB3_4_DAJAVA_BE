@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: true
   elasticsearch:
     uris: http://127.0.0.1:9200/
   profiles:
@@ -10,12 +13,16 @@ spring:
   application:
     name: dajava_server
   datasource:
-    url: jdbc:h2:./db_dev;MODE=MySQL
+    url: jdbc:h2:file:./backend/db/db_dev
     username: sa
     password:
     driver-class-name: org.h2.Driver
   cache:
     type: redis
+  servlet:
+    multipart:
+      max-file-size: ${spring.servlet.multipart.max-request-size}
+      max-request-size: 10MB
   jpa:
     hibernate:
       ddl-auto: create
