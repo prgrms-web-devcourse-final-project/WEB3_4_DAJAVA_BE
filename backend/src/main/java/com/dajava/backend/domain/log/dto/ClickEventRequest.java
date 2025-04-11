@@ -26,7 +26,7 @@ public class ClickEventRequest extends BaseEventRequest {
 	private Integer scrollY;
 
 	@NotNull
-	private String element;
+	private String tag;
 
 	@Builder
 	public ClickEventRequest(
@@ -39,13 +39,13 @@ public class ClickEventRequest extends BaseEventRequest {
 		Integer clientX,
 		Integer clientY,
 		Integer scrollY,
-		String element
+		String tag
 	) {
 		super(eventId, timestamp, browserWidth, scrollHeight, viewportHeight, sessionIdentifier);
 		this.clientX = clientX;
 		this.clientY = clientY;
 		this.scrollY = scrollY;
-		this.element = element;
+		this.tag = tag;
 	}
 
 }
