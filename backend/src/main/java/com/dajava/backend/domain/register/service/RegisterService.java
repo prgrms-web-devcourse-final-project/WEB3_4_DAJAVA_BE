@@ -183,4 +183,17 @@ public class RegisterService {
 			fileName
 		);
 	}
+
+	/**
+	 * 솔루션 시리얼 번호를 통해 조회된 Register의 이벤트 수집 기간을 강제로 만료한다.
+	 * @param serialNumber 시리얼 번호
+	 */
+	@Transactional
+	public void expireRegister(String serialNumber) {
+		Register register = registerRepository.findBySerialNumber(serialNumber).orElseThrow(
+			() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
+
+		log.info("Register 강제 만료, serialNumber : {}", serialNumber);
+		register.expire();
+	}
 }

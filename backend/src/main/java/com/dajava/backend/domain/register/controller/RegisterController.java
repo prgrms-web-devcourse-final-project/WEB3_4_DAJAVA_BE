@@ -187,4 +187,15 @@ public class RegisterController {
 	public Set<String> getCacheList() {
 		return registerCacheService.getSerialNumberCache();
 	}
+
+	@Operation(
+		summary = "솔루션 시리얼넘버의 캐시 정보를 반환하는 테스트 API"
+	)
+	@GetMapping(value = "/v1/register/test/expire/{serialNumber}")
+	@ResponseStatus(HttpStatus.OK)
+	public void expireRegister(
+		@PathVariable String serialNumber
+	) {
+		registerService.expireRegister(serialNumber);
+	}
 }
