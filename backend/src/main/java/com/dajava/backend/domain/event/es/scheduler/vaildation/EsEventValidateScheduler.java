@@ -120,6 +120,7 @@ public class EsEventValidateScheduler {
 		List<PointerMoveEventDocument> moveEvents = pointerEventDocumentService.fetchAllMoveEventDocumentsBySessionId(sessionId, batchSize);
 		List<PointerScrollEventDocument> scrollEvents = pointerEventDocumentService.fetchAllScrollEventDocumentsBySessionId(sessionId, batchSize);
 
+		// null 값 있음 안되니 필터링
 		EventsUtils.filterValidClickEvents(clickEvents);
 		EventsUtils.filterValidMoveEvents(moveEvents);
 		EventsUtils.filterValidScrollEvents(scrollEvents);
