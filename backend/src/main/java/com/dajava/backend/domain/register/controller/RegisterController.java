@@ -1,5 +1,7 @@
 package com.dajava.backend.domain.register.controller;
 
+import java.util.Set;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -172,5 +174,17 @@ public class RegisterController {
 		@ModelAttribute PageCaptureRequest request
 	) {
 		return registerService.createPageCapture(request);
+	}
+
+	private final RegisterCacheService registerCacheService;
+
+
+	@Operation(
+		summary = "솔루션 시리얼넘버의 캐시 정보를 반환하는 테스트 API"
+	)
+	@GetMapping(value = "/v1/register/test/cacheList")
+	@ResponseStatus(HttpStatus.OK)
+	public Set<String> getCacheList() {
+		return registerCacheService.getSerialNumberCache();
 	}
 }
