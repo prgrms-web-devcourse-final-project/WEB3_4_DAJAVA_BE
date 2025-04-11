@@ -1,13 +1,9 @@
 package com.dajava.backend.domain.event.es.entity;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.exception.ErrorCode;
@@ -62,7 +58,8 @@ public class SessionDataDocument {
 		this.isVerified = true;
 	}
 
-	public static SessionDataDocument create(String sessionId, String memberSerialNumber, String pageUrl, Long timestamp) {
+	public static SessionDataDocument create(String sessionId, String memberSerialNumber, String pageUrl,
+		Long timestamp) {
 		String id = sessionId + "_" + pageUrl + "_" + memberSerialNumber;
 
 		return SessionDataDocument.builder()
