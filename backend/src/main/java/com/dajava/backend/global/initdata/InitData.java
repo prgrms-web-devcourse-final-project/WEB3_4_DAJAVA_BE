@@ -27,6 +27,7 @@ import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentReposi
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.register.service.RegisterCacheService;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
@@ -47,6 +48,7 @@ public class InitData {
 	private final RegisterRepository registerRepository;
 	private final SessionDataDocumentRepository sessionDataDocumentRepository;
 	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
+	private final RegisterCacheService registerCacheService;
 
 	private PointerClickEventDocument createEvent(Long time, int clientX, int clientY, String tag) {
 		return PointerClickEventDocument.builder()
@@ -141,6 +143,7 @@ public class InitData {
 
 		if (registerRepository.findBySerialNumber(register.getSerialNumber()).isEmpty()) {
 			Register newRegister = registerRepository.save(register);
+			registerCacheService.refreshCacheAll();
 			log.info("baseInit register 등록 완료");
 		}
 	}
@@ -241,7 +244,7 @@ public class InitData {
 				"AiSolutionTestSessionNumber",
 				"/home",
 				"click",               // 이벤트 타입: click, scroll, move 등
-				120,                   // scrollY
+			120,                   		// scrollY
 				2200,                  // scrollHeight
 				900,                   // viewportHeight
 				1280,                  // browserWidth
