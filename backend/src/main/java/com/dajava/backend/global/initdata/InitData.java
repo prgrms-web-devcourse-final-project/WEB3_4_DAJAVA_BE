@@ -31,6 +31,7 @@ import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.RegisterCacheService;
+import com.dajava.backend.domain.solution.scheduler.SolutionScheduler;
 import com.dajava.backend.global.utils.PasswordUtils;
 import com.dajava.backend.global.utils.TimeUtils;
 
@@ -54,6 +55,8 @@ public class InitData {
 	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
 	private final RegisterCacheService registerCacheService;
 	private static final Random random = new Random();
+	@Autowired
+	private SolutionScheduler solutionScheduler;
 
 	// -range 부터 +range 범위의 랜덤 오프셋을 반환합니다.
 	public static int getRandomOffset(int range) {
@@ -125,6 +128,7 @@ public class InitData {
 			self.work1();
 			// self.work2();
 			self.work3();
+			self.work4();
 		};
 	}
 
@@ -135,7 +139,7 @@ public class InitData {
 	@Transactional
 	public void work1() {
 		RegisterCreateRequest request = new RegisterCreateRequest(
-			"chsan626@gmail.com",
+			"choi981127@naver.com",
 			"password123!",
 			"https://www.dajava.link/main",
 			LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0).plusDays(0),
@@ -422,5 +426,10 @@ public class InitData {
 		solutionEventDocumentRepository.saveAll(docs);
 
 		log.info("솔루션용 테스트 데이터 등록 완료");
+	}
+
+	public void work4() {
+		solutionScheduler.processExpiredRegisters();
+		log.info("AI 솔루션 결과 생성 완료 (Gemini)");
 	}
 }
