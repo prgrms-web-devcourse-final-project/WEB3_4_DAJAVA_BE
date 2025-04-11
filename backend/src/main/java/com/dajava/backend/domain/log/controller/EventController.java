@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "EventLogController", description = "이벤트 로깅 컨트롤러")
 public class EventController {
 	private final EventService eventService;
-	private final SessionScheduler sessionScheduler;
 
 	/**
 	 * type 이 "click" 인 Click(Touch) 이벤트가 redis에 저장

@@ -41,6 +41,7 @@ public class RedisSessionDataService {
 						k.getPageUrl(),
 						System.currentTimeMillis()
 					);
+
 					return sessionDataDocumentRepository.save(newSession);
 				})
 		);
