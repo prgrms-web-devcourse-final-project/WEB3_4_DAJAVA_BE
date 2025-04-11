@@ -111,6 +111,10 @@ public class Register extends BaseTimeEntity {
 		this.endDate = newEndDate;
 	}
 
+	public void expire(){
+		this.isServiceExpired = true;
+	}
+
 	/**
 	 * 서비스 제공 기간이 지난 AI Solution 정보를 지웁니다.
 	 */

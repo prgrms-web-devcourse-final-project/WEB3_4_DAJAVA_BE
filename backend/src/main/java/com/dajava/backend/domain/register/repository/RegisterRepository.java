@@ -74,6 +74,7 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 		    AND r.modifiedDate < :deleteTime
 		""")
 	int deleteCleanupTargetRegisters(@Param("deleteTime") LocalDateTime deleteTime);
+
 	/**
 	 * 엔티티가 현재 시각 기준으로 14일 이상 수정 시각이 차이나는 Register 의 List를 조회후 반환
 	 * @param threshold 시간 비교를 위한 LocalDateTime 값 (서비스 정책상 14일 이전 데이터)
@@ -86,6 +87,19 @@ public interface RegisterRepository extends JpaRepository<Register, Long> {
 			AND r.isSolutionComplete = true
 		""")
 	List<Register> findAllCompletedRegisterList(LocalDateTime threshold);
+
+	/**
+	 * 수집 종료시간(endDate)가 이미 지났고, 아직 만료시키지 않은 Register를 조회한다.
+	 * @param now 현재 시간
+	 * @return List<Register>
+	 */
+	@Query("""
+			SELECT r
+			FROM Register r
+			WHERE r.endDate < :now
+			AND r.isServiceExpired = false
+		""")
+	List<Register> findExpiredTarget(LocalDateTime now);
 }
 
 
