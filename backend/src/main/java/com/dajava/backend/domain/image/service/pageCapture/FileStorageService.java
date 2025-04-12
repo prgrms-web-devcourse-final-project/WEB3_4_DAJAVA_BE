@@ -64,7 +64,7 @@ public class FileStorageService {
 	 */
 	public String updateFile(MultipartFile file, PageCaptureData pageData) {
 		String fileExtension = getExtension(file.getOriginalFilename());
-		String fileName = pageData.getCaptureFileName();
+		String fileName = pageData.getCaptureFileName().substring(0, pageData.getCaptureFileName().lastIndexOf('.'));
 
 		if (fileName == null || fileName.isEmpty()) {
 			fileName = generateUniqueFileName(file);
@@ -79,7 +79,14 @@ public class FileStorageService {
 
 	private void saveFile(String fileName, MultipartFile file) {
 		try {
-			Path targetLocation = this.fileStorageLocation.resolve(fileName);
+			// 저장 디렉토리가 없으면 사전에 생성
+			Files.createDirectories(this.fileStorageLocation);
+
+			Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
+			if (!targetLocation.startsWith(this.fileStorageLocation)) {
+				throw new RuntimeException("잘못된 파일 경로입니다: " + fileName);
+			}
+
 			try (InputStream inputStream = file.getInputStream()) {
 				Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
 			}
