@@ -237,9 +237,9 @@ public class InitData {
 	 */
 	public void work3() {
 		// 공통적으로 사용되는 Fixed 값
-		Integer browserWidth = 1798;
+		Integer browserWidth = 1024;
 		Integer viewportHeight = 1280;
-		Integer scrollHeight = 2587;
+		Integer scrollHeight = 1024;
 		String serialNumber = "5_team_testSerial";
 		String pageUrl = "https://www.dajava.link/main";
 		String sessionId = "SolutionTestSessionId";

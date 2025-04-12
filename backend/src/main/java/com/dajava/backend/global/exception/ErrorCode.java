@@ -52,9 +52,14 @@ public enum ErrorCode {
 	SESSION_IDENTIFIER_NOT_FOUND(HttpStatus.NOT_FOUND, "sessionIdentify가 없습니다."),
 	SESSION_IDENTIFIER_PARSING_NOT_FOUND(HttpStatus.BAD_REQUEST, "Key 문자열이 없습니다."),
 	SESSION_IDENTIFIER_PARSING_ERROR(HttpStatus.BAD_REQUEST, "문자열 양식이 맞지 않습니다."),
-	REDIS_CACHING_ERROR(HttpStatus.BAD_REQUEST, "Redis에 저장하지 못했습니다.");
+	REDIS_CACHING_ERROR(HttpStatus.BAD_REQUEST, "Redis에 저장하지 못했습니다."),
 
+	// Image
+	INVALID_IMAGE_FILE(HttpStatus.BAD_REQUEST, "유효한 이미지 파일이 아닙니다."),
+	IMAGE_IO_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 읽기 중 오류가 발생했습니다."),
 
+	// Heatmap
+	PAGE_CAPTURE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지가 없어 히트맵을 불러올 수 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String description;

@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
@@ -26,12 +29,15 @@ import com.dajava.backend.domain.heatmap.dto.HeatmapMetadata;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
 import com.dajava.backend.domain.heatmap.validation.UrlEqualityValidator;
+import com.dajava.backend.domain.image.ImageDimensions;
+import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.global.utils.PasswordUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +56,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 	private final RegisterRepository registerRepository;
 	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
 	private final UrlEqualityValidator urlEqualityValidator;
+	private final FileStorageService fileStorageService;
 
 	// 고정 그리드 사이즈
 	// 추후 기능 확장시 해당 사이즈를 인자로 받아 조정하도록 만들 계획
@@ -118,9 +125,26 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 			if (optionalData.isPresent()) {
 				String captureFileName = optionalData.get().getCaptureFileName();
+
+				// request 객체 획득
+				HttpServletRequest request = ((ServletRequestAttributes)Objects.requireNonNull(RequestContextHolder
+					.getRequestAttributes())).getRequest();
+
+				// 이미지의 높이, 너비를 BufferedImage 로 변환후 획득
+				ImageDimensions imageDimensions = fileStorageService.getImageDimensions(captureFileName, request);
+				int pageWidth = imageDimensions.pageWidth();
+				int pageHeight = imageDimensions.pageHeight();
+
 				response = response.toBuilder()
+					.gridSize(GRID_SIZE)
+					.gridSizeX(pageWidth / GRID_SIZE)
+					.gridSizeY(pageHeight / GRID_SIZE)
 					.pageCapture(captureFileName)
+					.pageWidth(pageWidth)
+					.pageHeight(pageHeight)
 					.build();
+			} else {
+				throw new HeatmapException(PAGE_CAPTURE_NOT_FOUND);
 			}
 
 			// 소요 시간 측정
@@ -177,7 +201,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 */
 	private HeatmapResponse createEmptyHeatmapResponse() {
 		return HeatmapResponse.builder()
-			.gridSize(GRID_SIZE)
+			.gridSizeX(103)
+			.gridSizeY(103)
 			.pageWidth(1024)
 			.pageHeight(1024) // 기본값
 			.gridCells(Collections.emptyList())
@@ -325,9 +350,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
-			.gridSize(GRID_SIZE)
-			.pageWidth(maxPageWidth)
-			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();
@@ -464,9 +486,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
-			.gridSize(GRID_SIZE)
-			.pageWidth(maxPageWidth)
-			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();

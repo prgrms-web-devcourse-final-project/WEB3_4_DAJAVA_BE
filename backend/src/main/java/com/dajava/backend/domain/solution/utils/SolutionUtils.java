@@ -14,8 +14,9 @@ public final class SolutionUtils {
 	 * @return 생성된 프롬프트 문자열
 	 */
 	public static String refinePrompt(List<SolutionRequest.EventDataDto> eventData) {
-		return String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요. 브라우저 width는 1024px이고 브라우저 환경은 Chrome이야 글자는 400자 이내로 해줘: %s", eventData);
+		return String.format("다음 사용자 세션 데이터를 분석하여 UI/UX 개선점을 제안해주세요. 브라우저 환경은 Chrome이야 글자는 400자 이내로 해줘: %s", eventData);
 	}
+
 	/**
 	 * 프롬프트를 바탕으로 AI에게 전달할 데이터 형식을 생성합니다.
 	 * @param prompt UI/UX 개선을 위한 프롬프트
@@ -24,6 +25,7 @@ public final class SolutionUtils {
 	public static String buildRefineData(String prompt) {
 		return String.format("{\"contents\": [{\"parts\": [{\"text\": \"%s\"}]}]}", prompt);
 	}
+
 	/**
 	 * SolutionData 객체에서 serialNumber를 추출합니다.
 	 * @param solutionRequest solutionRequestDto 객체
@@ -36,6 +38,7 @@ public final class SolutionUtils {
 		}
 		return solutionRequest.serialNumber();
 	}
+
 	/**
 	 * SolutionData 객체에서 event data를 추출합니다.
 	 * @param solutionRequest solutionRequestDto 객체
