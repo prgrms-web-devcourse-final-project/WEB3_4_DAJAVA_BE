@@ -132,10 +132,15 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 				// 이미지의 높이, 너비를 BufferedImage 로 변환후 획득
 				ImageDimensions imageDimensions = fileStorageService.getImageDimensions(captureFileName, request);
+				int pageWidth = imageDimensions.pageWidth();
+				int pageHeight = imageDimensions.pageHeight();
+
 				response = response.toBuilder()
+					.gridSizeX(pageWidth / GRID_SIZE)
+					.gridSizeY(pageHeight / GRID_SIZE)
 					.pageCapture(captureFileName)
-					.pageWidth(imageDimensions.pageWidth())
-					.pageHeight(imageDimensions.pageHeight())
+					.pageWidth(pageWidth)
+					.pageHeight(pageHeight)
 					.build();
 			}
 
@@ -193,7 +198,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 	 */
 	private HeatmapResponse createEmptyHeatmapResponse() {
 		return HeatmapResponse.builder()
-			.gridSize(GRID_SIZE)
+			.gridSizeX(103)
+			.gridSizeY(103)
 			.pageWidth(1024)
 			.pageHeight(1024) // 기본값
 			.gridCells(Collections.emptyList())
@@ -341,7 +347,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
-			.gridSize(GRID_SIZE)
+			.gridSizeX(0)
+			.gridSizeY(0)
 			.pageWidth(maxPageWidth)
 			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
@@ -480,7 +487,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
-			.gridSize(GRID_SIZE)
+			.gridSizeX(0)
+			.gridSizeY(0)
 			.pageWidth(maxPageWidth)
 			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
