@@ -1,5 +1,6 @@
 package com.dajava.backend.domain.image.service.pageCapture;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -8,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.dajava.backend.domain.image.ImageDimensions;
+import com.dajava.backend.domain.image.exception.ImageException;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
+import com.dajava.backend.global.exception.ErrorCode;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -140,6 +146,34 @@ public class FileStorageService {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 처리 중 오류가 발생했습니다.", ex);
 		}
 	}
+
+	/**
+	 * 주어진 파일 이름으로 이미지의 높이와 너비를 추출하는 메서드
+	 * @param fileName 이미지 파일 이름 (예: UUID 기반의 파일명 + 확장자)
+	 * @param request  HTTP 요청 정보
+	 * @return 이미지의 높이와 너비를 담은 DTO 객체
+	 */
+	public ImageDimensions getImageDimensions(String fileName, HttpServletRequest request) {
+		try {
+			// 기존 getImage() 메서드 호출
+			Resource imageResource = getImage(fileName, request);
+
+			// 이미지 스트림을 BufferedImage 로 변환
+			BufferedImage image = ImageIO.read(imageResource.getInputStream());
+			if (image == null) {
+				throw new ImageException(ErrorCode.INVALID_IMAGE_FILE);
+			}
+
+			// 높이와 너비 추출
+			int width = image.getWidth();
+			int height = image.getHeight();
+
+			return new ImageDimensions(width, height);
+		} catch (IOException e) {
+			throw new ImageException(ErrorCode.IMAGE_IO_ERROR);
+		}
+	}
+
 }
 
 

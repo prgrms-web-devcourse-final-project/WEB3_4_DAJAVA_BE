@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
@@ -26,12 +29,15 @@ import com.dajava.backend.domain.heatmap.dto.HeatmapMetadata;
 import com.dajava.backend.domain.heatmap.dto.HeatmapResponse;
 import com.dajava.backend.domain.heatmap.exception.HeatmapException;
 import com.dajava.backend.domain.heatmap.validation.UrlEqualityValidator;
+import com.dajava.backend.domain.image.ImageDimensions;
+import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.global.utils.PasswordUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +56,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 	private final RegisterRepository registerRepository;
 	private final SolutionEventDocumentRepository solutionEventDocumentRepository;
 	private final UrlEqualityValidator urlEqualityValidator;
+	private final FileStorageService fileStorageService;
 
 	// 고정 그리드 사이즈
 	// 추후 기능 확장시 해당 사이즈를 인자로 받아 조정하도록 만들 계획
@@ -118,8 +125,17 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 			if (optionalData.isPresent()) {
 				String captureFileName = optionalData.get().getCaptureFileName();
+
+				// request 객체 획득
+				HttpServletRequest request = ((ServletRequestAttributes)Objects.requireNonNull(RequestContextHolder
+					.getRequestAttributes())).getRequest();
+
+				// 이미지의 높이, 너비를 BufferedImage 로 변환후 획득
+				ImageDimensions imageDimensions = fileStorageService.getImageDimensions(captureFileName, request);
 				response = response.toBuilder()
 					.pageCapture(captureFileName)
+					.pageWidth(imageDimensions.pageWidth())
+					.pageHeight(imageDimensions.pageHeight())
 					.build();
 			}
 
@@ -269,8 +285,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 			int y = event.getClientY() + event.getScrollY();
 
 			// 페이지 크기 업데이트
-			maxPageWidth = Math.max(maxPageWidth, event.getBrowserWidth());
-			maxPageHeight = Math.max(maxPageHeight, event.getScrollHeight());
+			// maxPageWidth = Math.max(maxPageWidth, event.getBrowserWidth());
+			// maxPageHeight = Math.max(maxPageHeight, event.getScrollHeight());
 
 			// 이벤트 시간 업데이트
 			if (firstEventTime == null || event.getTimestamp().isBefore(firstEventTime)) {
@@ -371,14 +387,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 		sessionIds.add(prevEvent.getSessionId());
 
 		// 전체 페이지 크기 업데이트
-		if (prevEvent.getBrowserWidth() != null) {
-			maxPageWidth = Math.max(maxPageWidth, prevEvent.getBrowserWidth());
-		}
-		if (prevEvent.getScrollHeight() != null) {
-			maxPageHeight = Math.max(maxPageHeight, prevEvent.getScrollHeight());
-		} else if (prevEvent.getViewportHeight() != null) {
-			maxPageHeight = Math.max(maxPageHeight, prevEvent.getViewportHeight());
-		}
+		// if (prevEvent.getBrowserWidth() != null) {
+		// 	maxPageWidth = Math.max(maxPageWidth, prevEvent.getBrowserWidth());
+		// }
+		// if (prevEvent.getScrollHeight() != null) {
+		// 	maxPageHeight = Math.max(maxPageHeight, prevEvent.getScrollHeight());
+		// } else if (prevEvent.getViewportHeight() != null) {
+		// 	maxPageHeight = Math.max(maxPageHeight, prevEvent.getViewportHeight());
+		// }
 
 		// event 리스트에서 전후 데이터의 타임스탬프를 비교해 grid 정보를 생성하는 로직
 		for (int i = 1; i < filteredEvents.size(); i++) {
@@ -390,14 +406,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 			}
 
 			// 전체 페이지 크기 업데이트
-			if (cntEvent.getBrowserWidth() != null) {
-				maxPageWidth = Math.max(maxPageWidth, cntEvent.getBrowserWidth());
-			}
-			if (cntEvent.getScrollHeight() != null) {
-				maxPageHeight = Math.max(maxPageHeight, cntEvent.getScrollHeight());
-			} else if (cntEvent.getViewportHeight() != null) {
-				maxPageHeight = Math.max(maxPageHeight, cntEvent.getViewportHeight());
-			}
+			// if (cntEvent.getBrowserWidth() != null) {
+			// 	maxPageWidth = Math.max(maxPageWidth, cntEvent.getBrowserWidth());
+			// }
+			// if (cntEvent.getScrollHeight() != null) {
+			// 	maxPageHeight = Math.max(maxPageHeight, cntEvent.getScrollHeight());
+			// } else if (cntEvent.getViewportHeight() != null) {
+			// 	maxPageHeight = Math.max(maxPageHeight, cntEvent.getViewportHeight());
+			// }
 
 			// 두 이벤트 시간 간격 계산
 			long duration = Duration.between(prevEvent.getTimestamp(), cntEvent.getTimestamp()).toMillis();
