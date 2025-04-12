@@ -260,6 +260,10 @@ public class HeatmapServiceImpl implements HeatmapService {
 			return createEmptyHeatmapResponse();
 		}
 
+		// 전체 페이지 크기 초기화
+		int maxPageWidth = 0;
+		int maxPageHeight = 0;
+
 		// 그리드 맵 - 좌표를 키로 사용하는 HashMap
 		Map<String, Integer> gridMap = new HashMap<>();
 
@@ -290,8 +294,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 			int y = event.getClientY() + event.getScrollY();
 
 			// 페이지 크기 업데이트
-			// maxPageWidth = Math.max(maxPageWidth, event.getBrowserWidth());
-			// maxPageHeight = Math.max(maxPageHeight, event.getScrollHeight());
+			maxPageWidth = Math.max(maxPageWidth, event.getBrowserWidth());
+			maxPageHeight = Math.max(maxPageHeight, event.getScrollHeight());
 
 			// 이벤트 시간 업데이트
 			if (firstEventTime == null || event.getTimestamp().isBefore(firstEventTime)) {
@@ -369,6 +373,9 @@ public class HeatmapServiceImpl implements HeatmapService {
 			return createEmptyHeatmapResponse();
 		}
 
+		int maxPageWidth = 0;
+		int maxPageHeight = 0;
+
 		// 시간순 정렬로 데이터를 가져오므로, 첫 데이터와 마지막 데이터로 시간 설정
 		LocalDateTime firstEventTime = filteredEvents.getFirst().getTimestamp();
 		LocalDateTime lastEventTime = filteredEvents.getLast().getTimestamp();
@@ -386,14 +393,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 		sessionIds.add(prevEvent.getSessionId());
 
 		// 전체 페이지 크기 업데이트
-		// if (prevEvent.getBrowserWidth() != null) {
-		// 	maxPageWidth = Math.max(maxPageWidth, prevEvent.getBrowserWidth());
-		// }
-		// if (prevEvent.getScrollHeight() != null) {
-		// 	maxPageHeight = Math.max(maxPageHeight, prevEvent.getScrollHeight());
-		// } else if (prevEvent.getViewportHeight() != null) {
-		// 	maxPageHeight = Math.max(maxPageHeight, prevEvent.getViewportHeight());
-		// }
+		if (prevEvent.getBrowserWidth() != null) {
+			maxPageWidth = Math.max(maxPageWidth, prevEvent.getBrowserWidth());
+		}
+		if (prevEvent.getScrollHeight() != null) {
+			maxPageHeight = Math.max(maxPageHeight, prevEvent.getScrollHeight());
+		} else if (prevEvent.getViewportHeight() != null) {
+			maxPageHeight = Math.max(maxPageHeight, prevEvent.getViewportHeight());
+		}
 
 		// event 리스트에서 전후 데이터의 타임스탬프를 비교해 grid 정보를 생성하는 로직
 		for (int i = 1; i < filteredEvents.size(); i++) {
@@ -405,14 +412,14 @@ public class HeatmapServiceImpl implements HeatmapService {
 			}
 
 			// 전체 페이지 크기 업데이트
-			// if (cntEvent.getBrowserWidth() != null) {
-			// 	maxPageWidth = Math.max(maxPageWidth, cntEvent.getBrowserWidth());
-			// }
-			// if (cntEvent.getScrollHeight() != null) {
-			// 	maxPageHeight = Math.max(maxPageHeight, cntEvent.getScrollHeight());
-			// } else if (cntEvent.getViewportHeight() != null) {
-			// 	maxPageHeight = Math.max(maxPageHeight, cntEvent.getViewportHeight());
-			// }
+			if (cntEvent.getBrowserWidth() != null) {
+				maxPageWidth = Math.max(maxPageWidth, cntEvent.getBrowserWidth());
+			}
+			if (cntEvent.getScrollHeight() != null) {
+				maxPageHeight = Math.max(maxPageHeight, cntEvent.getScrollHeight());
+			} else if (cntEvent.getViewportHeight() != null) {
+				maxPageHeight = Math.max(maxPageHeight, cntEvent.getViewportHeight());
+			}
 
 			// 두 이벤트 시간 간격 계산
 			long duration = Duration.between(prevEvent.getTimestamp(), cntEvent.getTimestamp()).toMillis();
