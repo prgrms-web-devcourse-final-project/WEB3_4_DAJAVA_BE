@@ -2,6 +2,8 @@ package com.dajava.backend.domain.heatmap.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
@@ -21,9 +23,9 @@ public record HeatmapMetadata(
 	int totalSessions,
 
 	@Schema(description = "첫 이벤트 발생 시간")
-	LocalDateTime firstEventTime,
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime firstEventTime,
 
 	@Schema(description = "마지막 이벤트 발생 시간")
-	LocalDateTime lastEventTime
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime lastEventTime
 ) {
 }
