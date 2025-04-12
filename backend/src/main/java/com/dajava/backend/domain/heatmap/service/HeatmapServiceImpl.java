@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,8 +18,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.dajava.backend.domain.event.es.entity.SolutionEventDocument;
 import com.dajava.backend.domain.event.es.repository.SolutionEventDocumentRepository;
@@ -37,7 +34,6 @@ import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.global.utils.PasswordUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -126,12 +122,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 			if (optionalData.isPresent()) {
 				String captureFileName = optionalData.get().getCaptureFileName();
 
-				// request 객체 획득
-				HttpServletRequest request = ((ServletRequestAttributes)Objects.requireNonNull(RequestContextHolder
-					.getRequestAttributes())).getRequest();
-
 				// 이미지의 높이, 너비를 BufferedImage 로 변환후 획득
-				ImageDimensions imageDimensions = fileStorageService.getImageDimensions(captureFileName, request);
+				ImageDimensions imageDimensions = fileStorageService.getImageDimensions(captureFileName);
 				int pageWidth = imageDimensions.pageWidth();
 				int pageHeight = imageDimensions.pageHeight();
 
