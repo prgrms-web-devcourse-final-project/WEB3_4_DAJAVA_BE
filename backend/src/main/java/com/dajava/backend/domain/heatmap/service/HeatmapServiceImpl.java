@@ -136,12 +136,15 @@ public class HeatmapServiceImpl implements HeatmapService {
 				int pageHeight = imageDimensions.pageHeight();
 
 				response = response.toBuilder()
+					.gridSize(GRID_SIZE)
 					.gridSizeX(pageWidth / GRID_SIZE)
 					.gridSizeY(pageHeight / GRID_SIZE)
 					.pageCapture(captureFileName)
 					.pageWidth(pageWidth)
 					.pageHeight(pageHeight)
 					.build();
+			} else {
+				throw new HeatmapException(PAGE_CAPTURE_NOT_FOUND);
 			}
 
 			// 소요 시간 측정
@@ -257,10 +260,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 			return createEmptyHeatmapResponse();
 		}
 
-		// 전체 페이지 크기 초기화
-		int maxPageWidth = 0;
-		int maxPageHeight = 0;
-
 		// 그리드 맵 - 좌표를 키로 사용하는 HashMap
 		Map<String, Integer> gridMap = new HashMap<>();
 
@@ -347,10 +346,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
-			.gridSizeX(0)
-			.gridSizeY(0)
-			.pageWidth(maxPageWidth)
-			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();
@@ -373,9 +368,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 		if (filteredEvents.isEmpty()) {
 			return createEmptyHeatmapResponse();
 		}
-
-		int maxPageWidth = 0;
-		int maxPageHeight = 0;
 
 		// 시간순 정렬로 데이터를 가져오므로, 첫 데이터와 마지막 데이터로 시간 설정
 		LocalDateTime firstEventTime = filteredEvents.getFirst().getTimestamp();
@@ -487,10 +479,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
-			.gridSizeX(0)
-			.gridSizeY(0)
-			.pageWidth(maxPageWidth)
-			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();

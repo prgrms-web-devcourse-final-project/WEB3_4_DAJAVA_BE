@@ -8,6 +8,9 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 @Schema(description = "히트맵 응답 DTO")
 public record HeatmapResponse(
+	@Schema(description = "그리드 단위 (현재는 10px 값으로 고정해서 히트맵 데이터 생성)", example = "10")
+	int gridSize,
+
 	@Schema(description = "X 그리드 갯수 (pageWidth 를 그리드 사이즈로 나눈 값)", example = "192")
 	int gridSizeX,
 
