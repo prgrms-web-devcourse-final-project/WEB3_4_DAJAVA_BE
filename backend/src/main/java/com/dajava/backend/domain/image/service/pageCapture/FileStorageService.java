@@ -120,43 +120,39 @@ public class FileStorageService {
 	 * Resource 형태로 로드합니다.
 	 *
 	 * @param fileName 이미지 파일 이름 (예: UUID 기반의 파일명 + 확장자)
-	 * @param request  HTTP 요청 정보 (MIME 타입 확인 용도)
 	 * @return Resource 형태의 이미지 파일
 	 */
-	public Resource getImage(String fileName, HttpServletRequest request) {
+	public Resource getImage(String fileName) {
 		try {
 			// 파일 저장 경로에서 파일명을 사용해 절대 파일 경로 계산
 			Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
-			Resource resource = new UrlResource(filePath.toUri());
 
-			if (!resource.exists()) {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다.");
+			// 보안 체크: 계산된 경로가 fileStorageLocation 하위에 있는지 확인
+			if (!filePath.startsWith(this.fileStorageLocation)) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 파일 경로입니다.");
 			}
 
-			// ServletContext 를 통해 MIME 타입 결정
-			String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-			if (contentType == null) {
-				contentType = "application/octet-stream";
+			Resource resource = new UrlResource(filePath.toUri());
+
+			if (!resource.exists() || !resource.isReadable()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다.");
 			}
 
 			return resource;
 		} catch (MalformedURLException ex) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "잘못된 파일 경로입니다.", ex);
-		} catch (IOException ex) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 처리 중 오류가 발생했습니다.", ex);
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 파일 경로입니다.", ex);
 		}
 	}
 
 	/**
 	 * 주어진 파일 이름으로 이미지의 높이와 너비를 추출하는 메서드
 	 * @param fileName 이미지 파일 이름 (예: UUID 기반의 파일명 + 확장자)
-	 * @param request  HTTP 요청 정보
 	 * @return 이미지의 높이와 너비를 담은 DTO 객체
 	 */
-	public ImageDimensions getImageDimensions(String fileName, HttpServletRequest request) {
+	public ImageDimensions getImageDimensions(String fileName) {
 		try {
 			// 기존 getImage() 메서드 호출
-			Resource imageResource = getImage(fileName, request);
+			Resource imageResource = getImage(fileName);
 
 			// 이미지 스트림을 BufferedImage 로 변환
 			BufferedImage image = ImageIO.read(imageResource.getInputStream());
@@ -174,6 +170,17 @@ public class FileStorageService {
 		}
 	}
 
+	public String determineContentType(Resource resource, HttpServletRequest request) {
+		try {
+			String contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+			return (contentType != null && !contentType.isEmpty())
+				? contentType
+				: "application/octet-stream";
+		} catch (Exception ex) {
+			// MIME 타입 결정 실패 시 기본 값 반환
+			return "application/octet-stream";
+		}
+	}
 }
 
 

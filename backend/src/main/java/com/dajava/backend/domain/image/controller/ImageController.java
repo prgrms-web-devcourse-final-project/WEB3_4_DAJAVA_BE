@@ -1,11 +1,11 @@
 package com.dajava.backend.domain.image.controller;
 
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
@@ -39,8 +39,13 @@ public class ImageController {
 		summary = "이미지 캡쳐 파일 로드",
 		description = "URL 경로의 파일명으로 파일을 로드합니다")
 	@GetMapping("/{fileName:.+}")
-	@ResponseStatus(HttpStatus.OK)
-	public Resource getImage(@PathVariable String fileName, HttpServletRequest request) {
-		return fileStorageService.getImage(fileName, request);
+	public ResponseEntity<Resource> getImage(@PathVariable String fileName, HttpServletRequest request) {
+		Resource resource = fileStorageService.getImage(fileName);
+
+		String contentType = fileStorageService.determineContentType(resource, request);
+
+		return ResponseEntity.ok()
+			.contentType(MediaType.parseMediaType(contentType))
+			.body(resource);
 	}
 }
