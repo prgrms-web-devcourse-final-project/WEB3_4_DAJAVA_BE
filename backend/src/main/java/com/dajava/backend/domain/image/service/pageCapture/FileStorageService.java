@@ -158,18 +158,21 @@ public class FileStorageService {
 	 */
 	public ImageDimensions getImageDimensions(String fileName) {
 		try {
+			// 이미지 이상을 대비해 width, height 기본값 설정
+			int width = 0;
+			int height = 0;
+
 			// 기존 getImage() 메서드 호출
 			Resource imageResource = getImage(fileName);
 
 			// 이미지 스트림을 BufferedImage 로 변환
 			BufferedImage image = ImageIO.read(imageResource.getInputStream());
-			if (image == null) {
-				throw new ImageException(ErrorCode.INVALID_IMAGE_FILE);
-			}
 
-			// 높이와 너비 추출
-			int width = image.getWidth();
-			int height = image.getHeight();
+			// 불러온 이미지에 이상이 없다면 높이와 너비 추출
+			if (image != null) {
+				width = image.getWidth();
+				height = image.getHeight();
+			}
 
 			return new ImageDimensions(width, height);
 		} catch (IOException e) {

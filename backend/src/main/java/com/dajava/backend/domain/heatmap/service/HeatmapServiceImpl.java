@@ -69,6 +69,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		if (type.equals("scroll")) {
 			sortByTimestamp = true;
 		}
+
 		try {
 			Register findRegister = registerRepository.findBySerialNumber(serialNumber)
 				.orElseThrow(() -> new HeatmapException(SOLUTION_SERIAL_NUMBER_INVALID));
@@ -127,16 +128,28 @@ public class HeatmapServiceImpl implements HeatmapService {
 				int pageWidth = imageDimensions.pageWidth();
 				int pageHeight = imageDimensions.pageHeight();
 
+				if (pageWidth == 0 && pageHeight == 0) {
+					// 이미지가 알 수 없는 이유로 손상된 경우 이벤트 기반 페이지 너비, 높이, 그리드 사이즈 그대로 사용
+					response = response.toBuilder()
+						.gridSize(GRID_SIZE)
+						.pageCapture("")
+						.build();
+				} else {
+					response = response.toBuilder()
+						.gridSize(GRID_SIZE)
+						.gridSizeX(pageWidth / GRID_SIZE)
+						.gridSizeY(pageHeight / GRID_SIZE)
+						.pageCapture(captureFileName)
+						.pageWidth(pageWidth)
+						.pageHeight(pageHeight)
+						.build();
+				}
+			} else {
+				// 이미지 관련 데이터가 없어도 반환된 데이터를 그대로 사용
 				response = response.toBuilder()
 					.gridSize(GRID_SIZE)
-					.gridSizeX(pageWidth / GRID_SIZE)
-					.gridSizeY(pageHeight / GRID_SIZE)
-					.pageCapture(captureFileName)
-					.pageWidth(pageWidth)
-					.pageHeight(pageHeight)
+					.pageCapture("")
 					.build();
-			} else {
-				throw new HeatmapException(PAGE_CAPTURE_NOT_FOUND);
 			}
 
 			// 소요 시간 측정
@@ -342,6 +355,10 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
+			.gridSizeX(maxPageWidth / GRID_SIZE)
+			.gridSizeY(maxPageHeight / GRID_SIZE)
+			.pageWidth(maxPageWidth)
+			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();
@@ -478,6 +495,10 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
+			.gridSizeX(maxPageWidth / GRID_SIZE)
+			.gridSizeY(maxPageHeight / GRID_SIZE)
+			.pageWidth(maxPageWidth)
+			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();
