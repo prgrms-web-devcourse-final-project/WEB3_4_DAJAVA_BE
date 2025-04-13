@@ -70,10 +70,6 @@ public class HeatmapServiceImpl implements HeatmapService {
 			sortByTimestamp = true;
 		}
 
-		// 이미지가 존재하지 않으면 기본 너비, 높이 설정
-		int pageWidth = 1024;
-		int pageHeight = 1024;
-
 		try {
 			Register findRegister = registerRepository.findBySerialNumber(serialNumber)
 				.orElseThrow(() -> new HeatmapException(SOLUTION_SERIAL_NUMBER_INVALID));
@@ -129,8 +125,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 				// 이미지의 높이, 너비를 BufferedImage 로 변환후 획득
 				ImageDimensions imageDimensions = fileStorageService.getImageDimensions(captureFileName);
-				pageWidth = imageDimensions.pageWidth();
-				pageHeight = imageDimensions.pageHeight();
+				int pageWidth = imageDimensions.pageWidth();
+				int pageHeight = imageDimensions.pageHeight();
 
 				response = response.toBuilder()
 					.gridSize(GRID_SIZE)
@@ -141,7 +137,11 @@ public class HeatmapServiceImpl implements HeatmapService {
 					.pageHeight(pageHeight)
 					.build();
 			} else {
-				throw new HeatmapException(PAGE_CAPTURE_NOT_FOUND);
+				// 이미지가 없어도 각 히트맵 생성 로직에서 각 그리드 사이즈, 페이지 너비 및 높이를 로그를 통해 생성해 반환함
+				response = response.toBuilder()
+					.gridSize(GRID_SIZE)
+					.pageCapture("") // 이미지가 없다면 빈 값 반환
+					.build();
 			}
 
 			// 소요 시간 측정
@@ -347,6 +347,10 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
+			.gridSizeX(maxPageWidth / GRID_SIZE)
+			.gridSizeY(maxPageHeight / GRID_SIZE)
+			.pageWidth(maxPageWidth)
+			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();
@@ -483,6 +487,10 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 		// Heatmap Response 생성
 		return HeatmapResponse.builder()
+			.gridSizeX(maxPageWidth / GRID_SIZE)
+			.gridSizeY(maxPageHeight / GRID_SIZE)
+			.pageWidth(maxPageWidth)
+			.pageHeight(maxPageHeight)
 			.gridCells(gridCells)
 			.metadata(metadata)
 			.build();
