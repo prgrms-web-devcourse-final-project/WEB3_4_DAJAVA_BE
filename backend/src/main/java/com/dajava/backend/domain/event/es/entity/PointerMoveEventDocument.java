@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.exception.ErrorCode;
@@ -29,10 +31,13 @@ public class PointerMoveEventDocument {
 	@Id
 	private String id;
 
+	@Field(type = FieldType.Keyword)
 	private String sessionId;
 
+	@Field(type = FieldType.Keyword)
 	private String pageUrl;
 
+	@Field(type = FieldType.Keyword)
 	private String memberSerialNumber;
 
 	private Long timestamp;

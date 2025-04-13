@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.annotations.Query;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 import com.dajava.backend.domain.event.es.entity.PointerScrollEventDocument;
@@ -31,5 +32,7 @@ public interface PointerScrollEventDocumentRepository
 	 * @return List<PointerMoveEventDocument>
 	 */
 	Page<PointerScrollEventDocument> findBySessionId(String sessionId, Pageable pageable);
+
+	boolean existsBySessionId(String sessionId);
 
 }

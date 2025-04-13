@@ -32,10 +32,13 @@ public class PointerScrollEventDocument {
 	@Id
 	private String id;
 
+	@Field(type = FieldType.Keyword)
 	private String sessionId;
 
+	@Field(type = FieldType.Keyword)
 	private String pageUrl;
 
+	@Field(type = FieldType.Keyword)
 	private String memberSerialNumber;
 
 	private Long timestamp;

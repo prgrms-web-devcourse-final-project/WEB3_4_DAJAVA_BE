@@ -33,8 +33,13 @@ public class PointerClickEventDocument {
 	@Id
 	private String id;
 
+	@Field(type = FieldType.Keyword)
 	private String sessionId;
+
+	@Field(type = FieldType.Keyword)
 	private String pageUrl;
+
+	@Field(type = FieldType.Keyword)
 	private String memberSerialNumber;
 
 	private Long timestamp;
@@ -45,6 +50,7 @@ public class PointerClickEventDocument {
 	private Integer scrollY;
 	private Integer scrollHeight;
 	private Integer viewportHeight;
+
 	private String element;
 
 	private Boolean isOutlier;
