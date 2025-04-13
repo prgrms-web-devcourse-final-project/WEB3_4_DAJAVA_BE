@@ -127,8 +127,8 @@ public class InitData {
 			cleanUp();
 			self.work1();
 			//self.work2();
-			//self.work3();
-			//self.work4();
+			self.work3();
+			self.work4();
 		};
 	}
 
