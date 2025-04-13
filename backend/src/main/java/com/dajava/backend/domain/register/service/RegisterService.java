@@ -134,12 +134,13 @@ public class RegisterService {
 			.toList();
 
 		long registersSize = registerRepository.count();
-		long totalPages = (long) Math.ceil((double) registersSize / request.pageSize());
+		long totalPages = (long)Math.ceil((double)registersSize / request.pageSize());
 
 		log.info("Solution 등록 리스트를 조회합니다. PageNum: {}, PageSize: {}, Search Count: {}",
 			request.pageNum(), request.pageSize(), registerInfos.size());
 
-		return RegistersInfoResponse.create(registerInfos, registersSize, totalPages, request.pageNum(), request.pageSize());
+		return RegistersInfoResponse.create(registerInfos, registersSize, totalPages, request.pageNum(),
+			request.pageSize());
 	}
 
 	/**
@@ -166,38 +167,20 @@ public class RegisterService {
 		String fileName;
 
 		try {
-			// 이미지 내용을 문자열로 읽어서 확인
+			// Base64 이미지 처리 및 저장
 			String content = new String(imageFile.getBytes(), StandardCharsets.UTF_8);
 
-			// Base64 형식의 이미지인지 확인
-			if (content.startsWith("data:")) {
-				// Base64 이미지 처리
-				if (optionalData.isPresent()) {
-					PageCaptureData existingData = optionalData.get();
-					fileName = fileStorageService.updateBase64Image(content, existingData, imageFile.getOriginalFilename());
-				} else {
-					fileName = fileStorageService.storeBase64Image(content, imageFile.getOriginalFilename());
-					PageCaptureData newData = PageCaptureData.builder()
-						.pageUrl(pageUrl)
-						.captureFileName(fileName)
-						.register(register)
-						.build();
-					captureDataList.add(newData);
-				}
+			if (optionalData.isPresent()) {
+				PageCaptureData existingData = optionalData.get();
+				fileName = fileStorageService.updateBase64Image(content, existingData, imageFile.getOriginalFilename());
 			} else {
-				// 일반 이미지 파일 처리 (기존 로직)
-				if (optionalData.isPresent()) {
-					PageCaptureData existingData = optionalData.get();
-					fileName = fileStorageService.updateFile(imageFile, existingData);
-				} else {
-					fileName = fileStorageService.storeFile(imageFile);
-					PageCaptureData newData = PageCaptureData.builder()
-						.pageUrl(pageUrl)
-						.captureFileName(fileName)
-						.register(register)
-						.build();
-					captureDataList.add(newData);
-				}
+				fileName = fileStorageService.storeBase64Image(content, imageFile.getOriginalFilename());
+				PageCaptureData newData = PageCaptureData.builder()
+					.pageUrl(pageUrl)
+					.captureFileName(fileName)
+					.register(register)
+					.build();
+				captureDataList.add(newData);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("이미지 처리 중 오류가 발생했습니다", e);
