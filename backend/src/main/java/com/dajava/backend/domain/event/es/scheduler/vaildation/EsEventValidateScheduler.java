@@ -2,7 +2,9 @@ package com.dajava.backend.domain.event.es.scheduler.vaildation;
 
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.elasticsearch.UncategorizedElasticsearchException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +21,7 @@ import com.dajava.backend.domain.log.converter.EventConverter;
 import com.dajava.backend.global.component.analyzer.BufferSchedulerProperties;
 import com.dajava.backend.global.utils.EventsUtils;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,7 +76,13 @@ public class EsEventValidateScheduler {
 					processSession(sessionDataDocument);
 				} catch (PointerEventException e) {
 					log.warn("세션 검증 실패 (이미 검증된 세션일 수 있음): {}, {}", sessionDataDocument.getSessionId(), e.getMessage());
-				} catch (Exception e) {
+				} catch (ElasticsearchException | UncategorizedElasticsearchException e) {
+					log.warn("세션 ID: {} - Elasticsearch 쿼리 실패", sessionDataDocument.getSessionId());
+					log.warn("Exception Message: {}", e.getMessage());
+					log.warn("Full Stack Trace", e);
+
+				}
+				catch (Exception e) {
 					log.error("예상치 못한 에러 발생 - 세션 ID: {}", sessionDataDocument.getSessionId(), e);
 				}
 			}

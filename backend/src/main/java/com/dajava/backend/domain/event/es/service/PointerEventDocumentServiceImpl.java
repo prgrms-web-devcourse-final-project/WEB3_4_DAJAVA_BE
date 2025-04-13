@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.event.es.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import com.dajava.backend.domain.event.exception.PointerEventException;
 import com.dajava.backend.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * PointerEventDocument 인터페이스 구현체
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class PointerEventDocumentServiceImpl implements PointerEventDocumentService {
 
 	private final PointerClickEventDocumentRepository clickEventDocumentRepository;
@@ -41,6 +44,11 @@ public class PointerEventDocumentServiceImpl implements PointerEventDocumentServ
 		List<PointerClickEventDocument> allEvents = new ArrayList<>();
 		int page = 0;
 		Page<PointerClickEventDocument> resultPage;
+
+		if (!clickEventDocumentRepository.existsBySessionId(sessionId)) {
+			log.info("해당 sessionId에 대한 이벤트 데이터가 없습니다: {}", sessionId);
+			return Collections.emptyList();
+		}
 
 		do {
 			PageRequest pageRequest = PageRequest.of(page, batchSize, Sort.by(Sort.Direction.ASC, "timestamp"));
@@ -58,6 +66,11 @@ public class PointerEventDocumentServiceImpl implements PointerEventDocumentServ
 		int page = 0;
 		Page<PointerMoveEventDocument> resultPage;
 
+		if (!moveEventDocumentRepository.existsBySessionId(sessionId)) {
+			log.info("해당 sessionId에 대한 이벤트 데이터가 없습니다: {}", sessionId);
+			return Collections.emptyList();
+		}
+
 		do {
 			PageRequest pageRequest = PageRequest.of(page, batchSize, Sort.by(Sort.Direction.ASC, "timestamp"));
 			resultPage = moveEventDocumentRepository.findBySessionId(sessionId, pageRequest);
@@ -73,6 +86,11 @@ public class PointerEventDocumentServiceImpl implements PointerEventDocumentServ
 		List<PointerScrollEventDocument> allEvents = new ArrayList<>();
 		int page = 0;
 		Page<PointerScrollEventDocument> resultPage;
+
+		if (!scrollEventDocumentRepository.existsBySessionId(sessionId)) {
+			log.info("해당 sessionId에 대한 이벤트 데이터가 없습니다: {}", sessionId);
+			return Collections.emptyList();
+		}
 
 		do {
 			PageRequest pageRequest = PageRequest.of(page, batchSize, Sort.by(Sort.Direction.ASC, "timestamp"));
