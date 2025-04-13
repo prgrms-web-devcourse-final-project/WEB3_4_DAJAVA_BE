@@ -69,6 +69,11 @@ public class HeatmapServiceImpl implements HeatmapService {
 		if (type.equals("scroll")) {
 			sortByTimestamp = true;
 		}
+
+		// 이미지가 존재하지 않으면 기본 너비, 높이 설정
+		int pageWidth = 1024;
+		int pageHeight = 1024;
+
 		try {
 			Register findRegister = registerRepository.findBySerialNumber(serialNumber)
 				.orElseThrow(() -> new HeatmapException(SOLUTION_SERIAL_NUMBER_INVALID));
@@ -124,8 +129,8 @@ public class HeatmapServiceImpl implements HeatmapService {
 
 				// 이미지의 높이, 너비를 BufferedImage 로 변환후 획득
 				ImageDimensions imageDimensions = fileStorageService.getImageDimensions(captureFileName);
-				int pageWidth = imageDimensions.pageWidth();
-				int pageHeight = imageDimensions.pageHeight();
+				pageWidth = imageDimensions.pageWidth();
+				pageHeight = imageDimensions.pageHeight();
 
 				response = response.toBuilder()
 					.gridSize(GRID_SIZE)
