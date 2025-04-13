@@ -83,7 +83,7 @@ public class EsEventValidateScheduler {
 
 				}
 				catch (Exception e) {
-					log.error("예상치 못한 에러 발생 - 세션 ID: {}", sessionDataDocument.getSessionId(), e);
+					log.error("	예상치 못한 에러 발생 - 세션 ID: {}", sessionDataDocument.getSessionId(), e);
 				}
 			}
 

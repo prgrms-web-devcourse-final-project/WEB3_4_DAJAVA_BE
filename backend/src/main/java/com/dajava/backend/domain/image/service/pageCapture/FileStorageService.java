@@ -191,6 +191,85 @@ public class FileStorageService {
 			return "application/octet-stream";
 		}
 	}
+
+	/**
+	 * Base64로 인코딩된 이미지 데이터를 저장하고 파일명을 반환합니다.
+	 * @param base64Image Base64로 인코딩된 이미지 데이터 (data:image/jpeg;base64, 포함 가능)
+	 * @param originalFilename 원본 파일명 (확장자 추출용)
+	 * @return 저장된 파일명
+	 */
+	public String storeBase64Image(String base64Image, String originalFilename) {
+		try {
+			// data:image/jpeg;base64, 형식 처리
+			if (base64Image.contains(",")) {
+				base64Image = base64Image.substring(base64Image.indexOf(",") + 1);
+			}
+
+			// Base64 디코딩
+			byte[] imageData = java.util.Base64.getDecoder().decode(base64Image);
+
+			// UUID 기반 파일명 생성
+			String fileExtension = getExtension(originalFilename);
+			String fileName = UUID.randomUUID().toString() + fileExtension;
+
+			// 파일 저장
+			Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
+			if (!targetLocation.startsWith(this.fileStorageLocation)) {
+				throw new RuntimeException("잘못된 파일 경로입니다: " + fileName);
+			}
+
+			Files.write(targetLocation, imageData);
+
+			return fileName;
+		} catch (IOException ex) {
+			throw new RuntimeException("Base64 이미지 저장에 실패했습니다.", ex);
+		}
+	}
+
+	/**
+	 * Base64로 인코딩된 이미지를 기존 PageCaptureData에 업데이트합니다.
+	 * @param base64Image Base64로 인코딩된 이미지 데이터
+	 * @param pageData 업데이트할 PageCaptureData 객체
+	 * @param originalFilename 원본 파일명 (확장자 추출용)
+	 * @return 저장된 파일명
+	 */
+	public String updateBase64Image(String base64Image, PageCaptureData pageData, String originalFilename) {
+		String fileExtension = getExtension(originalFilename);
+		String fileName = pageData.getCaptureFileName();
+
+		// 기존 파일명이 없는 경우 새로 생성
+		if (fileName == null || fileName.isEmpty()) {
+			fileName = UUID.randomUUID().toString() + fileExtension;
+		} else {
+			// 기존 파일명의 확장자 검사 및 조정
+			if (!fileName.endsWith(fileExtension) && !fileExtension.isEmpty()) {
+				fileName = fileName.substring(0, fileName.lastIndexOf('.')) + fileExtension;
+			}
+		}
+
+		try {
+			// data:image/jpeg;base64, 형식 처리
+			if (base64Image.contains(",")) {
+				base64Image = base64Image.substring(base64Image.indexOf(",") + 1);
+			}
+
+			// Base64 디코딩
+			byte[] imageData = java.util.Base64.getDecoder().decode(base64Image);
+
+			// 파일 저장
+			Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
+			if (!targetLocation.startsWith(this.fileStorageLocation)) {
+				throw new RuntimeException("잘못된 파일 경로입니다: " + fileName);
+			}
+
+			Files.write(targetLocation, imageData);
+			pageData.updateCaptureFileName(fileName);
+
+			return fileName;
+		} catch (IOException ex) {
+			throw new RuntimeException("Base64 이미지 업데이트에 실패했습니다.", ex);
+		}
+	}
 }
 
 
