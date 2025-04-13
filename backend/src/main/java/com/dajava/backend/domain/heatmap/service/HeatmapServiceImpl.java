@@ -128,19 +128,27 @@ public class HeatmapServiceImpl implements HeatmapService {
 				int pageWidth = imageDimensions.pageWidth();
 				int pageHeight = imageDimensions.pageHeight();
 
-				response = response.toBuilder()
-					.gridSize(GRID_SIZE)
-					.gridSizeX(pageWidth / GRID_SIZE)
-					.gridSizeY(pageHeight / GRID_SIZE)
-					.pageCapture(captureFileName)
-					.pageWidth(pageWidth)
-					.pageHeight(pageHeight)
-					.build();
+				if (pageWidth == 0 && pageHeight == 0) {
+					// 이미지가 알 수 없는 이유로 손상된 경우 이벤트 기반 페이지 너비, 높이, 그리드 사이즈 그대로 사용
+					response = response.toBuilder()
+						.gridSize(GRID_SIZE)
+						.pageCapture("")
+						.build();
+				} else {
+					response = response.toBuilder()
+						.gridSize(GRID_SIZE)
+						.gridSizeX(pageWidth / GRID_SIZE)
+						.gridSizeY(pageHeight / GRID_SIZE)
+						.pageCapture(captureFileName)
+						.pageWidth(pageWidth)
+						.pageHeight(pageHeight)
+						.build();
+				}
 			} else {
-				// 이미지가 없어도 각 히트맵 생성 로직에서 각 그리드 사이즈, 페이지 너비 및 높이를 로그를 통해 생성해 반환함
+				// 이미지 관련 데이터가 없어도 반환된 데이터를 그대로 사용
 				response = response.toBuilder()
 					.gridSize(GRID_SIZE)
-					.pageCapture("") // 이미지가 없다면 빈 값 반환
+					.pageCapture("")
 					.build();
 			}
 

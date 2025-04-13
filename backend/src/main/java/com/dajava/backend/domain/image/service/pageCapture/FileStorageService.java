@@ -159,8 +159,8 @@ public class FileStorageService {
 	public ImageDimensions getImageDimensions(String fileName) {
 		try {
 			// 이미지 이상을 대비해 width, height 기본값 설정
-			int width = 1024;
-			int height = 1024;
+			int width = 0;
+			int height = 0;
 
 			// 기존 getImage() 메서드 호출
 			Resource imageResource = getImage(fileName);
