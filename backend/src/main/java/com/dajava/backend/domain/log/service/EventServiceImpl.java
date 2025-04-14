@@ -26,11 +26,11 @@ public class EventServiceImpl implements EventService {
 				request.getSessionIdentifier().getPageUrl(),
 				request.getSessionIdentifier().getMemberSerialNumber()
 			);
-			log.info("[클릭 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
-				sessionIdentifier.getSessionId(),
-				sessionIdentifier.getPageUrl(),
-				sessionIdentifier.getMemberSerialNumber()
-			);
+			// log.info("[클릭 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
+			// 	sessionIdentifier.getSessionId(),
+			// 	sessionIdentifier.getPageUrl(),
+			// 	sessionIdentifier.getMemberSerialNumber()
+			// );
 			redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
 			eventRedisBuffer.addClickEvent(request, sessionIdentifier);
 		} catch (Exception e) {
@@ -47,11 +47,11 @@ public class EventServiceImpl implements EventService {
 				request.getSessionIdentifier().getPageUrl(),
 				request.getSessionIdentifier().getMemberSerialNumber()
 			);
-			log.info("[이동 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
-				sessionIdentifier.getSessionId(),
-				sessionIdentifier.getPageUrl(),
-				sessionIdentifier.getMemberSerialNumber()
-			);
+			// log.info("[이동 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
+			// 	sessionIdentifier.getSessionId(),
+			// 	sessionIdentifier.getPageUrl(),
+			// 	sessionIdentifier.getMemberSerialNumber()
+			// );
 			redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
 
 			eventRedisBuffer.addMoveEvent(request, sessionIdentifier);
@@ -70,11 +70,11 @@ public class EventServiceImpl implements EventService {
 				request.getSessionIdentifier().getMemberSerialNumber()
 			);
 
-			log.info("[스크롤 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
-				sessionIdentifier.getSessionId(),
-				sessionIdentifier.getPageUrl(),
-				sessionIdentifier.getMemberSerialNumber()
-			);
+			// log.info("[스크롤 이벤트] sessionId={}, pageUrl={}, memberSerial={}",
+			// 	sessionIdentifier.getSessionId(),
+			// 	sessionIdentifier.getPageUrl(),
+			// 	sessionIdentifier.getMemberSerialNumber()
+			// );
 			redisSessionDataService.createOrFindSessionDataDocument(sessionIdentifier);
 			eventRedisBuffer.addScrollEvent(request, sessionIdentifier);
 		} catch (Exception e) {
