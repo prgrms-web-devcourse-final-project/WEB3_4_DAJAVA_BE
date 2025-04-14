@@ -34,6 +34,7 @@ import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.global.utils.PasswordUtils;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -99,7 +100,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 			int totalEvents = events.size();
 
 			// 이벤트 샘플링으로 데이터가 방대한 경우 반환 시간 최적화
-			if (events.size() > 1000) {
+			if (events.size() > 10000) {
 				events = sampleEvents(events, type);
 			}
 
@@ -189,7 +190,26 @@ public class HeatmapServiceImpl implements HeatmapService {
 			} else {
 				pageRequest = PageRequest.of(pageNumber, PAGE_SIZE);
 			}
-			pageData = solutionEventDocumentRepository.findBySerialNumber(serialNumber, pageRequest);
+			try {
+				pageData = solutionEventDocumentRepository.findBySerialNumber(serialNumber, pageRequest);
+			} catch (ElasticsearchException ex) {
+				log.error("Elasticsearch 쿼리 실패! 예외 메시지: {}", ex.getMessage());
+				log.error("예외 클래스: {}", ex.getClass().getName());
+
+				Throwable rootCause = ex.getCause(); // 혹은 getRootCause() 대신 getCause() 반복적으로 추적
+
+				if (rootCause != null) {
+					log.error("루트 원인 클래스: {}", rootCause.getClass().getName());
+					log.error("루트 원인 메시지: {}", rootCause.getMessage());
+				}
+
+				// 전체 스택 트레이스 출력
+				for (StackTraceElement trace : ex.getStackTrace()) {
+					log.debug("TRACE: {}", trace.toString());
+				}
+
+				throw new HeatmapException(ELASTICSEARCH_QUERY_FAILED);
+			}
 			allEvents.addAll(pageData);
 			pageNumber++;
 		} while (!pageData.isEmpty());
@@ -228,7 +248,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		int sampleRate;
 
 		if ("move".equalsIgnoreCase(eventType)) {
-			sampleRate = events.size() > 10000 ? 20 : 10; // 이동 이벤트가 10000개 이상 ? 20 : 1 / 10 : 1
+			sampleRate = events.size() > 10000 ? 10 : 5; // 이동 이벤트가 10000개 이상 ? 20 : 1 / 10 : 1
 		} else if ("scroll".equalsIgnoreCase(eventType)) {
 			sampleRate = 5; // 스크롤 이벤트 5 : 1
 		} else {
