@@ -99,7 +99,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 			int totalEvents = events.size();
 
 			// 이벤트 샘플링으로 데이터가 방대한 경우 반환 시간 최적화
-			if (events.size() > 1000) {
+			if (events.size() > 10000) {
 				events = sampleEvents(events, type);
 			}
 
@@ -228,7 +228,7 @@ public class HeatmapServiceImpl implements HeatmapService {
 		int sampleRate;
 
 		if ("move".equalsIgnoreCase(eventType)) {
-			sampleRate = events.size() > 10000 ? 20 : 10; // 이동 이벤트가 10000개 이상 ? 20 : 1 / 10 : 1
+			sampleRate = events.size() > 10000 ? 10 : 5; // 이동 이벤트가 10000개 이상 ? 20 : 1 / 10 : 1
 		} else if ("scroll".equalsIgnoreCase(eventType)) {
 			sampleRate = 5; // 스크롤 이벤트 5 : 1
 		} else {
