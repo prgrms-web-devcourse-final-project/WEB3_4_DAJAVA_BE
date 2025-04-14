@@ -237,9 +237,9 @@ public class InitData {
 	 */
 	public void work3() {
 		// 공통적으로 사용되는 Fixed 값
-		Integer browserWidth = 1024;
-		Integer viewportHeight = 1280;
-		Integer scrollHeight = 1024;
+		Integer browserWidth = 1920;
+		Integer viewportHeight = 1080;
+		Integer scrollHeight = 2543;
 		String serialNumber = "5_team_testSerial";
 		String pageUrl = "https://www.dajava.link/main";
 		String sessionId = "SolutionTestSessionId";
@@ -260,14 +260,14 @@ public class InitData {
 
 		// 우상단 네비게이션 버튼 Fixed 값
 		Integer navScrollY = 0;
-		Integer navClientX1 = 1135;
-		Integer navClientX2 = 1255;
-		Integer navClientX3 = 1370;
-		Integer navClientX4 = 1535;
-		Integer navClientX5 = 1675;
+		Integer navClientX1 = 1308;
+		Integer navClientX2 = 1417;
+		Integer navClientX3 = 1532;
+		Integer navClientX4 = 1673;
+		Integer navClientX5 = 1821;
 		Integer navClientY1 = 50;
-		Integer navXRange = 25;
-		Integer navYRange = 10;
+		Integer navXRange = 35;
+		Integer navYRange = 15;
 
 		List<Integer> navClientXList = Arrays.asList(navClientX1, navClientX2, navClientX3, navClientX4, navClientX5);
 
@@ -287,14 +287,21 @@ public class InitData {
 				navClientY1 + getRandomOffset(navYRange),                       // clientY
 				"button",                                                       // element
 				serialNumber,                                                   // serialNumber
-				i % 10 == 0                                                     // isOutlier
+				i % 25 == 0                                                     // isOutlier
 			);
 			docs.add(doc);
 		}
 
 		// 우상단 네비게이션 버튼 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
 		for (int i = 0; i < 2000; i++) {
-			Integer navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange) * 5;
+			int navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange) * 5;
+			int navClientY = navClientY1 + getRandomOffset(navYRange);
+			if (navClientX > 1919) {
+				navClientX = 1919;
+			}
+			if (navClientY < 0) {
+				navClientY = 0;
+			}
 			SolutionEventDocument doc = SolutionEventDocument.create(
 				sessionId,                                                         // 사용자 식별자
 				pageUrl,                                                         // 이벤트 페이지 URL
@@ -305,7 +312,7 @@ public class InitData {
 				browserWidth,                                                    // browserWidth
 				timestamp + i,                                                   // timestamp (밀리초 단위)
 				navClientX,                                                      // clientX
-				navClientY1 + getRandomOffset(navYRange) * 5,                    // clientY
+				navClientY,                                                         // clientY
 				null,                                                            // element
 				serialNumber,                                                    // serialNumber
 				i % 10 == 0                                                      // isOutlier
@@ -314,11 +321,11 @@ public class InitData {
 		}
 
 		// 사이트 각 섹션 카드 Fixed 값
-		Integer heroScrollY = 900;
-		Integer heroClientX1 = 525;
-		Integer heroClientX2 = 890;
-		Integer heroClientX3 = 1270;
-		Integer heroClientY1 = 280;
+		Integer heroScrollY = 800;
+		Integer heroClientX1 = 595;
+		Integer heroClientX2 = 965;
+		Integer heroClientX3 = 1335;
+		Integer heroClientY1 = 310;
 		Integer heroClientY2 = 825;
 		Integer heroXRange = 100;
 		Integer heroYRange = 200;
@@ -343,17 +350,23 @@ public class InitData {
 				heroClientY,                                                     // clientY
 				"img",                                                           // element
 				serialNumber,                                                    // serialNumber
-				i % 10 == 0                                                      // isOutlier
+				i % 25 == 0                                                      // isOutlier
 			);
 			docs.add(doc);
 		}
 
 		// 중앙 섹션 카드 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
 		for (int i = 0; i < 2000; i++) {
-			Integer heroClientX =
+			int heroClientX =
 				heroClientXList.get((i / 3) % heroClientXList.size()) + getRandomOffset(heroXRange) * 5;
-			Integer heroClientY =
+			int heroClientY =
 				heroClientYList.get((i / 2) % heroClientYList.size()) + getRandomOffset(heroYRange) * 5;
+			if (heroClientY < 0) {
+				heroClientY = 0;
+			}
+			if (heroClientY > 1919) {
+				heroClientY = 1919;
+			}
 			SolutionEventDocument doc = SolutionEventDocument.create(
 				sessionId,                                                       // 사용자 식별자
 				pageUrl,                                                         // 이벤트 페이지 URL
@@ -374,10 +387,10 @@ public class InitData {
 
 		// 가운데 솔루션 신청 버튼 Fixed 값
 		Integer middleScrollY = 0;
-		Integer middleClientX1 = 895;
-		Integer middleClientY1 = 546;
+		Integer middleClientX1 = 965;
+		Integer middleClientY1 = 517;
 		Integer middleXRange = 35;
-		Integer middleYRange = 5;
+		Integer middleYRange = 10;
 
 		// 중앙 솔루션 신청 버튼 클릭 이벤트 생성 [정상 및 비정상 데이터]
 		for (int i = 0; i < 250; i++) {
@@ -396,15 +409,15 @@ public class InitData {
 				middleClientY,                                                   // clientY
 				"button",                                                        // element
 				serialNumber,                                                    // serialNumber
-				i % 10 == 0                                                      // isOutlier
+				i % 25 == 0                                                      // isOutlier
 			);
 			docs.add(doc);
 		}
 
 		// 중앙 솔루션 신청 버튼 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
 		for (int i = 0; i < 1000; i++) {
-			Integer middleClientX = middleClientX1 + getRandomOffset(middleXRange) * 5;
-			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange) * 5;
+			Integer middleClientX = middleClientX1 + getRandomOffset(middleXRange) * 10;
+			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange) * 10;
 			SolutionEventDocument doc = SolutionEventDocument.create(
 				sessionId,                                                       // 사용자 식별자
 				pageUrl,                                                         // 이벤트 페이지 URL
