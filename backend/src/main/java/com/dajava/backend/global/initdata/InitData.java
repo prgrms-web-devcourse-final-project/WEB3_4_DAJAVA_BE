@@ -282,269 +282,330 @@ public class InitData {
 		// 공통적으로 사용되는 Fixed 값
 		Integer browserWidth = 1920;
 		Integer viewportHeight = 1080;
-		Integer scrollHeight = 2617;
+		Integer scrollHeight = 2671;
 		String serialNumber = "5_team_testSerial";
 		String pageUrl = "https://mock.page";
-		String sessionId = "SolutionTestSessionId";
+		String baseSessionId = "SolutionTestSessionId";
 
 		LocalDateTime now = LocalDateTime.now();
 		long timestamp = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-		SessionDataDocument sessionData = SessionDataDocument.create(
-			sessionId,                                                           // sessionId
-			serialNumber,                                                        // memberSerialNumber
-			pageUrl,                                                             // pageUrl
-			timestamp                                                            // timestamp
-		);
-
-		sessionDataDocumentRepository.save(sessionData);
+		// 세션 데이터 생성 (50개의 세션)
+		for (int i = 0; i < 50; i++) {
+			String sessionId = baseSessionId + i;
+			SessionDataDocument sessionData = SessionDataDocument.create(
+				sessionId,
+				serialNumber,
+				pageUrl,
+				timestamp + i * 1000
+			);
+			sessionDataDocumentRepository.save(sessionData);
+		}
 
 		List<SolutionEventDocument> docs = new ArrayList<>();
 
-		// 우상단 네비게이션 버튼 Fixed 값
-		Integer navScrollY = 0;
-		Integer navClientX1 = 657;
-		Integer navClientX2 = 969;
-		Integer navClientX3 = 1281;
-		Integer navClientX4 = 1596;
-		Integer navClientY1 = 75;
-		Integer navXRange = 35;
-		Integer navYRange = 15;
+		// 1. 중요도 우선순위에 따른 이벤트 분배
+		// 검색창 (655, 614, 0) - 높은 중요도
+		generateEventsByLocation(docs, 655, 614, 0, 500, 1000, 150, 30, 50, 15, baseSessionId, timestamp, pageUrl,
+			serialNumber, browserWidth, viewportHeight, scrollHeight);
 
-		List<Integer> navClientXList = Arrays.asList(navClientX1, navClientX2, navClientX3, navClientX4);
+		// 로그인 버튼 (1743, 30, 0)
+		generateEventsByLocation(docs, 1743, 30, 0, 300, 600, 100, 15, 10, 5, baseSessionId, timestamp, pageUrl,
+			serialNumber, browserWidth, viewportHeight, scrollHeight);
 
-		// 네비게이션 버튼 클릭 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 500; i++) {
-			Integer navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange);
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                      // 사용자 식별자
-				pageUrl,                                                        // 이벤트 페이지 URL
-				"click",                                                        // 이벤트 타입: click, scroll, move 등
-				navScrollY,                                                     // scrollY
-				scrollHeight,                                                   // scrollHeight
-				viewportHeight,                                                 // viewportHeight
-				browserWidth,                                                   // browserWidth
-				timestamp + i,                                                  // timestamp (밀리초 단위)
-				navClientX,                                                     // clientX
-				navClientY1 + getRandomOffset(navYRange),                       // clientY
-				"button",                                                       // element
-				serialNumber,                                                   // serialNumber
-				i % 25 == 0                                                     // isOutlier
-			);
-			docs.add(doc);
+		// 회원가입 버튼 (1800, 30, 0)
+		generateEventsByLocation(docs, 1800, 30, 0, 200, 400, 70, 15, 10, 5, baseSessionId, timestamp, pageUrl,
+			serialNumber, browserWidth, viewportHeight, scrollHeight);
+
+		// 2. 상단 네비게이션 버튼들
+		List<Integer> navButtonsX = Arrays.asList(658, 971, 1270, 1578);
+		for (Integer x : navButtonsX) {
+			generateEventsByLocation(docs, x, 75, 0, 75, 150, 25, 20, 10, 0, baseSessionId, timestamp, pageUrl,
+				serialNumber, browserWidth, viewportHeight, scrollHeight);
 		}
 
-		// 네비게이션 버튼 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 2000; i++) {
-			int navClientX = navClientXList.get((i / 5) % navClientXList.size()) + getRandomOffset(navXRange) * 5;
-			int navClientY = navClientY1 + getRandomOffset(navYRange);
-			if (navClientX > 1919) {
-				navClientX = 1919;
-			}
-			if (navClientY < 0) {
-				navClientY = 0;
-			}
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                         // 사용자 식별자
-				pageUrl,                                                         // 이벤트 페이지 URL
-				(i % 4 == 0) ? "scroll" : "move",                                // 이벤트 타입: click, scroll, move 등
-				navScrollY,                                                      // scrollY
-				scrollHeight,                                                    // scrollHeight
-				viewportHeight,                                                  // viewportHeight
-				browserWidth,                                                    // browserWidth
-				timestamp + i,                                                   // timestamp (밀리초 단위)
-				navClientX,                                                      // clientX
-				navClientY,                                                         // clientY
-				null,                                                            // element
-				serialNumber,                                                    // serialNumber
-				i % 10 == 0                                                      // isOutlier
-			);
-			docs.add(doc);
+		// 3. 1열 상품 중심 좌표
+		List<Integer> productRowX = Arrays.asList(250, 430, 610, 789, 973, 1159, 1358, 1525);
+		for (Integer x : productRowX) {
+			generateEventsByLocation(docs, x, 245, 700, 30, 60, 10, 30, 30, 5, baseSessionId, timestamp, pageUrl,
+				serialNumber, browserWidth, viewportHeight, scrollHeight);
 		}
 
-		// 검색창 Fixed 값
-		Integer searchScrollY = 0;
-		Integer searchClientX1 = 653;
-		Integer searchClientX2 = 965;
-		Integer searchClientX3 = 1289;
-		Integer searchClientY1 = 615;
-		Integer searchXRange = 200;
-		Integer searchYRange = 100;
+		// 4. 하단 기타 상품영역 랜덤 이벤트 생성
+		generateRandomEventsInArea(docs, 298, 1630, 64, 756, 1200, 500, baseSessionId, timestamp, pageUrl, serialNumber,
+			browserWidth, viewportHeight, scrollHeight);
 
-		List<Integer> heroClientXList = Arrays.asList(searchClientX1, searchClientX2, searchClientX3);
+		// 총합이 5000개가 되도록 조정
+		int currentTotal = docs.size();
+		int remaining = 5000 - currentTotal;
 
-		// 검색창 클릭 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 500; i++) {
-			Integer heroClientX = heroClientXList.get((i / 3) % heroClientXList.size()) + getRandomOffset(searchXRange);
-			Integer heroClientY = searchClientY1 + getRandomOffset(searchYRange);
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                       // 사용자 식별자
-				serialNumber,                                                    // 이벤트 페이지 URL
-				"click",                                                         // 이벤트 타입: click, scroll, move 등
-				searchScrollY,                                                     // scrollY
-				scrollHeight,                                                    // scrollHeight
-				viewportHeight,                                                  // viewportHeight
-				browserWidth,                                                    // browserWidth
-				timestamp + i,                                                   // timestamp (밀리초 단위)
-				heroClientX,                                                     // clientX
-				heroClientY,                                                     // clientY
-				"div",                                                           // element
-				serialNumber,                                                    // serialNumber
-				i % 25 == 0                                                      // isOutlier
-			);
-			docs.add(doc);
-		}
-
-		// 검색창 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 1300; i++) {
-			int heroClientX =
-				heroClientXList.get((i / 3) % heroClientXList.size()) + getRandomOffset(searchXRange) * 5;
-			int heroClientY =
-				searchClientY1 + getRandomOffset(searchYRange) * 5;
-			if (heroClientY < 0) {
-				heroClientY = 0;
-			}
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                       // 사용자 식별자
-				pageUrl,                                                         // 이벤트 페이지 URL
-				(i % 4 == 0) ? "scroll" : "move",                             // 이벤트 타입: click, scroll, move 등
-				searchScrollY,                                                     // scrollY
-				scrollHeight,                                                    // scrollHeight
-				viewportHeight,                                                  // viewportHeight
-				browserWidth,                                                    // browserWidth
-				timestamp + i,                                                   // timestamp (밀리초 단위)
-				heroClientX,                                                     // clientX
-				heroClientY,                                                     // clientY
-				null,                                                            // element
-				serialNumber,                                                    // serialNumber
-				i % 20 == 0                                                      // isOutlier
-			);
-			docs.add(doc);
-		}
-
-		// 사이트 하단 상품 이미지 Fixed 값
-		Integer productScrollY = 0;
-		Integer productClientX1 = 263;
-		Integer productClientX2 = 615;
-		Integer productClientX3 = 986;
-		Integer productClientX4 = 1344;
-		Integer productClientX5 = 1715;
-		Integer productClientY1 = 955;
-		Integer productXRange = 65;
-		Integer productYRange = 65;
-
-		List<Integer> productClientXList = Arrays.asList(productClientX1, productClientX2, productClientX3,
-			productClientX4, productClientX5);
-
-		// 사이트 하단 상품 이미지 클릭 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 500; i++) {
-			Integer productClientX =
-				productClientXList.get((i / 5) % productClientXList.size()) + getRandomOffset(searchXRange);
-			Integer productClientY = searchClientY1 + getRandomOffset(searchYRange);
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                       // 사용자 식별자
-				serialNumber,                                                    // 이벤트 페이지 URL
-				"click",                                                         // 이벤트 타입: click, scroll, move 등
-				searchScrollY,                                                     // scrollY
-				scrollHeight,                                                    // scrollHeight
-				viewportHeight,                                                  // viewportHeight
-				browserWidth,                                                    // browserWidth
-				timestamp + i,                                                   // timestamp (밀리초 단위)
-				productClientX,                                                     // clientX
-				productClientY,                                                     // clientY
-				"img",                                                           // element
-				serialNumber,                                                    // serialNumber
-				i % 25 == 0                                                      // isOutlier
-			);
-			docs.add(doc);
-		}
-
-		// 사이트 하단 상품 이미지 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 2000; i++) {
-			int heroClientX =
-				heroClientXList.get((5 / 3) % heroClientXList.size()) + getRandomOffset(searchXRange) * 5;
-			int heroClientY =
-				searchClientY1 + getRandomOffset(searchYRange) * 5;
-			if (heroClientY < 0) {
-				heroClientY = 0;
-			}
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                       // 사용자 식별자
-				pageUrl,                                                         // 이벤트 페이지 URL
-				(i % 4 == 0) ? "scroll" : "move",                             // 이벤트 타입: click, scroll, move 등
-				searchScrollY,                                                     // scrollY
-				scrollHeight,                                                    // scrollHeight
-				viewportHeight,                                                  // viewportHeight
-				browserWidth,                                                    // browserWidth
-				timestamp + i,                                                   // timestamp (밀리초 단위)
-				heroClientX,                                                     // clientX
-				heroClientY,                                                     // clientY
-				null,                                                            // element
-				serialNumber,                                                    // serialNumber
-				i % 20 == 0                                                      // isOutlier
-			);
-			docs.add(doc);
-		}
-
-		// 로그인, 회원가입 Fixed 값
-		Integer middleScrollY = 0;
-		Integer middleClientX1 = 1745;
-		Integer middleClientX2 = 1806;
-		Integer middleClientY1 = 30;
-		Integer middleXRange = 20;
-		Integer middleYRange = 10;
-
-		List<Integer> middleClientXList = Arrays.asList(middleClientX1, middleClientX2);
-
-		// 로그인, 회원가입 클릭 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 250; i++) {
-			Integer middleClientX =
-				middleClientXList.get((i / 2) % middleClientXList.size()) + getRandomOffset(middleXRange);
-			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange);
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                       // 사용자 식별자
-				pageUrl,                                                         // 이벤트 페이지 URL
-				"click",                                                         // 이벤트 타입: click, scroll, move 등
-				middleScrollY,                                                   // scrollY
-				scrollHeight,                                                    // scrollHeight
-				viewportHeight,                                                  // viewportHeight
-				browserWidth,                                                    // browserWidth
-				timestamp + i,                                                   // timestamp (밀리초 단위)
-				middleClientX,                                                   // clientX
-				middleClientY,                                                   // clientY
-				"button",                                                        // element
-				serialNumber,                                                    // serialNumber
-				i % 25 == 0                                                      // isOutlier
-			);
-			docs.add(doc);
-		}
-
-		// 로그인, 회원가입 이동 및 스크롤 이벤트 생성 [정상 및 비정상 데이터]
-		for (int i = 0; i < 1000; i++) {
-			Integer middleClientX =
-				middleClientXList.get((i / 2) % middleClientXList.size()) + getRandomOffset(middleXRange) * 5;
-			Integer middleClientY = middleClientY1 + getRandomOffset(middleYRange) * 5;
-			SolutionEventDocument doc = SolutionEventDocument.create(
-				sessionId + (i % 50),                                                       // 사용자 식별자
-				pageUrl,                                                         // 이벤트 페이지 URL
-				(i % 4 == 0) ? "scroll" : "move",                             // 이벤트 타입: click, scroll, move 등
-				middleScrollY,                                                   // scrollY
-				scrollHeight,                                                    // scrollHeight
-				viewportHeight,                                                  // viewportHeight
-				browserWidth,                                                    // browserWidth
-				timestamp + i,                                                   // timestamp (밀리초 단위)
-				middleClientX,                                                   // clientX
-				middleClientY,                                                   // clientY
-				null,                                                            // element
-				serialNumber,                                                    // serialNumber
-				i % 20 == 0                                                      // isOutlier
-			);
-			docs.add(doc);
+		if (remaining > 0) {
+			// 남은 이벤트는 전체 페이지 영역에 랜덤하게 분배
+			generateRandomEventsInArea(docs, 0, browserWidth, 0, scrollHeight, 0, remaining, baseSessionId, timestamp,
+				pageUrl, serialNumber, browserWidth, viewportHeight, scrollHeight);
 		}
 
 		solutionEventDocumentRepository.saveAll(docs);
+		log.info("솔루션용 테스트 데이터 등록 완료: 총 {} 개 이벤트 생성", docs.size());
+	}
 
-		log.info("솔루션용 테스트 데이터 등록 완료");
+	/**
+	 * 특정 좌표 주변에 이벤트 생성
+	 */
+	private void generateEventsByLocation(
+		List<SolutionEventDocument> docs,
+		int centerX,
+		int centerY,
+		int scrollY,
+		int clickCount,
+		int moveCount,
+		int scrollCount,
+		int rangeX,
+		int rangeY,
+		int rangeScroll,
+		String baseSessionId,
+		long timestamp,
+		String pageUrl,
+		String serialNumber,
+		int browserWidth,
+		int viewportHeight,
+		int scrollHeight
+	) {
+		// 클릭 이벤트 생성
+		for (int i = 0; i < clickCount; i++) {
+			int offsetX = getRandomOffset(rangeX);
+			int offsetY = getRandomOffset(rangeY);
+			int x = Math.min(Math.max(centerX + offsetX, 0), browserWidth - 1);
+			int y = Math.min(Math.max(centerY + offsetY, 0), viewportHeight - 1);
+			int actualScrollY = Math.min(Math.max(scrollY + getRandomOffset(rangeScroll), 0),
+				scrollHeight - viewportHeight);
+
+			String sessionId = baseSessionId + (i % 50);
+			String element = determineElementType(centerX, centerY, scrollY);
+
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,
+				pageUrl,
+				"click",
+				actualScrollY,
+				scrollHeight,
+				viewportHeight,
+				browserWidth,
+				timestamp + i * 10,
+				x,
+				y,
+				element,
+				serialNumber,
+				i % 25 == 0 // 약 4%의 이상치
+			);
+			docs.add(doc);
+		}
+
+		// 이동 이벤트 생성
+		for (int i = 0; i < moveCount; i++) {
+			int offsetX = getRandomOffset(rangeX * 2);
+			int offsetY = getRandomOffset(rangeY * 2);
+			int x = Math.min(Math.max(centerX + offsetX, 0), browserWidth - 1);
+			int y = Math.min(Math.max(centerY + offsetY, 0), viewportHeight - 1);
+			int actualScrollY = Math.min(Math.max(scrollY + getRandomOffset(rangeScroll), 0),
+				scrollHeight - viewportHeight);
+
+			String sessionId = baseSessionId + (i % 50);
+
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,
+				pageUrl,
+				"move",
+				actualScrollY,
+				scrollHeight,
+				viewportHeight,
+				browserWidth,
+				timestamp + i * 5,
+				x,
+				y,
+				null,
+				serialNumber,
+				i % 30 == 0 // 약 3.3%의 이상치
+			);
+			docs.add(doc);
+		}
+
+		// 스크롤 이벤트 생성
+		for (int i = 0; i < scrollCount; i++) {
+			int offsetY = getRandomOffset(rangeScroll * 3);
+			int actualScrollY = Math.min(Math.max(scrollY + offsetY, 0), scrollHeight - viewportHeight);
+
+			String sessionId = baseSessionId + (i % 50);
+
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,
+				pageUrl,
+				"scroll",
+				actualScrollY,
+				scrollHeight,
+				viewportHeight,
+				browserWidth,
+				timestamp + i * 15,
+				centerX + getRandomOffset(rangeX),
+				centerY + getRandomOffset(rangeY),
+				null,
+				serialNumber,
+				i % 20 == 0 // 약 5%의 이상치
+			);
+			docs.add(doc);
+		}
+	}
+
+	/**
+	 * 특정 영역 내에서 랜덤 이벤트 생성
+	 */
+	private void generateRandomEventsInArea(
+		List<SolutionEventDocument> docs,
+		int minX,
+		int maxX,
+		int minY,
+		int maxY,
+		int baseScrollY,
+		int totalEvents,
+		String baseSessionId,
+		long timestamp,
+		String pageUrl,
+		String serialNumber,
+		int browserWidth,
+		int viewportHeight,
+		int scrollHeight
+	) {
+		// 클릭 : 이동 : 스크롤 = 1.5 : 3 : 0.5 비율
+		int clickCount = (int)(totalEvents * 0.3);
+		int scrollCount = (int)(totalEvents * 0.1);
+		int moveCount = totalEvents - clickCount - scrollCount;
+
+		// 클릭 이벤트
+		for (int i = 0; i < clickCount; i++) {
+			int x = random.nextInt(maxX - minX + 1) + minX;
+			int y = random.nextInt(maxY - minY + 1) + minY;
+			int actualScrollY = Math.min(Math.max(baseScrollY + getRandomOffset(100), 0),
+				scrollHeight - viewportHeight);
+
+			String sessionId = baseSessionId + (i % 50);
+			String element = determineElementType(x, y, actualScrollY);
+
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,
+				pageUrl,
+				"click",
+				actualScrollY,
+				scrollHeight,
+				viewportHeight,
+				browserWidth,
+				timestamp + i * 10 + 30000,
+				x,
+				y,
+				element,
+				serialNumber,
+				i % 25 == 0
+			);
+			docs.add(doc);
+		}
+
+		// 이동 이벤트
+		for (int i = 0; i < moveCount; i++) {
+			int x = random.nextInt(maxX - minX + 1) + minX;
+			int y = random.nextInt(maxY - minY + 1) + minY;
+			int actualScrollY = Math.min(Math.max(baseScrollY + getRandomOffset(100), 0),
+				scrollHeight - viewportHeight);
+
+			String sessionId = baseSessionId + (i % 50);
+
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,
+				pageUrl,
+				"move",
+				actualScrollY,
+				scrollHeight,
+				viewportHeight,
+				browserWidth,
+				timestamp + i * 5 + 40000,
+				x,
+				y,
+				null,
+				serialNumber,
+				i % 30 == 0
+			);
+			docs.add(doc);
+		}
+
+		// 스크롤 이벤트
+		for (int i = 0; i < scrollCount; i++) {
+			int x = random.nextInt(maxX - minX + 1) + minX;
+			int y = random.nextInt(maxY - minY + 1) + minY;
+			int actualScrollY = Math.min(Math.max(baseScrollY + getRandomOffset(200), 0),
+				scrollHeight - viewportHeight);
+
+			String sessionId = baseSessionId + (i % 50);
+
+			SolutionEventDocument doc = SolutionEventDocument.create(
+				sessionId,
+				pageUrl,
+				"scroll",
+				actualScrollY,
+				scrollHeight,
+				viewportHeight,
+				browserWidth,
+				timestamp + i * 15 + 50000,
+				x,
+				y,
+				null,
+				serialNumber,
+				i % 20 == 0
+			);
+			docs.add(doc);
+		}
+	}
+
+	/**
+	 * 좌표와 스크롤 위치에 따라 요소 타입을 결정
+	 */
+	private String determineElementType(int x, int y, int scrollY) {
+		// 검색창
+		if (isInRange(x, y, 655, 614, 50, 30) && scrollY < 100) {
+			return "input";
+		}
+
+		// 로그인/회원가입 버튼
+		if ((isInRange(x, y, 1743, 30, 20, 15) || isInRange(x, y, 1800, 30, 20, 15)) && scrollY < 100) {
+			return "button";
+		}
+
+		// 네비게이션 버튼
+		if ((isInRange(x, y, 658, 75, 30, 15) ||
+			isInRange(x, y, 971, 75, 30, 15) ||
+			isInRange(x, y, 1270, 75, 30, 15) ||
+			isInRange(x, y, 1578, 75, 30, 15)) && scrollY < 100) {
+			return "a";
+		}
+
+		// 상품 영역
+		if (scrollY >= 600 && scrollY <= 800) {
+			return "img";
+		}
+
+		// 하단 상품 영역
+		if (scrollY >= 1100) {
+			return "div";
+		}
+
+		// 기본 요소 타입
+		String[] elementTypes = {"div", "span", "button", "a", "img"};
+		return elementTypes[random.nextInt(elementTypes.length)];
+	}
+
+	/**
+	 * 좌표가 특정 영역 내에 있는지 확인
+	 */
+	private boolean isInRange(int x, int y, int centerX, int centerY, int rangeX, int rangeY) {
+		return x >= (centerX - rangeX) && x <= (centerX + rangeX) &&
+			y >= (centerY - rangeY) && y <= (centerY + rangeY);
 	}
 
 	public void work5() {
