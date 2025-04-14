@@ -2,12 +2,10 @@ package com.dajava.backend.domain.image.service.pageCapture;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -45,53 +43,6 @@ public class FileStorageService {
 			Files.createDirectories(this.fileStorageLocation);
 		} catch (IOException ex) {
 			throw new RuntimeException("디렉토리를 생성하지 못했습니다: " + this.fileStorageLocation, ex);
-		}
-	}
-
-	/**
-	 * 파일을 저장 후 UUID 기반의 파일명(확장자 포함)을 반환
-	 */
-	public String storeFile(MultipartFile file) {
-		String fileName = generateUniqueFileName(file);
-		saveFile(fileName, file);
-		// UUID와 확장자만으로 구성된 파일명 반환
-		return fileName;
-	}
-
-	/**
-	 * 전달받은 PageCaptureData 객체를 사용하여 파일을 저장합니다.
-	 * 기존 파일명이 있는 경우 해당 파일명으로 덮어쓰고, 없으면 새로 생성한 후 엔티티에 반영합니다.
-	 */
-	public String updateFile(MultipartFile file, PageCaptureData pageData) {
-		String fileExtension = getExtension(file.getOriginalFilename());
-		String fileName = pageData.getCaptureFileName().substring(0, pageData.getCaptureFileName().lastIndexOf('.'));
-
-		if (fileName == null || fileName.isEmpty()) {
-			fileName = generateUniqueFileName(file);
-		} else if (!fileName.endsWith(fileExtension) && !fileExtension.isEmpty()) {
-			fileName += fileExtension;
-		}
-
-		pageData.updateCaptureFileName(fileName);
-		saveFile(fileName, file);
-		return fileName;
-	}
-
-	private void saveFile(String fileName, MultipartFile file) {
-		try {
-			// 저장 디렉토리가 없으면 사전에 생성
-			Files.createDirectories(this.fileStorageLocation);
-
-			Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
-			if (!targetLocation.startsWith(this.fileStorageLocation)) {
-				throw new RuntimeException("잘못된 파일 경로입니다: " + fileName);
-			}
-
-			try (InputStream inputStream = file.getInputStream()) {
-				Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
-			}
-		} catch (IOException ex) {
-			throw new RuntimeException("파일 저장에 실패했습니다: " + fileName, ex);
 		}
 	}
 
@@ -189,6 +140,74 @@ public class FileStorageService {
 		} catch (Exception ex) {
 			// MIME 타입 결정 실패 시 기본 값 반환
 			return "application/octet-stream";
+		}
+	}
+
+	/**
+	 * Base64로 인코딩된 이미지 데이터를 저장하고 파일명을 반환합니다.
+	 * @param base64Image Base64로 인코딩된 이미지 데이터 (data:image/jpeg;base64, 포함 가능)
+	 * @param originalFilename 원본 파일명 (확장자 추출용)
+	 * @return 저장된 파일명
+	 */
+	public String storeBase64Image(String base64Image, String originalFilename) {
+		String fileExtension = getExtension(originalFilename);
+		String fileName = UUID.randomUUID().toString() + fileExtension;
+
+		saveBase64ImageToFile(base64Image, fileName);
+		return fileName;
+	}
+
+	/**
+	 * Base64로 인코딩된 이미지를 기존 PageCaptureData에 업데이트합니다.
+	 * @param base64Image Base64로 인코딩된 이미지 데이터
+	 * @param pageData 업데이트할 PageCaptureData 객체
+	 * @param originalFilename 원본 파일명 (확장자 추출용)
+	 * @return 저장된 파일명
+	 */
+	public String updateBase64Image(String base64Image, PageCaptureData pageData, String originalFilename) {
+		String fileExtension = getExtension(originalFilename);
+		String fileName = pageData.getCaptureFileName();
+
+		// 기존 파일명이 없는 경우 새로 생성
+		if (fileName == null || fileName.isEmpty()) {
+			fileName = UUID.randomUUID().toString() + fileExtension;
+		} else {
+			// 기존 파일명의 확장자 검사 및 조정
+			if (!fileName.endsWith(fileExtension) && !fileExtension.isEmpty()) {
+				fileName = fileName.substring(0, fileName.lastIndexOf('.')) + fileExtension;
+			}
+		}
+
+		saveBase64ImageToFile(base64Image, fileName);
+		pageData.updateCaptureFileName(fileName);
+
+		return fileName;
+	}
+
+	/**
+	 * Base64 인코딩된 이미지를 디코딩하여 파일로 저장하는 공통 메서드
+	 * @param base64Image Base64로 인코딩된 이미지 데이터
+	 * @param fileName 저장할 파일명
+	 */
+	private void saveBase64ImageToFile(String base64Image, String fileName) {
+		try {
+			// data:image/jpeg;base64, 형식 처리
+			if (base64Image.contains(",")) {
+				base64Image = base64Image.substring(base64Image.indexOf(",") + 1);
+			}
+
+			// Base64 디코딩
+			byte[] imageData = java.util.Base64.getDecoder().decode(base64Image);
+
+			// 파일 저장
+			Path targetLocation = this.fileStorageLocation.resolve(fileName).normalize();
+			if (!targetLocation.startsWith(this.fileStorageLocation)) {
+				throw new RuntimeException("잘못된 파일 경로입니다: " + fileName);
+			}
+
+			Files.write(targetLocation, imageData);
+		} catch (IOException ex) {
+			throw new RuntimeException("Base64 이미지 저장에 실패했습니다: " + fileName, ex);
 		}
 	}
 }
