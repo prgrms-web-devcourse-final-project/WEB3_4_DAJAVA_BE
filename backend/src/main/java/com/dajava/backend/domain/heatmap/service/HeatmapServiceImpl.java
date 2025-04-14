@@ -34,6 +34,7 @@ import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.global.utils.PasswordUtils;
 
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -189,7 +190,26 @@ public class HeatmapServiceImpl implements HeatmapService {
 			} else {
 				pageRequest = PageRequest.of(pageNumber, PAGE_SIZE);
 			}
-			pageData = solutionEventDocumentRepository.findBySerialNumber(serialNumber, pageRequest);
+			try {
+				pageData = solutionEventDocumentRepository.findBySerialNumber(serialNumber, pageRequest);
+			} catch (ElasticsearchException ex) {
+				log.error("Elasticsearch 쿼리 실패! 예외 메시지: {}", ex.getMessage());
+				log.error("예외 클래스: {}", ex.getClass().getName());
+
+				Throwable rootCause = ex.getCause(); // 혹은 getRootCause() 대신 getCause() 반복적으로 추적
+
+				if (rootCause != null) {
+					log.error("루트 원인 클래스: {}", rootCause.getClass().getName());
+					log.error("루트 원인 메시지: {}", rootCause.getMessage());
+				}
+
+				// 전체 스택 트레이스 출력
+				for (StackTraceElement trace : ex.getStackTrace()) {
+					log.debug("TRACE: {}", trace.toString());
+				}
+
+				throw new HeatmapException(ELASTICSEARCH_QUERY_FAILED);
+			}
 			allEvents.addAll(pageData);
 			pageNumber++;
 		} while (!pageData.isEmpty());
