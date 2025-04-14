@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterCheckRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCheckResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
@@ -26,18 +27,15 @@ import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyResponse;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
-import com.dajava.backend.domain.register.entity.Register;
-import com.dajava.backend.domain.register.exception.RegisterException;
-import com.dajava.backend.domain.register.repository.RegisterRepository;
 import com.dajava.backend.domain.register.service.AdminService;
 import com.dajava.backend.domain.register.service.RegisterCacheService;
 import com.dajava.backend.domain.register.service.RegisterService;
-import com.dajava.backend.global.exception.ErrorCode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,9 +56,6 @@ public class RegisterController {
 
 	private final RegisterService registerService;
 	private final AdminService adminService;
-	private final FileStorageService fileStorageService;
-	private final RegisterRepository registerRepository;
-
 	/**
 	 * 솔루션 신청 폼 접수 API
 	 * @param request 신청 데이터 (RegisterCreateRequest)
@@ -148,13 +143,14 @@ public class RegisterController {
 	}
 
 	/**
-	 * 일련번호로 Register 값을 가져오는 로직입니다.
-	 * @param serialNumber 고유 일련번호 입니다
-	 * @return Register
+	 * 일련번호와 비밀번호로 신청 내역이 있는지 확인합니다.
+	 * @param registerCheckRequest 고유 일련번호 입니다
+	 * @return RegisterCheckResponse
 	 */
-	public Register findRegisterBySerialNumber(String serialNumber) {
-		return registerRepository.findBySerialNumber(serialNumber)
-			.orElseThrow(() -> new RegisterException(ErrorCode.REGISTER_NOT_FOUND));
+	@PostMapping("/v1/register/check")
+	@Operation(summary = "시리얼 번호와 비밀번호로 솔루션 찾기", description = "등록된 시리얼 번호와 비밀번호를 이용해 솔루션이 존재하는지 확인합니다.")
+	public RegisterCheckResponse getSolutionCheck(@Valid @RequestBody RegisterCheckRequest registerCheckRequest) {
+		return registerService.getSolutionCheck(registerCheckRequest);
 	}
 
 	/**

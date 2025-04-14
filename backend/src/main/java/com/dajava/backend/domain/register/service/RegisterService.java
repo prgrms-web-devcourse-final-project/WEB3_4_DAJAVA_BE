@@ -1,6 +1,7 @@
 package com.dajava.backend.domain.register.service;
 
 import static com.dajava.backend.domain.register.converter.RegisterConverter.*;
+import static com.dajava.backend.global.exception.ErrorCode.*;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,14 +12,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.dajava.backend.domain.email.EmailService;
+import com.dajava.backend.domain.event.entity.SolutionData;
 import com.dajava.backend.domain.image.service.pageCapture.FileStorageService;
 import com.dajava.backend.domain.register.RegisterInfo;
 import com.dajava.backend.domain.register.converter.RegisterConverter;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureRequest;
 import com.dajava.backend.domain.register.dto.pageCapture.PageCaptureResponse;
+import com.dajava.backend.domain.register.dto.register.RegisterCheckRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCheckResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterCreateResponse;
 import com.dajava.backend.domain.register.dto.register.RegisterDeleteResponse;
@@ -26,14 +31,15 @@ import com.dajava.backend.domain.register.dto.register.RegisterModifyRequest;
 import com.dajava.backend.domain.register.dto.register.RegisterModifyResponse;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoRequest;
 import com.dajava.backend.domain.register.dto.register.RegistersInfoResponse;
-import com.dajava.backend.domain.register.entity.Order;
 import com.dajava.backend.domain.register.entity.PageCaptureData;
 import com.dajava.backend.domain.register.entity.Register;
 import com.dajava.backend.domain.register.exception.RegisterException;
 import com.dajava.backend.domain.register.implement.RegisterValidator;
-import com.dajava.backend.domain.register.repository.OrderRepository;
 import com.dajava.backend.domain.register.repository.RegisterRepository;
+import com.dajava.backend.domain.solution.entity.Solution;
+import com.dajava.backend.domain.solution.exception.SolutionException;
 import com.dajava.backend.global.exception.ErrorCode;
+import com.dajava.backend.global.utils.PasswordUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +57,6 @@ import lombok.extern.slf4j.Slf4j;
 public class RegisterService {
 
 	private final RegisterRepository registerRepository;
-	private final OrderRepository orderRepository;
 	private final RegisterValidator registerValidator;
 	private final FileStorageService fileStorageService;
 	private final RegisterCacheService registerCacheService;
@@ -68,10 +73,8 @@ public class RegisterService {
 		RegisterCreateRequest validatedRequest = registerValidator.validateCreateRequest(request);
 
 		Register newRegister = registerRepository.save(Register.create(validatedRequest));
-		Order newOrder = orderRepository.save(Order.create(validatedRequest.email(), validatedRequest.url()));
 
 		log.info("Register 엔티티 생성 : {} ", newRegister);
-		// log.info("Order 엔티티 생성 : {} ", newOrder);
 
 		registerCacheService.refreshCacheAll();
 
@@ -207,4 +210,29 @@ public class RegisterService {
 		log.info("Register 강제 만료, serialNumber : {}", serialNumber);
 		register.expire();
 	}
+	/**
+	 * 일련번호와 비밀번호로 신청 내역이 있는지 확인합니다.
+	 * @param registerCheckRequest 시리얼 번호
+	 */
+	@Transactional
+	public RegisterCheckResponse getSolutionCheck(RegisterCheckRequest registerCheckRequest) {
+		Optional<Register> optionalRegister = registerRepository.findBySerialNumber(registerCheckRequest.serialNumber());
+
+		if (optionalRegister.isEmpty()) {
+			log.warn("시리얼 번호 '{}' 로 등록된 사용자를 찾을 수 없습니다.", registerCheckRequest.serialNumber());
+			return new RegisterCheckResponse(false);
+		}
+
+		Register findRegister = optionalRegister.get();
+
+		boolean isValidPassword = PasswordUtils.verifyPassword(
+			registerCheckRequest.password(), findRegister.getPassword());
+
+		if (!isValidPassword) {
+			log.warn("비밀번호 불일치 - 시리얼 번호: '{}'", registerCheckRequest.serialNumber());
+		}
+
+		return new RegisterCheckResponse(isValidPassword);
+	}
+
 }

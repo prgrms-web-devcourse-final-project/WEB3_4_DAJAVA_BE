@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dajava.backend.domain.register.dto.register.RegisterCheckRequest;
+import com.dajava.backend.domain.register.dto.register.RegisterCheckResponse;
 import com.dajava.backend.domain.solution.dto.SolutionInfoResponse;
 import com.dajava.backend.domain.solution.dto.SolutionRequest;
 import com.dajava.backend.domain.solution.dto.SolutionResponse;
