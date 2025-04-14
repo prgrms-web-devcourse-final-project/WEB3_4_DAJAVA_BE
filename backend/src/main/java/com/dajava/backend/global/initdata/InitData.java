@@ -404,9 +404,6 @@ public class InitData {
 			if (heroClientY < 0) {
 				heroClientY = 0;
 			}
-			if (heroClientY > 1919) {
-				heroClientY = 1919;
-			}
 			SolutionEventDocument doc = SolutionEventDocument.create(
 				sessionId + (i % 50),                                                       // 사용자 식별자
 				pageUrl,                                                         // 이벤트 페이지 URL
@@ -470,9 +467,6 @@ public class InitData {
 				searchClientY1 + getRandomOffset(searchYRange) * 5;
 			if (heroClientY < 0) {
 				heroClientY = 0;
-			}
-			if (heroClientY > 1919) {
-				heroClientY = 1919;
 			}
 			SolutionEventDocument doc = SolutionEventDocument.create(
 				sessionId + (i % 50),                                                       // 사용자 식별자
